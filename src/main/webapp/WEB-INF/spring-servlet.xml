@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<annotation-driven />
+        
+        <resources mapping="/resources/**" location="/resources/" />
+
+        <beans:bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+            destroy-method="close">
+            <beans:property name="driverClassName" value="com.mysql.jdbc.Driver" />
+            <beans:property name="url"
+                    value="jdbc:mysql://localhost:3306/pureff"/>
+            <beans:property name="username" value="root" />
+            <beans:property name="password" value="root" />
+	</beans:bean>
+        
+        <!-- Hibernate 4 SessionFactory Bean definition -->
+	<beans:bean id="hibernate4AnnotatedSessionFactory"
+            class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+            <beans:property name="dataSource" ref="dataSource" />
+            <!--beans:property name="mappingResources">
+                <beans:list>
+                    <beans:value>net.purnama.pureff.entity.ItemGroupEntity</beans:value>
+                </beans:list>
+            </beans:property-->
+            <beans:property name="annotatedClasses">
+                <beans:list>
+                    
+                    <beans:value>net.purnama.pureff.entity.BuyPriceEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.CurrencyEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.ItemEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.ItemGroupEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.ItemWarehouseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.MenuEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.NumberingEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.NumberingNameEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.PartnerEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.PartnerTypeEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.RateEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.RoleEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.SellPriceEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.UomEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.UserEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.WarehouseEntity</beans:value>
+                    
+                    <beans:value>net.purnama.pureff.entity.transactional.AdjustmentEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.DeliveryEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ExpensesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.InvoiceSalesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.InvoicePurchaseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.InvoiceWarehouseInEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.InvoiceWarehouseOutEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentInEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentOutEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ReturnSalesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ReturnPurchaseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemAdjustmentEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemDeliveryEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemExpensesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemInvoiceSalesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemInvoicePurchaseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseInEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseOutEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemReturnSalesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.ItemReturnPurchaseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentInInvoiceSalesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentInReturnSalesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentOutInvoicePurchaseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentOutReturnPurchaseEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentOutExpensesEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentTypeOutEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.PaymentTypeInEntity</beans:value>
+                    
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.AdjustmentDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.DeliveryDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ExpensesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.InvoiceSalesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.InvoicePurchaseDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.InvoiceWarehouseInDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.InvoiceWarehouseOutDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ReturnSalesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ReturnPurchaseDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemAdjustmentDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemDeliveryDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemExpensesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemInvoiceSalesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemInvoicePurchaseDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemInvoiceWarehouseInDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemInvoiceWarehouseOutDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemReturnSalesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.ItemReturnPurchaseDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentInInvoiceSalesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentInReturnSalesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentOutInvoicePurchaseDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentOutReturnPurchaseDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentOutExpensesDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentTypeOutDraftEntity</beans:value>
+                    <beans:value>net.purnama.pureff.entity.transactional.draft.PaymentTypeInDraftEntity</beans:value>
+                </beans:list>
+            </beans:property>
+            <beans:property name="hibernateProperties">
+                <beans:props>
+                    <beans:prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+                    </beans:prop>
+                    <beans:prop key="hibernate.show_sql">true</beans:prop>
+                    <beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
+                </beans:props>
+            </beans:property>
+	</beans:bean>
+	
+	<context:component-scan base-package="net.purnama.pureff" />
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<beans:bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<beans:property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+	</beans:bean>
+
+        <!--global-method-security pre-post-annotations="enabled" />  (1)
+    
+        <http pattern="/api/login" security="none"/>   (2)
+        <http pattern="/api/signup" security="none"/>
+
+        <http pattern="/api/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless"> (3)
+            <csrf disabled="true"/>  (4)
+            <custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>  (5)
+        </http>
+
+        <beans:bean id="jwtAuthenticationFilter" class="net.purnama.pureff.security.JwtAuthenticationFilter">  (6)
+            <beans:property name="authenticationManager" ref="authenticationManager" />
+            <beans:property name="authenticationSuccessHandler" ref="jwtAuthenticationSuccessHandler" />  (7)
+        </beans:bean>
+
+        <authentication-manager alias="authenticationManager">
+            <authentication-provider ref="jwtAuthenticationProvider" />  (8)
+        </authentication-manager-->
+
+</beans:beans>
