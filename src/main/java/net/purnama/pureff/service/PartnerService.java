@@ -45,4 +45,14 @@ public class PartnerService {
     public void updatePartner(PartnerEntity partner) {
             partnerDao.updatePartner(partner);
     }
+    
+    @Transactional
+    public List getPartnerList(int itemperpage, int page, String keyword){
+        return partnerDao.getPartnerList(itemperpage, page, keyword);
+    }
+    
+    @Transactional
+    public int countPartnerList(String keyword){
+        return partnerDao.countPartnerList(keyword);
+    }
 }

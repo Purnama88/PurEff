@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.NumberingNameEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -56,5 +57,27 @@ public class NumberingNameDao {
     public void updateNumberingName(NumberingNameEntity numberingname) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(numberingname);
+    }
+    
+    public List getNumberingNameList(int itemperpage, int page, String keyword){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(NumberingNameEntity.class);
+        c.add(Restrictions.like("name", "%"+keyword+"%"));
+        
+        c.setFirstResult(itemperpage * (page-1));
+        c.setMaxResults(itemperpage);
+        
+        return c.list();
+    }
+    
+    public int countNumberingNameList(String keyword) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(NumberingNameEntity.class);
+        c.add(Restrictions.like("name", "%"+keyword+"%"));
+        c.setProjection(Projections.rowCount());
+        List result = c.list();
+        int resultint = Integer.valueOf(result.get(0).toString());
+        
+        return resultint;
     }
 }

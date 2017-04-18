@@ -10,6 +10,9 @@ import net.purnama.pureff.entity.PartnerEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -56,5 +59,33 @@ public class PartnerDao {
     public void updatePartner(PartnerEntity partner) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(partner);
+    }
+    
+    public List getPartnerList(int itemperpage, int page, String keyword){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerEntity.class);
+        Criterion code = Restrictions.like("code", "%"+keyword+"%");
+        Criterion desc = Restrictions.like("name", "%"+keyword+"%");
+        LogicalExpression orExp = Restrictions.or(code,desc);
+        c.add(orExp);
+        
+        c.setFirstResult(itemperpage * (page-1));
+        c.setMaxResults(itemperpage);
+        
+        return c.list();
+    }
+    
+    public int countPartnerList(String keyword) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerEntity.class);
+        Criterion code = Restrictions.like("code", "%"+keyword+"%");
+        Criterion description = Restrictions.like("name", "%"+keyword+"%");
+        LogicalExpression orExp = Restrictions.or(code,description);
+        c.add(orExp);
+        c.setProjection(Projections.rowCount());
+        List result = c.list();
+        int resultint = Integer.valueOf(result.get(0).toString());
+        
+        return resultint;
     }
 }

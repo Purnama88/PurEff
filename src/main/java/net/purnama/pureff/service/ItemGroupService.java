@@ -52,4 +52,14 @@ public class ItemGroupService {
     public void deleteItemGroup(String id) {
             itemgroupDao.deleteItemGroup(id);
     }
+    
+    @Transactional
+    public List getItemGroupList(int itemperpage, int page, String keyword){
+        return itemgroupDao.getItemGroupList(itemperpage, page, keyword);
+    }
+    
+    @Transactional
+    public int countItemGroupList(String keyword){
+        return itemgroupDao.countItemGroupList(keyword);
+    }
 }

@@ -114,7 +114,7 @@ public class UserController {
 
     @RequestMapping(value = "api/updateUser", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updateUser(HttpServletRequest httpRequest, @RequestBody UserEntity user) {
+    public UserEntity updateUser(HttpServletRequest httpRequest, @RequestBody UserEntity user) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
@@ -122,6 +122,8 @@ public class UserController {
         user.setLastmodifiedby(temp);
         
         userService.updateUser(user);
+        
+        return user;
     }
     
     @RequestMapping(value = {"api/countUserList/{keyword}"},

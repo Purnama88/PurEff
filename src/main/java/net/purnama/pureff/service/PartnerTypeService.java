@@ -45,4 +45,14 @@ public class PartnerTypeService {
     public void updatePartnerType(PartnerTypeEntity partnertype) {
             partnertypeDao.updatePartnerType(partnertype);
     }
+    
+    @Transactional
+    public List getPartnerTypeList(int itemperpage, int page, String keyword){
+        return partnertypeDao.getPartnerTypeList(itemperpage, page, keyword);
+    }
+    
+    @Transactional
+    public int countPartnerTypeList(String keyword){
+        return partnertypeDao.countPartnerTypeList(keyword);
+    }
 }

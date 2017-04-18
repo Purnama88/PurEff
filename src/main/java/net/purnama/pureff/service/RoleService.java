@@ -48,4 +48,15 @@ public class RoleService {
             roleDao.updateRole(role);
     }
     
+    @Transactional
+    public List getRoleList(
+            int itemperpage, int page, String keyword){
+        return roleDao.getRoleList(itemperpage, page, keyword);
+    }
+    
+    @Transactional
+    public int countRoleList(String keyword){
+        return roleDao.countRoleList(keyword);
+    }
+    
 }

@@ -52,4 +52,14 @@ public class CurrencyService {
 		currencyDao.updateCurrency(currency);
 	}
 
+        @Transactional
+        public List getCurrencyList(int itemperpage, int page, String keyword){
+            return currencyDao.getCurrencyList(itemperpage, page, keyword);
+        }
+        
+        @Transactional
+        public int countCurrencyList(String keyword){
+            return currencyDao.countCurrencyList(keyword);
+        }
+        
 }

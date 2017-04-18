@@ -82,5 +82,36 @@ public class CurrencyController {
         currencyService.updateCurrency(currency);
         
         return currency;
-    }  
+    }
+    
+    @RequestMapping(value = "/api/getCurrencyList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<CurrencyEntity> getCurrencyList(@PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        List<CurrencyEntity> ls = currencyService.getCurrencyList(itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getCurrencyList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<CurrencyEntity> getCurrencyList(@PathVariable int itemperpage,
+            @PathVariable int page) {
+        List<CurrencyEntity> ls = currencyService.getCurrencyList(itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countCurrencyList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countCurrencyList(@PathVariable String keyword){
+        return currencyService.countCurrencyList(keyword);
+    }
+    
+    @RequestMapping(value = {"api/countCurrencyList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countCurrencyList(){
+        return currencyService.countCurrencyList("");
+    }
 }

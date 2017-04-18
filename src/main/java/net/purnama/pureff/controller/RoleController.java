@@ -85,4 +85,35 @@ public class RoleController {
         
         return role;
     }
+    
+    @RequestMapping(value = "/api/getRoleList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<RoleEntity> getRoleList(@PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        List<RoleEntity> ls = roleService.getRoleList(itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getRoleList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<RoleEntity> getRoleList(@PathVariable int itemperpage,
+            @PathVariable int page) {
+        List<RoleEntity> ls = roleService.getRoleList(itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countRoleList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countRoleList(@PathVariable String keyword){
+        return roleService.countRoleList(keyword);
+    }
+    
+    @RequestMapping(value = {"api/countRoleList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countRoleList(){
+        return roleService.countRoleList("");
+    }
 }

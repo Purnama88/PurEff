@@ -71,7 +71,7 @@ public class WarehouseController {
     
     @RequestMapping(value = "api/addWarehouse", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public void addWarehouse(HttpServletRequest httpRequest, @RequestBody WarehouseEntity warehouse) {
+    public WarehouseEntity addWarehouse(HttpServletRequest httpRequest, @RequestBody WarehouseEntity warehouse) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -97,6 +97,8 @@ public class WarehouseController {
         
             itemwarehouseService.addItemWarehouse(itemwarehouse);
         }
+        
+        return warehouse;
     }
 
     @RequestMapping(value = "api/updateWarehouse", method = RequestMethod.PUT,
@@ -113,5 +115,36 @@ public class WarehouseController {
         warehouseService.updateWarehouse(warehouse);
         
         return warehouse;
+    }
+    
+    @RequestMapping(value = "/api/getWarehouseList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<WarehouseEntity> getWarehouseList(@PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        List<WarehouseEntity> ls = warehouseService.getWarehouseList(itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getWarehouseList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<WarehouseEntity> getWarehouseList(@PathVariable int itemperpage,
+            @PathVariable int page) {
+        List<WarehouseEntity> ls = warehouseService.getWarehouseList(itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countWarehouseList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countWarehouseList(@PathVariable String keyword){
+        return warehouseService.countWarehouseList(keyword);
+    }
+    
+    @RequestMapping(value = {"api/countWarehouseList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countWarehouseList(){
+        return warehouseService.countWarehouseList("");
     }
 }

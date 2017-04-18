@@ -14,6 +14,7 @@ import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.ItemService;
 import net.purnama.pureff.service.ItemWarehouseService;
+import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,9 @@ public class ItemWarehouseController {
     
     @Autowired
     ItemService itemService;
+    
+    @Autowired
+    WarehouseService warehouseService;
     
     @RequestMapping(value = "api/getItemWarehouseList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -56,5 +60,50 @@ public class ItemWarehouseController {
         ItemEntity item = itemService.getItem(itemid);
         
         return itemwarehouseService.getItemWarehouse(warehouse, item);
+    }
+    
+    @RequestMapping(value = "/api/getItemWarehouseList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<ItemWarehouseEntity> getItemWarehouseList(HttpServletRequest httpRequest,
+            @PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        List<ItemWarehouseEntity> ls = itemwarehouseService.getItemWarehouseList(warehouse, itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getItemWarehouseList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<ItemWarehouseEntity> getItemWarehouseList(HttpServletRequest httpRequest,
+            @PathVariable int itemperpage,
+            @PathVariable int page) {
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        List<ItemWarehouseEntity> ls = itemwarehouseService.getItemWarehouseList(warehouse, itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countItemWarehouseList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countItemWarehouseList(HttpServletRequest httpRequest,
+        @PathVariable String keyword){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        return itemwarehouseService.countItemWarehouseList(warehouse, keyword);
+    }
+    
+    @RequestMapping(value = {"api/countItemWarehouseList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countItemWarehouseList(HttpServletRequest httpRequest){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        return itemwarehouseService.countItemWarehouseList(warehouse, "");
     }
 }

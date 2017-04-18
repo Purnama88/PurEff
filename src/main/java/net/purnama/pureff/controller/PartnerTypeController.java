@@ -85,4 +85,35 @@ public class PartnerTypeController {
         
         return partnertype;
     }
+    
+    @RequestMapping(value = "/api/getPartnerTypeList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<PartnerTypeEntity> getPartnerTypeList(@PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList(itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getPartnerTypeList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<PartnerTypeEntity> getPartnerTypeList(@PathVariable int itemperpage,
+            @PathVariable int page) {
+        List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList(itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countPartnerTypeList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countPartnerTypeList(@PathVariable String keyword){
+        return partnertypeService.countPartnerTypeList(keyword);
+    }
+    
+    @RequestMapping(value = {"api/countPartnerTypeList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countPartnerTypeList(){
+        return partnertypeService.countPartnerTypeList("");
+    }
 }

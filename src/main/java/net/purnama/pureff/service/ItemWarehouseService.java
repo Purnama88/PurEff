@@ -42,4 +42,15 @@ public class ItemWarehouseService {
     public void updateItemWarehouse(ItemWarehouseEntity itemwarehouse) {
             itemwarehouseDao.updateItemWarehouse(itemwarehouse);
     }
+    
+    @Transactional
+    public List getItemWarehouseList(WarehouseEntity warehouse, int itemperpage,
+            int page, String keyword){
+        return itemwarehouseDao.getItemWarehouseList(warehouse, itemperpage, page, keyword);
+    }
+    
+    @Transactional
+    public int countItemWarehouseList(WarehouseEntity warehouse, String keyword){
+        return itemwarehouseDao.countItemWarehouseList(warehouse, keyword);
+    }
 }

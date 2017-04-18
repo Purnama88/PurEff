@@ -94,4 +94,35 @@ public class ItemGroupController {
     public void deleteItemGroup(@PathVariable String id) {
         itemgroupService.deleteItemGroup(id);		
     }
+    
+    @RequestMapping(value = "/api/getItemGroupList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<ItemGroupEntity> getItemGroupList(@PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        List<ItemGroupEntity> ls = itemgroupService.getItemGroupList(itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getItemGroupList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<ItemGroupEntity> getItemGroupList(@PathVariable int itemperpage,
+            @PathVariable int page) {
+        List<ItemGroupEntity> ls = itemgroupService.getItemGroupList(itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countItemGroupList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countItemGroupList(@PathVariable String keyword){
+        return itemgroupService.countItemGroupList(keyword);
+    }
+    
+    @RequestMapping(value = {"api/countItemGroupList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countItemGroupList(){
+        return itemgroupService.countItemGroupList("");
+    }
 }

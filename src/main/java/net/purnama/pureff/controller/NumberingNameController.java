@@ -86,4 +86,35 @@ public class NumberingNameController {
         
         return numberingname;
     }
+    
+    @RequestMapping(value = "/api/getNumberingNameList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<NumberingNameEntity> getNumberingNameList(@PathVariable int itemperpage,
+            @PathVariable int page, @PathVariable String keyword) {
+        
+        List<NumberingNameEntity> ls = numberingnameService.getNumberingNameList(itemperpage, page, keyword);
+        return ls;
+    }
+    
+    @RequestMapping(value = "/api/getNumberingNameList/{itemperpage}/{page}", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public List<NumberingNameEntity> getNumberingNameList(@PathVariable int itemperpage,
+            @PathVariable int page) {
+        List<NumberingNameEntity> ls = numberingnameService.getNumberingNameList(itemperpage, page, "");
+        return ls;
+    }
+    
+    @RequestMapping(value = {"api/countNumberingNameList/{keyword}"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countNumberingNameList(@PathVariable String keyword){
+        return numberingnameService.countNumberingNameList(keyword);
+    }
+    
+    @RequestMapping(value = {"api/countNumberingNameList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public int countNumberingNameList(){
+        return numberingnameService.countNumberingNameList("");
+    }
 }

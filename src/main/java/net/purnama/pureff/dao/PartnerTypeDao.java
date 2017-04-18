@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.PartnerTypeEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -57,5 +58,27 @@ public class PartnerTypeDao {
     public void updatePartnerType(PartnerTypeEntity partnertype) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(partnertype);
+    }
+    
+    public List getPartnerTypeList(int itemperpage, int page, String keyword){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerTypeEntity.class);
+        c.add(Restrictions.like("name", "%"+keyword+"%"));
+        
+        c.setFirstResult(itemperpage * (page-1));
+        c.setMaxResults(itemperpage);
+        
+        return c.list();
+    }
+    
+    public int countPartnerTypeList(String keyword) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerTypeEntity.class);
+        c.add(Restrictions.like("name", "%"+keyword+"%"));
+        c.setProjection(Projections.rowCount());
+        List result = c.list();
+        int resultint = Integer.valueOf(result.get(0).toString());
+        
+        return resultint;
     }
 }

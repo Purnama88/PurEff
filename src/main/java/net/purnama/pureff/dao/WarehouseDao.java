@@ -11,6 +11,9 @@ import net.purnama.pureff.entity.WarehouseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -72,6 +75,34 @@ public class WarehouseDao {
     public void updateWarehouse(WarehouseEntity warehouse) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(warehouse);
+    }
+    
+    public List getWarehouseList(int itemperpage, int page, String keyword){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(WarehouseEntity.class);
+        Criterion code = Restrictions.like("code", "%"+keyword+"%");
+        Criterion desc = Restrictions.like("name", "%"+keyword+"%");
+        LogicalExpression orExp = Restrictions.or(code,desc);
+        c.add(orExp);
+        
+        c.setFirstResult(itemperpage * (page-1));
+        c.setMaxResults(itemperpage);
+        
+        return c.list();
+    }
+    
+    public int countWarehouseList(String keyword) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(WarehouseEntity.class);
+        Criterion code = Restrictions.like("code", "%"+keyword+"%");
+        Criterion description = Restrictions.like("name", "%"+keyword+"%");
+        LogicalExpression orExp = Restrictions.or(code,description);
+        c.add(orExp);
+        c.setProjection(Projections.rowCount());
+        List result = c.list();
+        int resultint = Integer.valueOf(result.get(0).toString());
+        
+        return resultint;
     }
     
 }

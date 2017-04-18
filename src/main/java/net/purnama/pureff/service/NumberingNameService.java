@@ -46,4 +46,14 @@ public class NumberingNameService {
 	public void updateNumberingName(NumberingNameEntity numberingname) {
 		numberingnameDao.updateNumberingName(numberingname);
 	}
+        
+        @Transactional
+        public List getNumberingNameList(int itemperpage, int page, String keyword){
+            return numberingnameDao.getNumberingNameList(itemperpage, page, keyword);
+        }
+        
+        @Transactional
+        public int countNumberingNameList(String keyword) {
+            return numberingnameDao.countNumberingNameList(keyword);
+        }
 }

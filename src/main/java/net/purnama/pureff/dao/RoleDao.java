@@ -72,7 +72,7 @@ public class RoleDao {
         return c.list();
     }
     
-    public int CountRoleList(String keyword) {
+    public int countRoleList(String keyword) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(RoleEntity.class);
         c.add(Restrictions.like("name", "%"+keyword+"%"));

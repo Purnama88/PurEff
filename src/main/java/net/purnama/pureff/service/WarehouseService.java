@@ -53,4 +53,13 @@ public class WarehouseService {
             warehouseDao.updateWarehouse(warehouse);
     }
     
+    @Transactional
+    public List getWarehouseList(int itemperpage, int page, String keyword){
+        return warehouseDao.getWarehouseList(itemperpage, page, keyword);
+    }
+    
+    @Transactional
+    public int countWarehouseList(String keyword){
+        return warehouseDao.countWarehouseList(keyword);
+    }
 }
