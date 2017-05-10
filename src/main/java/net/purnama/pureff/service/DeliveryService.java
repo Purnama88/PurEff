@@ -42,4 +42,14 @@ public class DeliveryService {
     public void updateDelivery(DeliveryEntity delivery) {
             deliveryDao.updateDelivery(delivery);
     }
+    
+    @Transactional
+    public List getDeliveryList(int itemperpage, int page, String sort, String keyword){
+        return deliveryDao.getDeliveryList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countDeliveryList(String keyword){
+        return deliveryDao.countDeliveryList(keyword);
+    }
 }

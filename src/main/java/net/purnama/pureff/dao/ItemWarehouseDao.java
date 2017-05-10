@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class ItemWarehouseDao {
     }
     
     public List getItemWarehouseList(WarehouseEntity warehouse, int itemperpage,
-            int page, String keyword){
+            int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemWarehouseEntity.class);
         c.add(Restrictions.eq("warehouse", warehouse));
@@ -70,13 +71,13 @@ public class ItemWarehouseDao {
         LogicalExpression orExp = Restrictions.or(code,desc);
         Criteria nc = c.createCriteria("item");
         nc.add(orExp);
-//        if(order.equals(GlobalFields.PROPERTIES.getProperty("LABEL_ASCENDING"))){
-//                
-//            nc.addOrder(Order.asc(sort));
-//        }
-//        else{
-//            nc.addOrder(Order.desc(sort));
-//        }
+        
+        if(sort.contains("-")){
+            nc.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            nc.addOrder(Order.asc(sort));
+        }
 
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);

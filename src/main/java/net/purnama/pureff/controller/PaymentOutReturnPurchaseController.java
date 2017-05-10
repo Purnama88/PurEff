@@ -7,14 +7,15 @@
 package net.purnama.pureff.controller;
 
 import java.util.List;
+import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
+import net.purnama.pureff.entity.transactional.PaymentOutEntity;
 import net.purnama.pureff.entity.transactional.PaymentOutReturnPurchaseEntity;
-import net.purnama.pureff.service.ReturnPurchaseService;
 import net.purnama.pureff.service.PaymentOutReturnPurchaseService;
-import net.purnama.pureff.service.PaymentOutService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -23,42 +24,41 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class PaymentOutReturnPurchaseController {
+    
     @Autowired
     PaymentOutReturnPurchaseService paymentoutreturnpurchaseService;
     
-    @Autowired
-    PaymentOutService paymentoutService;
-    
-    @Autowired
-    ReturnPurchaseService returnpurchaseService;
-    
-    @RequestMapping(value = "api/getPaymentOutReturnPurchaseEntityListByPaymentOut", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PaymentOutReturnPurchaseEntity> getPaymentOutReturnPurchaseEntityListByPaymentOut(@PathVariable String id) {
+    @RequestMapping(value = "api/getPaymentOutReturnPurchaseEntityList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"paymentid"})
+    public ResponseEntity<?> getPaymentOutReturnPurchaseEntityList(@RequestParam(value="paymentid") String paymentid) {
+        
+        PaymentOutEntity paymentout = new PaymentOutEntity();
+        paymentout.setId(paymentid);
         
         List<PaymentOutReturnPurchaseEntity> ls = paymentoutreturnpurchaseService.
-                getPaymentOutReturnPurchaseEntityList(paymentoutService.getPaymentOut(id));
-        return ls;
+                getPaymentOutReturnPurchaseEntityList(paymentout);
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPaymentOutReturnPurchaseEntityListByReturnPurchase", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PaymentOutReturnPurchaseEntity> getPaymentOutReturnPurchaseEntityListByReturnPurchase(@PathVariable String id) {
-        
-        List<PaymentOutReturnPurchaseEntity> ls = paymentoutreturnpurchaseService.
-                getPaymentOutReturnPurchaseEntityList(returnpurchaseService.getReturnPurchase(id));
-        return ls;
-    }
-    
-    @RequestMapping(value = "api/getPaymentOutReturnPurchaseEntity/{paymentid}/{invoiceid}",
+    @RequestMapping(value = "api/getPaymentOutReturnPurchaseEntity",
             method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public PaymentOutReturnPurchaseEntity 
-        getPaymentOutReturnPurchaseEntity(@PathVariable String paymentid, @PathVariable String invoiceid){
-        PaymentOutReturnPurchaseEntity piisde = paymentoutreturnpurchaseService.
-                getPaymentOutReturnPurchaseEntity(paymentoutService.getPaymentOut(paymentid),
-                        returnpurchaseService.getReturnPurchase(invoiceid));
+    public ResponseEntity<?> 
+        getPaymentOutReturnPurchaseEntity(
+        @RequestParam(value="paymentid") String paymentid,
+        @RequestParam(value="invoiceid") String invoiceid){
+            
+        PaymentOutEntity paymentout = new PaymentOutEntity();
+        paymentout.setId(paymentid);
         
-        return piisde;
+        ReturnPurchaseEntity returnpurchase = new ReturnPurchaseEntity();
+        returnpurchase.setId(invoiceid);
+            
+        PaymentOutReturnPurchaseEntity piisde = paymentoutreturnpurchaseService.
+                getPaymentOutReturnPurchaseEntity(paymentout,
+                        returnpurchase);
+        
+        return ResponseEntity.ok(piisde);
     }
+    
 }

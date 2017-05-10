@@ -9,6 +9,8 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ReturnSalesDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.transactional.ReturnSalesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,5 +43,21 @@ public class ReturnSalesService {
     @Transactional
     public void updateReturnSales(ReturnSalesEntity returnsales) {
             returnsalesDao.updateReturnSales(returnsales);
+    }
+    
+    @Transactional
+    public List getReturnSalesList(int itemperpage, int page, String sort, String keyword){
+        return returnsalesDao.getReturnSalesList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countReturnSalesList(String keyword){
+        return returnsalesDao.countReturnSalesList(keyword);
+    }
+    
+    @Transactional
+    public List getUnpaidReturnSalesList(PartnerEntity partner,
+            CurrencyEntity currency){
+        return returnsalesDao.getUnpaidReturnSalesList(partner, currency);
     }
 }

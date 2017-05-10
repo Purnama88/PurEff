@@ -7,14 +7,22 @@ package net.purnama.pureff.controller;
 
 import java.util.Calendar;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.DeliveryEntity;
+import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.DeliveryService;
+import net.purnama.pureff.service.UserService;
+import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,36 +33,87 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeliveryController {
     
     @Autowired
+    UserService userService;
+    
+    @Autowired
+    WarehouseService warehouseService;
+    
+    @Autowired
     DeliveryService deliveryService;
     
     @RequestMapping(value = "api/getDeliveryList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<DeliveryEntity> getDeliveryList() {
+    public ResponseEntity<?> getDeliveryList() {
         
         List<DeliveryEntity> ls = deliveryService.getDeliveryList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getDelivery/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public DeliveryEntity getDelivery(@PathVariable String id) {
-        return deliveryService.getDelivery(id);
+    @RequestMapping(value = "api/getDelivery", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getDelivery(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(deliveryService.getDelivery(id));
     }
 
     @RequestMapping(value = "api/addDelivery", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public DeliveryEntity addDelivery(@RequestBody DeliveryEntity delivery) {
+    public ResponseEntity<?> addDelivery(@RequestBody DeliveryEntity delivery) {
         delivery.setId(IdGenerator.generateId());
         delivery.setLastmodified(Calendar.getInstance());
         
         deliveryService.addDelivery(delivery);
         
-        return delivery;
+        return ResponseEntity.ok(delivery);
     }
 
     @RequestMapping(value = "api/updateDelivery", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updateDelivery(@RequestBody DeliveryEntity delivery) {
+    public ResponseEntity<?> updateDelivery(@RequestBody DeliveryEntity delivery) {
         deliveryService.updateDelivery(delivery);
+        
+        return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = "/api/getDeliveryList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getDeliveryList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
+        
+        List<DeliveryEntity> ls = deliveryService.
+                getDeliveryList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/countDeliveryList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countDeliveryList(
+            @RequestParam(value="keyword") String keyword){
+        
+        return ResponseEntity.ok(deliveryService.countDeliveryList(keyword));
+    }
+    
+    @RequestMapping(value = {"api/cancelDelivery"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> cancelDelivery(HttpServletRequest httpRequest,
+            @RequestParam(value="id") String id){
+        DeliveryEntity delivery = deliveryService.getDelivery(id);
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        delivery.setLastmodified(Calendar.getInstance());
+        delivery.setWarehouse(warehouse);
+        delivery.setLastmodifiedby(user);
+        delivery.setStatus(false);
+        
+        deliveryService.updateDelivery(delivery);
+        
+        return ResponseEntity.ok("");
     }
 }

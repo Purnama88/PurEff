@@ -37,6 +37,11 @@ public class RoleService {
     public RoleEntity getRole(String id) {
             return roleDao.getRole(id);
     }
+    
+    @Transactional
+    public RoleEntity getRoleByName(String name) {
+            return roleDao.getRoleByName(name);
+    }
 
     @Transactional
     public void addRole(RoleEntity role) {
@@ -50,8 +55,8 @@ public class RoleService {
     
     @Transactional
     public List getRoleList(
-            int itemperpage, int page, String keyword){
-        return roleDao.getRoleList(itemperpage, page, keyword);
+            int itemperpage, int page, String sort, String keyword){
+        return roleDao.getRoleList(itemperpage, page, sort, keyword);
     }
     
     @Transactional

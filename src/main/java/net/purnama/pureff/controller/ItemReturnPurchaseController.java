@@ -5,15 +5,14 @@
  */
 package net.purnama.pureff.controller;
 
-import java.util.List;
 import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
-import net.purnama.pureff.entity.transactional.ItemReturnPurchaseEntity;
 import net.purnama.pureff.service.ReturnPurchaseService;
 import net.purnama.pureff.service.ItemReturnPurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +27,11 @@ public class ItemReturnPurchaseController {
     @Autowired
     ReturnPurchaseService returnpurchaseService;
     
-    @RequestMapping(value = "api/getItemReturnPurchaseList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemReturnPurchaseEntity> getItemReturnPurchaseList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemReturnPurchaseList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemReturnPurchaseList(@RequestParam(value="id") String id) {
         ReturnPurchaseEntity ad = returnpurchaseService.getReturnPurchase(id);
         
-        return itemreturnpurchaseService.getItemReturnPurchaseList(ad);
+        return ResponseEntity.ok(itemreturnpurchaseService.getItemReturnPurchaseList(ad));
     }
 }

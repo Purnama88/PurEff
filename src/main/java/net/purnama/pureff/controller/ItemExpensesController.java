@@ -5,15 +5,14 @@
  */
 package net.purnama.pureff.controller;
 
-import java.util.List;
 import net.purnama.pureff.entity.transactional.ExpensesEntity;
-import net.purnama.pureff.entity.transactional.ItemExpensesEntity;
 import net.purnama.pureff.service.ExpensesService;
 import net.purnama.pureff.service.ItemExpensesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +27,11 @@ public class ItemExpensesController {
     @Autowired
     ExpensesService expensesService;
     
-    @RequestMapping(value = "api/getItemExpensesList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemExpensesEntity> getItemExpensesList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemExpensesList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemExpensesList(@RequestParam(value="id") String id) {
         ExpensesEntity ad = expensesService.getExpenses(id);
         
-        return itemexpensesService.getItemExpensesList(ad);
+        return ResponseEntity.ok(itemexpensesService.getItemExpensesList(ad));
     }
 }

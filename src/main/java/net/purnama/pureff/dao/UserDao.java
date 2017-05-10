@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,13 @@ public class UserDao {
         return p;
     }
     
+    public UserEntity getUserByUsername(String username){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(UserEntity.class);
+        c.add(Restrictions.eq("username", username));
+        return (UserEntity)c.uniqueResult();
+    }
+    
     public UserEntity addUser(UserEntity user) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(user);
@@ -64,20 +72,20 @@ public class UserDao {
     }
     
     public List getUserList(
-            //String sort, String order,
-            int itemperpage, int page, String keyword){
+            int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(UserEntity.class);
         Criterion username = Restrictions.like("username", "%"+keyword+"%");
         Criterion name = Restrictions.like("name", "%"+keyword+"%");
         LogicalExpression orExp = Restrictions.or(username,name);
         c.add(orExp);
-//        if(order.equals(GlobalFields.PROPERTIES.getProperty("LABEL_ASCENDING"))){
-//            c.addOrder(Order.asc(sort));
-//        }
-//        else{
-//            c.addOrder(Order.desc(sort));
-//        }
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
 
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);

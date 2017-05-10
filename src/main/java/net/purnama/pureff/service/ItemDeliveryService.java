@@ -27,4 +27,9 @@ public class ItemDeliveryService {
     public List<ItemDeliveryEntity> getItemDeliveryList(DeliveryEntity delivery) {
         return itemdeliveryDao.getItemDeliveryList(delivery);
     }
+    
+    @Transactional
+    public void addItemDelivery(ItemDeliveryEntity itemdelivery){
+        itemdeliveryDao.addItemDelivery(itemdelivery);
+    }
 }

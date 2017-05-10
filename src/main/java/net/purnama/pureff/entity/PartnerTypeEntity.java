@@ -25,10 +25,6 @@ import javax.persistence.Temporal;
 @Table(name="partnertype")
 public class PartnerTypeEntity implements Serializable{
     
-    public static int CUSTOMER  = 0;
-    public static int VENDOR    = 1;
-    public static int NONTRADE  = 2;
-    
     @Id
     @Column(name="id")
     private String id;

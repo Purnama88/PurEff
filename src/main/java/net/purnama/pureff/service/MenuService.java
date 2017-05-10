@@ -42,9 +42,4 @@ public class MenuService {
     public void addMenu(MenuEntity menu) {
             menuDao.addMenu(menu);
     }
-
-    @Transactional
-    public void updateMenu(MenuEntity menu) {
-            menuDao.updateMenu(menu);
-    }
 }

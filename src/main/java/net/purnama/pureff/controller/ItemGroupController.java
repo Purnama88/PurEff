@@ -16,10 +16,11 @@ import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.ItemGroupService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,31 +36,36 @@ public class ItemGroupController {
     
     @RequestMapping(value = "api/getItemGroupList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<ItemGroupEntity> getItemGroupList() {
+    public ResponseEntity<?> getItemGroupList() {
         
         List<ItemGroupEntity> ls = itemgroupService.getItemGroupList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "api/getActiveItemGroupList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<ItemGroupEntity> getActiveItemGroupList() {
+    public ResponseEntity<?> getActiveItemGroupList() {
         
         List<ItemGroupEntity> ls = itemgroupService.getActiveItemGroupList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getItemGroup/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public ItemGroupEntity getItemGroup(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemGroup", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemGroup(@RequestParam(value="id") String id) {
         
-        return itemgroupService.getItemGroup(id);
+        return ResponseEntity.ok(itemgroupService.getItemGroup(id));
     }
 
     @RequestMapping(value = "api/addItemGroup", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public ItemGroupEntity addItemGroup(HttpServletRequest httpRequest,
+    public ResponseEntity<?> addItemGroup(HttpServletRequest httpRequest,
             @RequestBody ItemGroupEntity itemgroup) {
+        
+        if(itemgroupService.getItemGroupByCode(itemgroup.getCode()) != null){
+            return ResponseEntity.badRequest().body("Code '" + itemgroup.getCode() +"' already exist");
+        }
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
@@ -70,12 +76,12 @@ public class ItemGroupController {
         
         itemgroupService.addItemGroup(itemgroup);
         
-        return itemgroup;
+        return ResponseEntity.ok(itemgroup);
     }
 
     @RequestMapping(value = "api/updateItemGroup", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public ItemGroupEntity updateItemGroup(HttpServletRequest httpRequest,
+    public ResponseEntity<?> updateItemGroup(HttpServletRequest httpRequest,
             @RequestBody ItemGroupEntity itemgroup) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
@@ -86,43 +92,31 @@ public class ItemGroupController {
         
         itemgroupService.updateItemGroup(itemgroup);
         
-        return itemgroup;
+        return ResponseEntity.ok(itemgroup);
     }
 
-    @RequestMapping(value = "api/deleteItemGroup/{id}", method = RequestMethod.DELETE, 
-            headers = "Accept=application/json")
-    public void deleteItemGroup(@PathVariable String id) {
-        itemgroupService.deleteItemGroup(id);		
-    }
+//    @RequestMapping(value = "api/deleteItemGroup/{id}", method = RequestMethod.DELETE, 
+//            headers = "Accept=application/json")
+//    public void deleteItemGroup(@PathVariable String id) {
+//        itemgroupService.deleteItemGroup(id);		
+//    }
     
-    @RequestMapping(value = "/api/getItemGroupList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<ItemGroupEntity> getItemGroupList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    @RequestMapping(value = "/api/getItemGroupList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getItemGroupList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
-        List<ItemGroupEntity> ls = itemgroupService.getItemGroupList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getItemGroupList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<ItemGroupEntity> getItemGroupList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<ItemGroupEntity> ls = itemgroupService.getItemGroupList(itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countItemGroupList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countItemGroupList(@PathVariable String keyword){
-        return itemgroupService.countItemGroupList(keyword);
+        List<ItemGroupEntity> ls = itemgroupService.getItemGroupList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countItemGroupList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countItemGroupList(){
-        return itemgroupService.countItemGroupList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countItemGroupList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(itemgroupService.countItemGroupList(keyword));
     }
 }

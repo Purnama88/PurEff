@@ -37,6 +37,11 @@ public class ItemService {
     public ItemEntity getItem(String id) {
             return itemDao.getItem(id);
     }
+    
+    @Transactional
+    public ItemEntity getItemByCode(String code) {
+            return itemDao.getItemByCode(code);
+    }
 
     @Transactional
     public void addItem(ItemEntity item) {

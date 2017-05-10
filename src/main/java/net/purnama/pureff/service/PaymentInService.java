@@ -41,5 +41,15 @@ public class PaymentInService {
     public void updatePaymentIn(PaymentInEntity paymentin) {
             paymentinDao.updatePaymentIn(paymentin);
     }
+    
+    @Transactional
+    public List getPaymentInList(int itemperpage, int page, String sort, String keyword){
+        return paymentinDao.getPaymentInList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countPaymentInList(String keyword){
+        return paymentinDao.countPaymentInList(keyword);
+    }
 }
 

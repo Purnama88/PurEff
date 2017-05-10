@@ -17,7 +17,7 @@ import net.purnama.pureff.entity.UserEntity;
  */
 public class JwtUtil {
     
-    private static final String secret = "wiliana";
+    private static final String secret = "pureff";
     
     public static String parseToken2(String token){
         try{

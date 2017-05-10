@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import net.purnama.pureff.dao.NumberingDao;
 import net.purnama.pureff.entity.MenuEntity;
 import net.purnama.pureff.entity.NumberingEntity;
+import net.purnama.pureff.entity.NumberingNameEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,11 @@ public class NumberingService {
     }
 
     @Transactional
+    public List<NumberingEntity> getActiveNumberingList(WarehouseEntity warehouse) {
+            return numberingDao.getActiveNumberingList(warehouse);
+    }
+    
+    @Transactional
     public List<NumberingEntity> getNumberingList(WarehouseEntity warehouse, MenuEntity menu) {
             return numberingDao.getNumberingList(warehouse, menu);
     }
@@ -38,6 +44,12 @@ public class NumberingService {
     @Transactional
     public NumberingEntity getNumbering(String id) {
             return numberingDao.getNumbering(id);
+    }
+    
+    @Transactional
+    public NumberingEntity getNumbering(String prefix, NumberingNameEntity numberingname, 
+            WarehouseEntity warehouse, MenuEntity menu) {
+            return numberingDao.getNumbering(prefix, numberingname, warehouse, menu);
     }
     
     @Transactional

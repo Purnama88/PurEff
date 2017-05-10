@@ -9,6 +9,7 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.DeliveryDraftDao;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.draft.DeliveryDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,16 @@ public class DeliveryDraftService {
     @Transactional
     public void deleteDeliveryDraft(String id) {
             deliverydraftDao.deleteDeliveryDraft(id);
+    }
+    
+    @Transactional
+    public List getDeliveryDraftList(int itemperpage, int page, String sort, 
+            String keyword, UserEntity user){
+        return deliverydraftDao.getDeliveryDraftList(itemperpage, page, sort, keyword, user);
+    }
+    
+    @Transactional
+    public int countDeliveryDraftList(String keyword, UserEntity user){
+        return deliverydraftDao.countDeliveryDraftList(keyword, user);
     }
 }

@@ -41,5 +41,15 @@ public class PaymentOutService {
     public void updatePaymentOut(PaymentOutEntity paymentout) {
             paymentoutDao.updatePaymentOut(paymentout);
     }
+    
+    @Transactional
+    public List getPaymentOutList(int itemperpage, int page, String sort, String keyword){
+        return paymentoutDao.getPaymentOutList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countPaymentOutList(String keyword){
+        return paymentoutDao.countPaymentOutList(keyword);
+    }
 }
 

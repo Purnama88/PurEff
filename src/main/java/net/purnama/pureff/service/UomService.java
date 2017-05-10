@@ -52,6 +52,11 @@ public class UomService {
     public UomEntity getUom(String id) {
             return uomDao.getUom(id);
     }
+    
+    @Transactional
+    public UomEntity getUomByName(String name) {
+            return uomDao.getUomByName(name);
+    }
 
     @Transactional
     public void addUom(UomEntity uom) {
@@ -61,5 +66,15 @@ public class UomService {
     @Transactional
     public void updateUom(UomEntity uom) {
             uomDao.updateUom(uom);
+    }
+    
+    @Transactional
+    public List getUomList(int itemperpage, int page, String sort, String keyword, UomEntity parent){
+        return uomDao.getUomList(itemperpage, page, sort, keyword, parent);
+    }
+    
+    @Transactional
+    public int countUomList(String keyword, UomEntity parent){
+        return uomDao.countUomList(keyword, parent);
     }
 }

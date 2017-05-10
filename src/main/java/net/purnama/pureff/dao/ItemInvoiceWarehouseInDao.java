@@ -26,6 +26,11 @@ public class ItemInvoiceWarehouseInDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addItemInvoiceWarehouseIn(ItemInvoiceWarehouseInEntity iteminvoicewarehousein) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(iteminvoicewarehousein);
+    }
+    
     public List<ItemInvoiceWarehouseInEntity> getItemInvoiceWarehouseInList(InvoiceWarehouseInEntity invoicewarehousein) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemInvoiceWarehouseInEntity.class);

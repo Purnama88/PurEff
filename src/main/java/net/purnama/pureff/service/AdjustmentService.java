@@ -42,4 +42,14 @@ public class AdjustmentService {
     public void updateAdjustment(AdjustmentEntity adjustment) {
             adjustmentDao.updateAdjustment(adjustment);
     }
+    
+    @Transactional
+    public List getAdjustmentList(int itemperpage, int page, String sort, String keyword){
+        return adjustmentDao.getAdjustmentList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countAdjustmentList(String keyword){
+        return adjustmentDao.countAdjustmentList(keyword);
+    }
 }

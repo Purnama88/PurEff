@@ -26,6 +26,31 @@ public class ItemAdjustmentDraftDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addItemAdjustmentDraft(ItemAdjustmentDraftEntity itemadjustmentdraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(itemadjustmentdraft);
+    }
+    
+    public void updateItemAdjustmentDraft(ItemAdjustmentDraftEntity itemadjustmentdraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(itemadjustmentdraft);
+    }
+    
+    public void deleteItemAdjustmentDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        ItemAdjustmentDraftEntity p = getItemAdjustmentDraft(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    public ItemAdjustmentDraftEntity getItemAdjustmentDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        ItemAdjustmentDraftEntity p = (ItemAdjustmentDraftEntity) 
+                session.get(ItemAdjustmentDraftEntity.class, id);
+        return p;
+    }
+    
     public List<ItemAdjustmentDraftEntity> getItemAdjustmentDraftList(AdjustmentDraftEntity adjustmentdraft) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemAdjustmentDraftEntity.class);

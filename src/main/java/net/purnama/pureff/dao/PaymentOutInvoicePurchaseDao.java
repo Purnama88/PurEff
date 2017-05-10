@@ -27,6 +27,31 @@ public class PaymentOutInvoicePurchaseDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addPaymentOutInvoicePurchase(PaymentOutInvoicePurchaseEntity paymentoutinvoicepurchase) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymentoutinvoicepurchase);
+    }
+    
+    public void updatePaymentOutInvoicePurchase(PaymentOutInvoicePurchaseEntity paymentoutinvoicepurchase) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymentoutinvoicepurchase);
+    }
+    
+    public void deletePaymentOutInvoicePurchase(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentOutInvoicePurchaseEntity p = getPaymentOutInvoicePurchase(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    public PaymentOutInvoicePurchaseEntity getPaymentOutInvoicePurchase(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentOutInvoicePurchaseEntity p = (PaymentOutInvoicePurchaseEntity) 
+                session.get(PaymentOutInvoicePurchaseEntity.class, id);
+        return p;
+    }
+    
     public PaymentOutInvoicePurchaseEntity
      getPaymentOutInvoicePurchaseEntity(PaymentOutEntity paymentout,
                  InvoicePurchaseEntity invoicepurchase){

@@ -188,4 +188,12 @@ public class DeliveryEntity implements Serializable{
     public void setLastmodifiedby(UserEntity lastmodifiedby) {
         this.lastmodifiedby = lastmodifiedby;
     }
+
+    public String getDraftid() {
+        return draftid;
+    }
+
+    public void setDraftid(String draftid) {
+        this.draftid = draftid;
+    }
 }

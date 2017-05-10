@@ -39,5 +39,4 @@ public class LoginEntity implements Serializable{
     public void setWarehouseid(String warehouseid) {
         this.warehouseid = warehouseid;
     }
-    
 }

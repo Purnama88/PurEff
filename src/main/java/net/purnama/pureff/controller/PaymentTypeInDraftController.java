@@ -8,12 +8,12 @@ package net.purnama.pureff.controller;
 import java.util.List;
 import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentTypeInDraftEntity;
-import net.purnama.pureff.service.PaymentInDraftService;
 import net.purnama.pureff.service.PaymentTypeInDraftService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -26,16 +26,14 @@ public class PaymentTypeInDraftController {
     @Autowired
     PaymentTypeInDraftService paymenttypeindraftService;
     
-    @Autowired
-    PaymentInDraftService paymentindraftService;
-    
-    @RequestMapping(value = "api/getPaymentTypeInDraftList/{paymentid}", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getPaymentTypeInDraftList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<PaymentTypeInDraftEntity> getPaymentTypeInDraftList(@PathVariable String paymentid) {
+    public ResponseEntity<?> getPaymentTypeInDraftList(@RequestParam(value="paymentid") String paymentid) {
         
-        PaymentInDraftEntity paymentindraft = paymentindraftService.getPaymentInDraft(paymentid);
+        PaymentInDraftEntity paymentindraft = new PaymentInDraftEntity();
+        paymentindraft.setId(paymentid);
         
         List<PaymentTypeInDraftEntity> ls = paymenttypeindraftService.getPaymentTypeInDraftList(paymentindraft);
-        return ls;
+        return ResponseEntity.ok(ls);
     }
 }

@@ -26,6 +26,11 @@ public class ItemDeliveryDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addItemDelivery(ItemDeliveryEntity itemdelivery) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(itemdelivery);
+    }
+    
     public List<ItemDeliveryEntity> getItemDeliveryList(DeliveryEntity delivery) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemDeliveryEntity.class);

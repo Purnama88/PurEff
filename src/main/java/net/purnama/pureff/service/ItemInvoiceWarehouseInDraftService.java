@@ -24,6 +24,26 @@ public class ItemInvoiceWarehouseInDraftService {
     ItemInvoiceWarehouseInDraftDao iteminvoicewarehouseindraftDao;
     
     @Transactional
+    public void addItemInvoiceWarehouseInDraft(ItemInvoiceWarehouseInDraftEntity iteminvoicewarehouseindraft) {
+        iteminvoicewarehouseindraftDao.addItemInvoiceWarehouseInDraft(iteminvoicewarehouseindraft);
+    }
+    
+     @Transactional
+    public void updateItemInvoiceWarehouseInDraft(ItemInvoiceWarehouseInDraftEntity iteminvoicewarehouseindraft) {
+        iteminvoicewarehouseindraftDao.updateItemInvoiceWarehouseInDraft(iteminvoicewarehouseindraft);
+    }
+    
+    @Transactional
+    public void deleteItemInvoiceWarehouseInDraft(String id) {
+        iteminvoicewarehouseindraftDao.deleteItemInvoiceWarehouseInDraft(id);
+    }
+    
+    @Transactional
+    public ItemInvoiceWarehouseInDraftEntity getItemInvoiceWarehouseInDraft(String id) {
+        return iteminvoicewarehouseindraftDao.getItemInvoiceWarehouseInDraft(id);
+    }
+    
+    @Transactional
     public List<ItemInvoiceWarehouseInDraftEntity> getItemInvoiceWarehouseInDraftList(InvoiceWarehouseInDraftEntity invoicewarehouseindraft) {
         return iteminvoicewarehouseindraftDao.getItemInvoiceWarehouseInDraftList(invoicewarehouseindraft);
     }

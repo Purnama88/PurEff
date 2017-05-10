@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.NumberingNameEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,13 @@ public class NumberingNameDao {
         return p;
     }
     
+    public NumberingNameEntity getNumberingNameByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(NumberingNameEntity.class);
+        c.add(Restrictions.eq("name", name));
+        return (NumberingNameEntity) c.uniqueResult();
+    }
+    
     public NumberingNameEntity addNumberingName(NumberingNameEntity numberingname) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(numberingname);
@@ -59,10 +67,17 @@ public class NumberingNameDao {
         session.update(numberingname);
     }
     
-    public List getNumberingNameList(int itemperpage, int page, String keyword){
+    public List getNumberingNameList(int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(NumberingNameEntity.class);
         c.add(Restrictions.like("name", "%"+keyword+"%"));
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
         
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);

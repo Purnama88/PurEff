@@ -5,15 +5,14 @@
  */
 package net.purnama.pureff.controller;
 
-import java.util.List;
 import net.purnama.pureff.entity.transactional.InvoiceWarehouseOutEntity;
-import net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseOutEntity;
 import net.purnama.pureff.service.InvoiceWarehouseOutService;
 import net.purnama.pureff.service.ItemInvoiceWarehouseOutService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +27,11 @@ public class ItemInvoiceWarehouseOutController {
     @Autowired
     InvoiceWarehouseOutService invoicewarehouseoutService;
     
-    @RequestMapping(value = "api/getItemInvoiceWarehouseOutList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemInvoiceWarehouseOutEntity> getItemInvoiceWarehouseOutList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemInvoiceWarehouseOutList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemInvoiceWarehouseOutList(@RequestParam(value="id") String id) {
         InvoiceWarehouseOutEntity ad = invoicewarehouseoutService.getInvoiceWarehouseOut(id);
         
-        return iteminvoicewarehouseoutService.getItemInvoiceWarehouseOutList(ad);
+        return ResponseEntity.ok(iteminvoicewarehouseoutService.getItemInvoiceWarehouseOutList(ad));
     }
 }

@@ -40,6 +40,23 @@ public class PaymentTypeInDao {
         return c.list();
     }
     
+    public PaymentTypeInEntity getPaymentTypeIn(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentTypeInEntity p = (PaymentTypeInEntity) session.get(PaymentTypeInEntity.class, id);
+        return p;
+    }
+    
+    public PaymentTypeInEntity addPaymentTypeIn(PaymentTypeInEntity paymenttypein) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymenttypein);
+        return paymenttypein;
+    }
+
+    public void updatePaymentTypeIn(PaymentTypeInEntity paymenttypein) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymenttypein);
+    }
+    
     public List getPaymentTypeInList(int type, boolean accepted, boolean valid,
             Calendar begin, Calendar end){
         Session session = this.sessionFactory.getCurrentSession();

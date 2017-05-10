@@ -23,6 +23,7 @@ import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,7 +56,7 @@ public class InitializationController {
     
     @RequestMapping(value = "/init/addCurrency", method = RequestMethod.POST, 
             headers = "Accept=application/json")
-    public CurrencyEntity addCurrency(HttpServletRequest request, @RequestBody CurrencyEntity currency){
+    public ResponseEntity<?> addCurrency(HttpServletRequest request, @RequestBody CurrencyEntity currency){
         
         String header = request.getHeader("UserId");
         
@@ -70,12 +71,12 @@ public class InitializationController {
         
         currencyService.addCurrency(currency);
         
-        return currency;
+        return ResponseEntity.ok(currency);
     }
     
     @RequestMapping(value = "/init/addUser", method = RequestMethod.POST, 
             headers = "Accept=application/json")
-    public String addUser(@RequestBody UserEntity user){
+    public ResponseEntity<?> addUser(@RequestBody UserEntity user){
         
         user.setId(IdGenerator.generateId());
         user.setCode(user.getId());
@@ -99,18 +100,64 @@ public class InitializationController {
         role.setLastmodified(Calendar.getInstance());
         role.setLastmodifiedby(user);
         role.setNote("");
+        role.setAdjustment_read(true);
+        role.setAdjustment_write(true);
+        role.setCurrency_read(true);
+        role.setCurrency_write(true);
+        role.setDelivery_read(true);
+        role.setDelivery_write(true);
+        role.setExpenses_read(true);
+        role.setExpenses_write(true);
+        role.setInvoicepurchase_read(true);
+        role.setInvoicepurchase_write(true);
+        role.setInvoicesales_read(true);
+        role.setInvoicesales_write(true);
+        role.setInvoicewarehousein_read(true);
+        role.setInvoicewarehousein_write(true);
+        role.setInvoicewarehouseout_read(true);
+        role.setInvoicewarehouseout_write(true);
+        role.setItem_read(true);
+        role.setItem_write(true);
+        role.setItemgroup_read(true);
+        role.setItemgroup_write(true);
+        role.setNumbering_read(true);
+        role.setNumbering_write(true);
+        role.setNumberingname_read(true);
+        role.setNumberingname_write(true);
+        role.setPartner_read(true);
+        role.setPartner_write(true);
+        role.setPartnertype_read(true);
+        role.setPartnertype_write(true);
+        role.setPaymentin_read(true);
+        role.setPaymentin_write(true);
+        role.setPaymentout_read(true);
+        role.setPaymentout_write(true);
+        role.setPaymenttype_read(true);
+        role.setPaymenttype_write(true);
+        role.setReturnpurchase_read(true);
+        role.setReturnpurchase_write(true);
+        role.setReturnsales_read(true);
+        role.setReturnsales_write(true);
+        role.setRole_read(true);
+        role.setRole_write(true);
+        role.setUom_read(true);
+        role.setUom_write(true);
+        role.setUser_read(true);
+        role.setUser_write(true);
+        role.setWarehouse_read(true);
+        role.setWarehouse_write(true);
         role.setStatus(true);
         roleService.addRole(role);
         
         user.setRole(role);
         userService.updateUser(user);
         
-        return user.getId();
+        return ResponseEntity.ok(user.getId());
     }
     
     @RequestMapping(value = "/init/addWarehouse", method = RequestMethod.POST, 
             headers = "Accept=application/json")
-    public WarehouseEntity addWarehouse(HttpServletRequest request, @RequestBody WarehouseEntity warehouse){
+    public ResponseEntity<?> addWarehouse(HttpServletRequest request, @RequestBody WarehouseEntity warehouse){
         
         String header = request.getHeader("UserId");
         
@@ -132,12 +179,12 @@ public class InitializationController {
         user.setWarehouses(set);
         userService.updateUser(user);
         
-        return warehouse;
+        return ResponseEntity.ok(warehouse);
     }
     
     @RequestMapping(value = "/init/addUom", method = RequestMethod.POST, 
             headers = "Accept=application/json")
-    public UomEntity addUom(HttpServletRequest request, @RequestBody UomEntity uom){
+    public ResponseEntity<?> addUom(HttpServletRequest request, @RequestBody UomEntity uom){
         
         String header = request.getHeader("UserId");
         
@@ -159,6 +206,6 @@ public class InitializationController {
             menuService.addMenu(menu);
         }
         
-        return uom;
+        return ResponseEntity.ok(uom);
     }
 }

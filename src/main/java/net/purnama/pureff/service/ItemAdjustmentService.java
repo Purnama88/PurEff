@@ -24,6 +24,11 @@ public class ItemAdjustmentService {
     ItemAdjustmentDao itemadjustmentDao;
     
     @Transactional
+    public void addItemAdjustment(ItemAdjustmentEntity itemadjustment) {
+        itemadjustmentDao.addItemAdjustment(itemadjustment);
+    }
+    
+    @Transactional
     public List<ItemAdjustmentEntity> getItemAdjustmentList(AdjustmentEntity adjustment) {
         return itemadjustmentDao.getItemAdjustmentList(adjustment);
     }

@@ -42,4 +42,14 @@ public class InvoiceWarehouseInService {
     public void updateInvoiceWarehouseIn(InvoiceWarehouseInEntity invoicewarehousein) {
             invoicewarehouseinDao.updateInvoiceWarehouseIn(invoicewarehousein);
     }
+    
+    @Transactional
+    public List getInvoiceWarehouseInList(int itemperpage, int page, String sort, String keyword){
+        return invoicewarehouseinDao.getInvoiceWarehouseInList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countInvoiceWarehouseInList(String keyword){
+        return invoicewarehouseinDao.countInvoiceWarehouseInList(keyword);
+    }
 }

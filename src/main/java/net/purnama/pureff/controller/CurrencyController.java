@@ -15,10 +15,11 @@ import net.purnama.pureff.service.CurrencyService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,29 +32,38 @@ public class CurrencyController {
     @Autowired
     CurrencyService currencyService;
     
+    @RequestMapping(value = "api/getActiveCurrencyList", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public ResponseEntity<?> getActiveCurrencyList() {
+        
+        List<CurrencyEntity> ls = currencyService.getActiveCurrencyList();
+        return ResponseEntity.ok(ls);
+    }
+    
     @RequestMapping(value = "api/getCurrencyList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<CurrencyEntity> getCurrencyList() {
+    public ResponseEntity<?> getCurrencyList() {
         
         List<CurrencyEntity> ls = currencyService.getCurrencyList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getCurrency/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public CurrencyEntity getCurrency(@PathVariable String id) {
-        return currencyService.getCurrency(id);
+    //
+    
+    @RequestMapping(value = "api/getCurrency", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getCurrency(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(currencyService.getCurrency(id));
     }
     
-    @RequestMapping(value = "api/getCurrencyByCode/{code}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public CurrencyEntity getCurrencyByCode(@PathVariable String code) {
-        return currencyService.getCurrency(code);
-    }
-
     @RequestMapping(value = "api/addCurrency", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public CurrencyEntity addCurrency(HttpServletRequest httpRequest, @RequestBody CurrencyEntity currency) {
+    public ResponseEntity<?> addCurrency(HttpServletRequest httpRequest, 
+            @RequestBody CurrencyEntity currency) {
+        
+        if(currencyService.getCurrencyByCode(currency.getCode()) != null){
+            return ResponseEntity.badRequest().body("Code '" + currency.getCode() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -65,12 +75,12 @@ public class CurrencyController {
         
         currencyService.addCurrency(currency);
         
-        return currency;
+        return ResponseEntity.ok(currency);
     }
 
     @RequestMapping(value = "api/updateCurrency", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public CurrencyEntity updateCurrency(HttpServletRequest httpRequest, 
+    public ResponseEntity<?> updateCurrency(HttpServletRequest httpRequest, 
             @RequestBody CurrencyEntity currency) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -81,37 +91,27 @@ public class CurrencyController {
         
         currencyService.updateCurrency(currency);
         
-        return currency;
+        return ResponseEntity.ok(currency);
     }
     
-    @RequestMapping(value = "/api/getCurrencyList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<CurrencyEntity> getCurrencyList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    //api/getCurrencyList?itemperpage=9&
+    
+    @RequestMapping(value = "/api/getCurrencyList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getCurrencyList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
-        List<CurrencyEntity> ls = currencyService.getCurrencyList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getCurrencyList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<CurrencyEntity> getCurrencyList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<CurrencyEntity> ls = currencyService.getCurrencyList(itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countCurrencyList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countCurrencyList(@PathVariable String keyword){
-        return currencyService.countCurrencyList(keyword);
+        List<CurrencyEntity> ls = currencyService.getCurrencyList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countCurrencyList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countCurrencyList(){
-        return currencyService.countCurrencyList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countCurrencyList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(currencyService.countCurrencyList(keyword));
     }
 }

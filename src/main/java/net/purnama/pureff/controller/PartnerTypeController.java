@@ -5,6 +5,7 @@
  */
 package net.purnama.pureff.controller;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +14,14 @@ import net.purnama.pureff.entity.PartnerTypeEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.PartnerTypeService;
+import net.purnama.pureff.util.GlobalFields;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,31 +33,48 @@ public class PartnerTypeController {
     @Autowired
     PartnerTypeService partnertypeService;
     
+    @RequestMapping(value = "api/getPartnerTypeParentList", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public ResponseEntity<?> getPartnerTypeParentList() {
+        
+        List<String> ls = new ArrayList<>();
+        
+        for(String name : GlobalFields.PARENT_NAMES){
+            ls.add(name);
+        }
+        
+        return ResponseEntity.ok(ls);
+    }
+    
     @RequestMapping(value = "api/getActivePartnerTypeList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<PartnerTypeEntity> getActivePartnerTypeList() {
+    public ResponseEntity<?> getActivePartnerTypeList() {
         
         List<PartnerTypeEntity> ls = partnertypeService.getActivePartnerTypeList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "api/getPartnerTypeList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<PartnerTypeEntity> getPartnerTypeList() {
+    public ResponseEntity<?> getPartnerTypeList() {
         
         List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPartnerType/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public PartnerTypeEntity getPartnerType(@PathVariable String id) {
-        return partnertypeService.getPartnerType(id);
+    @RequestMapping(value = "api/getPartnerType", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getPartnerType(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(partnertypeService.getPartnerType(id));
     }
 
     @RequestMapping(value = "api/addPartnerType", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public PartnerTypeEntity addPartnerType(HttpServletRequest httpRequest, @RequestBody PartnerTypeEntity partnertype) {
+    public ResponseEntity<?> addPartnerType(HttpServletRequest httpRequest, @RequestBody PartnerTypeEntity partnertype) {
+        
+        if(partnertypeService.getPartnerTypeByName(partnertype.getName()) != null){
+            return ResponseEntity.badRequest().body("Name '" + partnertype.getName() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
@@ -66,13 +86,19 @@ public class PartnerTypeController {
         
         partnertypeService.addPartnerType(partnertype);
         
-        return partnertype;
+        return ResponseEntity.ok(partnertype);
     }
 
     @RequestMapping(value = "api/updatePartnerType", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public PartnerTypeEntity updatePartnerType(HttpServletRequest httpRequest, 
+    public ResponseEntity<?> updatePartnerType(HttpServletRequest httpRequest, 
             @RequestBody PartnerTypeEntity partnertype) {
+        
+        PartnerTypeEntity prev = partnertypeService.getPartnerTypeByName(partnertype.getName());
+        
+        if(prev != null && !prev.getId().equals(partnertype.getId())){
+            return ResponseEntity.badRequest().body("Name '" + partnertype.getName() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
@@ -83,37 +109,25 @@ public class PartnerTypeController {
         
         partnertypeService.updatePartnerType(partnertype);
         
-        return partnertype;
+        return ResponseEntity.ok(partnertype);
     }
     
-    @RequestMapping(value = "/api/getPartnerTypeList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PartnerTypeEntity> getPartnerTypeList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    @RequestMapping(value = "/api/getPartnerTypeList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getPartnerTypeList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
-        List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getPartnerTypeList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PartnerTypeEntity> getPartnerTypeList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList(itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countPartnerTypeList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countPartnerTypeList(@PathVariable String keyword){
-        return partnertypeService.countPartnerTypeList(keyword);
+        List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countPartnerTypeList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countPartnerTypeList(){
-        return partnertypeService.countPartnerTypeList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countPartnerTypeList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(partnertypeService.countPartnerTypeList(keyword));
     }
 }

@@ -48,6 +48,13 @@ public class ItemDao {
         return p;
     }
     
+    public ItemEntity getItemByCode(String code) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(ItemEntity.class);
+        c.add(Restrictions.eq("code", code));
+        return (ItemEntity)c.uniqueResult();
+    }
+    
     public ItemEntity addItem(ItemEntity item) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(item);

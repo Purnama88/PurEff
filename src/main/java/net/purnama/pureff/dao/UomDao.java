@@ -11,6 +11,8 @@ import net.purnama.pureff.entity.UomEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -48,7 +50,7 @@ public class UomDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(UomEntity.class);
         c.add(Restrictions.eq("parent", parent));
-        c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
@@ -71,6 +73,13 @@ public class UomDao {
         return p;
     }
     
+    public UomEntity getUomByName(String name){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(UomEntity.class);
+        c.add(Restrictions.eq("name", name));
+        return (UomEntity)c.uniqueResult();
+    }
+    
     public UomEntity addUom(UomEntity uom) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(uom);
@@ -80,5 +89,46 @@ public class UomDao {
     public void updateUom(UomEntity uom) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(uom);
+    }
+    
+    public List getUomList(int itemperpage, int page, String sort, String keyword, UomEntity parent){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(UomEntity.class);
+        if(parent == null){
+            c.add(Restrictions.isNull("parent"));
+        }
+        else{
+            c.add(Restrictions.eq("parent", parent));
+        }
+        c.add(Restrictions.like("name", "%"+keyword+"%"));
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
+        
+        c.setFirstResult(itemperpage * (page-1));
+        c.setMaxResults(itemperpage);
+        
+        return c.list();
+    }
+    
+    public int countUomList(String keyword, UomEntity parent){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(UomEntity.class);
+        if(parent == null){
+            c.add(Restrictions.isNull("parent"));
+        }
+        else{
+            c.add(Restrictions.eq("parent", parent));
+        }
+        c.add(Restrictions.like("name", "%"+keyword+"%"));
+        c.setProjection(Projections.rowCount());
+        List result = c.list();
+        int resultint = Integer.valueOf(result.get(0).toString());
+        
+        return resultint;
     }
 }

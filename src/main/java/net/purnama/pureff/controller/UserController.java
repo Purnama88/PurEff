@@ -6,13 +6,11 @@
 
 package net.purnama.pureff.controller;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.purnama.pureff.entity.LoginEntity;
-import net.purnama.pureff.entity.RoleEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.security.JwtUtil;
@@ -21,10 +19,11 @@ import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,9 +41,13 @@ public class UserController {
     
     @RequestMapping(value = "/login", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public RoleEntity login(HttpServletRequest request, HttpServletResponse response, @RequestBody LoginEntity login) throws IOException{
+    public ResponseEntity<?> login(HttpServletRequest request, HttpServletResponse response, 
+            @RequestBody LoginEntity login) throws Exception{
         
-        UserEntity user = userService.getUser(login.getUsername(), login.getPassword());
+        String username = login.getUsername();
+        String password = net.purnama.pureff.util.GlobalFunctions.encrypt(login.getPassword());
+        
+        UserEntity user = userService.getUser(username, password);
         WarehouseEntity warehouse = warehouseService.getWarehouse(login.getWarehouseid());   
         
         if(user != null && warehouse != null){
@@ -54,49 +57,39 @@ public class UserController {
             }
             
             String token = JwtUtil.generateToken(user.getId(), warehouse.getId());
-//            String token = JwtUtil.generateToken(user);
             response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+            
+            return ResponseEntity.ok(user.getRole());
         }
         else{
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid log in");
+            return ResponseEntity.badRequest().body("Invalid Log In");
         }
-        return user.getRole();
-    }
-    
-    @RequestMapping(value = "/api/getUserList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<UserEntity> getUserList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
-        
-        List<UserEntity> ls = userService.getUserList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getUserList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<UserEntity> getUserList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<UserEntity> ls = userService.getUserList(itemperpage, page, "");
-        return ls;
     }
     
     @RequestMapping(value = "/api/getUserList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<UserEntity> getUserList() {
+    public ResponseEntity<?> getUserList() {
         
         List<UserEntity> ls = userService.getUserList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getUser/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public UserEntity getUser(@PathVariable String id) {
-        return userService.getUser(id);
+    @RequestMapping(value = "api/getUser", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getUser(@RequestParam(value="id") String id) {
+        
+        return ResponseEntity.ok(userService.getUser(id));
     }
     
     @RequestMapping(value = "api/addUser", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public UserEntity addUser(HttpServletRequest httpRequest, @RequestBody UserEntity user) {
+    public ResponseEntity<?> addUser(HttpServletRequest httpRequest,
+            @RequestBody UserEntity user
+        ) {
+        
+        if(userService.getUserByUsername(user.getUsername()) != null){
+            return ResponseEntity.badRequest().body("Username '" + user.getUsername() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -107,36 +100,57 @@ public class UserController {
         user.setLastmodified(Calendar.getInstance());
         user.setLastmodifiedby(temp);
         
+        try{
+            String password = user.getPassword();
+            user.setPassword(net.purnama.pureff.util.GlobalFunctions.encrypt(password));
+        }
+        catch(Exception ex){
+            return ResponseEntity.badRequest().body("");
+        }
+        
         userService.addUser(user);
         
-        return user;
+        return ResponseEntity.ok(user);
     }
 
     @RequestMapping(value = "api/updateUser", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public UserEntity updateUser(HttpServletRequest httpRequest, @RequestBody UserEntity user) {
+    public ResponseEntity<?> updateUser(HttpServletRequest httpRequest, @RequestBody UserEntity user) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        try{
+            String password = user.getPassword();
+            user.setPassword(net.purnama.pureff.util.GlobalFunctions.encrypt(password));
+        }
+        catch(Exception ex){
+            return ResponseEntity.badRequest().body("");
+        }
         
         user.setLastmodifiedby(temp);
         
         userService.updateUser(user);
         
-        return user;
+        return ResponseEntity.ok(user);
     }
     
-    @RequestMapping(value = {"api/countUserList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countUserList(@PathVariable String keyword){
-        return userService.countUserList(keyword);
+    @RequestMapping(value = "/api/getUserList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getUserList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
+        
+        List<UserEntity> ls = userService.getUserList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countUserList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countUserList(){
-        return userService.countUserList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countUserList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(userService.countUserList(keyword));
     }
 }

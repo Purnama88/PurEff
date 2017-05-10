@@ -26,6 +26,11 @@ public class ItemAdjustmentDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addItemAdjustment(ItemAdjustmentEntity itemadjustment) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(itemadjustment);
+    }
+    
     public List<ItemAdjustmentEntity> getItemAdjustmentList(AdjustmentEntity adjustment) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemAdjustmentEntity.class);

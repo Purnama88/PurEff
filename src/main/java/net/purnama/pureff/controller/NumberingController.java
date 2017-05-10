@@ -19,10 +19,11 @@ import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -40,16 +41,28 @@ public class NumberingController {
     
     @RequestMapping(value = "api/getNumberingList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<NumberingEntity> getNumberingList() {
+    public ResponseEntity<?> getNumberingList() {
         
         List<NumberingEntity> ls = numberingService.getNumberingList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getNumberingList/{menuid}", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getActiveNumberingList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<NumberingEntity> getNumberingList(HttpServletRequest httpRequest,
-            @PathVariable int menuid) {
+    public ResponseEntity<?> getNumberingList(HttpServletRequest httpRequest) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity wartemp = new WarehouseEntity();
+        wartemp.setId(JwtUtil.parseToken2(header.substring(7)));
+        
+        List<NumberingEntity> ls = numberingService.getActiveNumberingList(wartemp);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getNumberingList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"menuid"})
+    public ResponseEntity<?> getNumberingList(HttpServletRequest httpRequest,
+            @RequestParam(value="menuid") int menuid) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity wartemp = new WarehouseEntity();
@@ -58,24 +71,65 @@ public class NumberingController {
         MenuEntity menu = menuService.getMenu(menuid);
         
         List<NumberingEntity> ls = numberingService.getNumberingList(wartemp, menu);
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getNumbering/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public NumberingEntity getNumbering(@PathVariable String id) {
-        return numberingService.getNumbering(id);
-    }
-
-    @RequestMapping(value = "api/addNumbering", method = RequestMethod.POST,
-            headers = "Accept=application/json")
-    public NumberingEntity addNumbering(HttpServletRequest httpRequest,
-            @RequestBody NumberingEntity numbering) {
+    @RequestMapping(value = "api/setDefaultNumbering", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> setDefaultNumbering(HttpServletRequest httpRequest,
+            @RequestParam(value="id") String id) {
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
         WarehouseEntity wartemp = new WarehouseEntity();
         wartemp.setId(JwtUtil.parseToken2(header.substring(7)));
+        
+        NumberingEntity numbering = numberingService.getNumbering(id);
+        
+        if(numbering.getCurrent() == numbering.getEnd()){
+            return ResponseEntity.badRequest().body("Numbering has reach its limit");
+        }
+        
+        numbering.setStatus(true);
+        numbering.setLastmodifiedby(temp);
+        
+        MenuEntity menu = numbering.getMenu();
+        
+        NumberingEntity defnum = numberingService.getDefaultNumbering(menu, wartemp);
+        if(defnum != null){
+            defnum.setStatus(false);
+            defnum.setLastmodifiedby(temp);
+            numberingService.updateNumbering(defnum);
+        }
+        
+        numberingService.updateNumbering(numbering);
+        
+        return ResponseEntity.ok(numbering);
+    }
+    
+    @RequestMapping(value = "api/getNumbering", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getNumbering(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(numberingService.getNumbering(id));
+    }
+
+    @RequestMapping(value = "api/addNumbering", method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> addNumbering(HttpServletRequest httpRequest,
+            @RequestBody NumberingEntity numbering) {
+        
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity temp = new UserEntity();
+        temp.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity wartemp = new WarehouseEntity();
+        wartemp.setId(JwtUtil.parseToken2(header.substring(7)));
+        
+        if(numberingService.getNumbering(numbering.getPrefix(), 
+                numbering.getNumberingname(), wartemp, numbering.getMenu()) != null){
+            return ResponseEntity.badRequest().body("Numbering '" + numbering.getPrefix() +"' already exist");
+        }
         
         numbering.setId(IdGenerator.generateId());
         numbering.setLastmodified(Calendar.getInstance());
@@ -84,12 +138,12 @@ public class NumberingController {
         
         numberingService.addNumbering(numbering);
         
-        return numbering;
+        return ResponseEntity.ok(numbering);
     }
 
     @RequestMapping(value = "api/updateNumbering", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public NumberingEntity updateNumbering(HttpServletRequest httpRequest,
+    public ResponseEntity<?> updateNumbering(HttpServletRequest httpRequest,
             @RequestBody NumberingEntity numbering) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -100,6 +154,6 @@ public class NumberingController {
         
         numberingService.updateNumbering(numbering);
         
-        return numbering;
+        return ResponseEntity.ok(numbering);
     }
 }

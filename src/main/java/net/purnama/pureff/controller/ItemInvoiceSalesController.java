@@ -5,15 +5,14 @@
  */
 package net.purnama.pureff.controller;
 
-import java.util.List;
 import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
-import net.purnama.pureff.entity.transactional.ItemInvoiceSalesEntity;
 import net.purnama.pureff.service.InvoiceSalesService;
 import net.purnama.pureff.service.ItemInvoiceSalesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +27,11 @@ public class ItemInvoiceSalesController {
     @Autowired
     InvoiceSalesService invoicesalesService;
     
-    @RequestMapping(value = "api/getItemInvoiceSalesList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemInvoiceSalesEntity> getItemInvoiceSalesList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemInvoiceSalesList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemInvoiceSalesList(@RequestParam(value="id") String id) {
         InvoiceSalesEntity ad = invoicesalesService.getInvoiceSales(id);
         
-        return iteminvoicesalesService.getItemInvoiceSalesList(ad);
+        return ResponseEntity.ok(iteminvoicesalesService.getItemInvoiceSalesList(ad));
     }
 }

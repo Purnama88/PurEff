@@ -16,9 +16,11 @@ import net.purnama.pureff.service.ItemService;
 import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,19 +41,19 @@ public class ItemWarehouseController {
     
     @RequestMapping(value = "api/getItemWarehouseList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<ItemWarehouseEntity> getItemWarehouseList(HttpServletRequest httpRequest) {
+    public ResponseEntity<?> getItemWarehouseList(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity warehouse = new WarehouseEntity();
         warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         List<ItemWarehouseEntity> ls = itemwarehouseService.getItemWarehouseList(warehouse);
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "api/getItemWarehouse/{itemid}", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public ItemWarehouseEntity getItemWarehouse(HttpServletRequest httpRequest, @PathVariable String itemid) {
+    public ResponseEntity<?> getItemWarehouse(HttpServletRequest httpRequest, @PathVariable String itemid) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity warehouse = new WarehouseEntity();
@@ -59,51 +61,33 @@ public class ItemWarehouseController {
         
         ItemEntity item = itemService.getItem(itemid);
         
-        return itemwarehouseService.getItemWarehouse(warehouse, item);
+        return ResponseEntity.ok(itemwarehouseService.getItemWarehouse(warehouse, item));
     }
     
-    @RequestMapping(value = "/api/getItemWarehouseList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<ItemWarehouseEntity> getItemWarehouseList(HttpServletRequest httpRequest,
-            @PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    @RequestMapping(value = "/api/getItemWarehouseList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getItemWarehouseList(HttpServletRequest httpRequest,
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
         
-        List<ItemWarehouseEntity> ls = itemwarehouseService.getItemWarehouseList(warehouse, itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getItemWarehouseList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<ItemWarehouseEntity> getItemWarehouseList(HttpServletRequest httpRequest,
-            @PathVariable int itemperpage,
-            @PathVariable int page) {
-        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
-        
-        List<ItemWarehouseEntity> ls = itemwarehouseService.getItemWarehouseList(warehouse, itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countItemWarehouseList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countItemWarehouseList(HttpServletRequest httpRequest,
-        @PathVariable String keyword){
-        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
-        
-        return itemwarehouseService.countItemWarehouseList(warehouse, keyword);
+        List<ItemWarehouseEntity> ls = itemwarehouseService.getItemWarehouseList(warehouse,
+                itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countItemWarehouseList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countItemWarehouseList(HttpServletRequest httpRequest){
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countItemWarehouseList(HttpServletRequest httpRequest,
+            @RequestParam(value="keyword") String keyword){
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
-        return itemwarehouseService.countItemWarehouseList(warehouse, "");
+        
+        return ResponseEntity.ok(itemwarehouseService.countItemWarehouseList(warehouse, keyword));
     }
 }

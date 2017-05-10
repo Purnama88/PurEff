@@ -27,4 +27,24 @@ public class ItemDeliveryDraftService {
     public List<ItemDeliveryDraftEntity> getItemDeliveryDraftList(DeliveryDraftEntity deliverydraft) {
         return itemdeliverydraftDao.getItemDeliveryDraftList(deliverydraft);
     }
+    
+    @Transactional
+    public ItemDeliveryDraftEntity getItemDeliveryDraft(String id){
+        return itemdeliverydraftDao.getItemDeliveryDraft(id);
+    }
+    
+    @Transactional
+    public ItemDeliveryDraftEntity addItemDeliveryDraft(ItemDeliveryDraftEntity itemdeliverydraft){
+        return itemdeliverydraftDao.addItemDeliveryDraft(itemdeliverydraft);
+    }
+    
+    @Transactional
+    public void updateItemDeliveryDraft(ItemDeliveryDraftEntity itemdeliverydraft){
+        itemdeliverydraftDao.updateItemDeliveryDraft(itemdeliverydraft);
+    }
+    
+    @Transactional
+    public void deleteItemDeliveryDraft(String id){
+        itemdeliverydraftDao.deleteItemDeliveryDraft(id);;
+    }
 }

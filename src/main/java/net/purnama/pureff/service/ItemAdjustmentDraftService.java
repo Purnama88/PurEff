@@ -24,6 +24,26 @@ public class ItemAdjustmentDraftService {
     ItemAdjustmentDraftDao itemadjustmentdraftDao;
     
     @Transactional
+    public void addItemAdjustmentDraft(ItemAdjustmentDraftEntity itemadjustmentdraft) {
+        itemadjustmentdraftDao.addItemAdjustmentDraft(itemadjustmentdraft);
+    }
+    
+    @Transactional
+    public void updateItemAdjustmentDraft(ItemAdjustmentDraftEntity itemadjustmentdraft) {
+        itemadjustmentdraftDao.updateItemAdjustmentDraft(itemadjustmentdraft);
+    }
+    
+    @Transactional
+    public void deleteItemAdjustmentDraft(String id) {
+        itemadjustmentdraftDao.deleteItemAdjustmentDraft(id);
+    }
+    
+    @Transactional
+    public ItemAdjustmentDraftEntity getItemAdjustmentDraft(String id) {
+        return itemadjustmentdraftDao.getItemAdjustmentDraft(id);
+    }
+    
+    @Transactional
     public List<ItemAdjustmentDraftEntity> getItemAdjustmentDraftList(AdjustmentDraftEntity adjustmentdraft) {
         return itemadjustmentdraftDao.getItemAdjustmentDraftList(adjustmentdraft);
     }

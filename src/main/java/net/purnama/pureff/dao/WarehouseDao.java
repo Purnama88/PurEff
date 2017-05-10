@@ -36,12 +36,15 @@ public class WarehouseDao {
     
     public List<WarehouseEntity> getWarehouse_IdCode_List(){
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria cr = session.createCriteria(WarehouseEntity.class)
-        .setProjection(Projections.projectionList()
+        Criteria cr = session.createCriteria(WarehouseEntity.class);
+        
+        cr.add(Restrictions.eq("status", true));
+        
+        cr.setProjection(Projections.projectionList()
         .add(Projections.property("id"), "id")
         .add(Projections.property("code"), "code"))
         .setResultTransformer(Transformers.aliasToBean(WarehouseEntity.class));
-
+        
         List<WarehouseEntity> list = cr.list();
         
         return list;
@@ -66,6 +69,13 @@ public class WarehouseDao {
         return p;
     }
     
+    public WarehouseEntity getWarehouseByCode(String code) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(WarehouseEntity.class);
+        c.add(Restrictions.eq("code", code));
+        return (WarehouseEntity)c.uniqueResult();
+    }
+    
     public WarehouseEntity addWarehouse(WarehouseEntity warehouse) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(warehouse);
@@ -77,13 +87,20 @@ public class WarehouseDao {
         session.update(warehouse);
     }
     
-    public List getWarehouseList(int itemperpage, int page, String keyword){
+    public List getWarehouseList(int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(WarehouseEntity.class);
         Criterion code = Restrictions.like("code", "%"+keyword+"%");
         Criterion desc = Restrictions.like("name", "%"+keyword+"%");
         LogicalExpression orExp = Restrictions.or(code,desc);
         c.add(orExp);
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
         
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);

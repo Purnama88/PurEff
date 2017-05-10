@@ -20,10 +20,11 @@ import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -44,34 +45,39 @@ public class WarehouseController {
     
     @RequestMapping(value = "/getWarehouse_IdCode_List", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<WarehouseEntity> getWarehouse_IdCode_List() {
+    public ResponseEntity<?> getWarehouse_IdCode_List() {
         List<WarehouseEntity> ls = warehouseService.getWarehouse_IdCode_List();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "/api/getWarehouseList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<WarehouseEntity> getWarehouseList() {
+    public ResponseEntity<?> getWarehouseList() {
         List<WarehouseEntity> ls = warehouseService.getWarehouseList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "/api/getActiveWarehouseList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<WarehouseEntity> getActiveWarehouseList() {
+    public ResponseEntity<?> getActiveWarehouseList() {
         List<WarehouseEntity> ls = warehouseService.getActiveWarehouseList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getWarehouse/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public WarehouseEntity getWarehouse(@PathVariable String id) {
-        return warehouseService.getWarehouse(id);
+    @RequestMapping(value = "api/getWarehouse", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getWarehouse(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(warehouseService.getWarehouse(id));
     }
     
     @RequestMapping(value = "api/addWarehouse", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public WarehouseEntity addWarehouse(HttpServletRequest httpRequest, @RequestBody WarehouseEntity warehouse) {
+    public ResponseEntity<?> addWarehouse(HttpServletRequest httpRequest,
+            @RequestBody WarehouseEntity warehouse) {
+        
+        if(warehouseService.getWarehouseByCode(warehouse.getCode()) != null){
+            return ResponseEntity.badRequest().body("Code '" + warehouse.getCode() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -98,12 +104,12 @@ public class WarehouseController {
             itemwarehouseService.addItemWarehouse(itemwarehouse);
         }
         
-        return warehouse;
+        return ResponseEntity.ok(warehouse);
     }
 
     @RequestMapping(value = "api/updateWarehouse", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public WarehouseEntity updateWarehouse(HttpServletRequest httpRequest,
+    public ResponseEntity<?> updateWarehouse(HttpServletRequest httpRequest,
             @RequestBody WarehouseEntity warehouse) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -114,37 +120,25 @@ public class WarehouseController {
         
         warehouseService.updateWarehouse(warehouse);
         
-        return warehouse;
+        return ResponseEntity.ok(warehouse);
     }
     
-    @RequestMapping(value = "/api/getWarehouseList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<WarehouseEntity> getWarehouseList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    @RequestMapping(value = "/api/getWarehouseList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getWarehouseList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
-        List<WarehouseEntity> ls = warehouseService.getWarehouseList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getWarehouseList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<WarehouseEntity> getWarehouseList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<WarehouseEntity> ls = warehouseService.getWarehouseList(itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countWarehouseList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countWarehouseList(@PathVariable String keyword){
-        return warehouseService.countWarehouseList(keyword);
+        List<WarehouseEntity> ls = warehouseService.getWarehouseList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countWarehouseList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countWarehouseList(){
-        return warehouseService.countWarehouseList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countWarehouseList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(warehouseService.countWarehouseList(keyword));
     }
 }

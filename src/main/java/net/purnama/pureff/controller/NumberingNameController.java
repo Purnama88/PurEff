@@ -15,10 +15,11 @@ import net.purnama.pureff.service.NumberingNameService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,30 +34,35 @@ public class NumberingNameController {
     
     @RequestMapping(value = "api/getNumberingNameList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<NumberingNameEntity> getNumberingNameList() {
+    public ResponseEntity<?> getNumberingNameList() {
         
         List<NumberingNameEntity> ls = numberingnameService.getNumberingNameList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "api/getActiveNumberingNameList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<NumberingNameEntity> getActiveNumberingNameList() {
+    public ResponseEntity<?>  getActiveNumberingNameList() {
         
         List<NumberingNameEntity> ls = numberingnameService.getActiveNumberingNameList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getNumberingName/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public NumberingNameEntity getNumberingName(@PathVariable String id) {
-        return numberingnameService.getNumberingName(id);
+    @RequestMapping(value = "api/getNumberingName", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getNumberingName(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(numberingnameService.getNumberingName(id));
     }
 
     @RequestMapping(value = "api/addNumberingName", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public NumberingNameEntity addNumberingName(HttpServletRequest httpRequest,
+    public ResponseEntity<?> addNumberingName(HttpServletRequest httpRequest,
             @RequestBody NumberingNameEntity numberingname) {
+        
+        if(numberingnameService.getNumberingNameByName(numberingname.getName()) != null){
+            return ResponseEntity.badRequest().body("Name '" + numberingname.getName() +"' already exist");
+        }
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
@@ -67,13 +73,19 @@ public class NumberingNameController {
         
         numberingnameService.addNumberingName(numberingname);
         
-        return numberingname;
+        return ResponseEntity.ok(numberingname);
     }
 
     @RequestMapping(value = "api/updateNumberingName", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public NumberingNameEntity updateNumberingName(HttpServletRequest httpRequest,
+    public ResponseEntity<?> updateNumberingName(HttpServletRequest httpRequest,
             @RequestBody NumberingNameEntity numberingname) {
+        
+        NumberingNameEntity prev = numberingnameService.getNumberingNameByName(numberingname.getName());
+        
+        if(prev != null && !prev.getId().equals(numberingname.getId())){
+            return ResponseEntity.badRequest().body("Name '" + numberingname.getName() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -84,37 +96,25 @@ public class NumberingNameController {
         
         numberingnameService.updateNumberingName(numberingname);
         
-        return numberingname;
+        return ResponseEntity.ok(numberingname);
     }
     
-    @RequestMapping(value = "/api/getNumberingNameList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<NumberingNameEntity> getNumberingNameList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    @RequestMapping(value = "/api/getNumberingNameList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getNumberingNameList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
-        List<NumberingNameEntity> ls = numberingnameService.getNumberingNameList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getNumberingNameList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<NumberingNameEntity> getNumberingNameList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<NumberingNameEntity> ls = numberingnameService.getNumberingNameList(itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countNumberingNameList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countNumberingNameList(@PathVariable String keyword){
-        return numberingnameService.countNumberingNameList(keyword);
+        List<NumberingNameEntity> ls = numberingnameService.getNumberingNameList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countNumberingNameList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countNumberingNameList(){
-        return numberingnameService.countNumberingNameList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countNumberingNameList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(numberingnameService.countNumberingNameList(keyword));
     }
 }

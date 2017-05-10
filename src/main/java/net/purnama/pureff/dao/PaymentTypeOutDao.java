@@ -40,6 +40,23 @@ public class PaymentTypeOutDao {
         return c.list();
     }
     
+    public PaymentTypeOutEntity getPaymentTypeOut(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentTypeOutEntity p = (PaymentTypeOutEntity) session.get(PaymentTypeOutEntity.class, id);
+        return p;
+    }
+    
+    public PaymentTypeOutEntity addPaymentTypeOut(PaymentTypeOutEntity paymenttypeout) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymenttypeout);
+        return paymenttypeout;
+    }
+
+    public void updatePaymentTypeOut(PaymentTypeOutEntity paymenttypeout) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymenttypeout);
+    }
+    
     public List getPaymentTypeOutList(int type, boolean accepted, boolean valid,
             Calendar begin, Calendar end){
         Session session = this.sessionFactory.getCurrentSession();

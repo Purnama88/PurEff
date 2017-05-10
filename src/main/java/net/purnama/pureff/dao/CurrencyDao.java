@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,13 @@ public class CurrencyDao {
         c.add(Restrictions.eq("defaultcurrency", true));
         CurrencyEntity currency = (CurrencyEntity)c.uniqueResult();
         return currency;
+    }
+    
+    public List<CurrencyEntity> getActiveCurrencyList() {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(CurrencyEntity.class);
+        c.add(Restrictions.eq("status", true));
+        return c.list();
     }
     
     public List<CurrencyEntity> getCurrencyList() {
@@ -69,7 +77,7 @@ public class CurrencyDao {
         session.update(currency);
     }
     
-    public List getCurrencyList(int itemperpage, int page, String keyword){
+    public List getCurrencyList(int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(CurrencyEntity.class);
         Criterion code = Restrictions.like("code", "%"+keyword+"%");
@@ -77,6 +85,13 @@ public class CurrencyDao {
         LogicalExpression orExp = Restrictions.or(code,desc);
         c.add(orExp);
 
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
+        
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.PartnerTypeEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,13 @@ public class PartnerTypeDao {
         return p;
     }
     
+    public PartnerTypeEntity getPartnerTypeByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerTypeEntity.class);
+        c.add(Restrictions.eq("name", name));
+        return (PartnerTypeEntity)c.uniqueResult();
+    }
+    
     public PartnerTypeEntity addPartnerType(PartnerTypeEntity partnertype) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(partnertype);
@@ -60,10 +68,17 @@ public class PartnerTypeDao {
         session.update(partnertype);
     }
     
-    public List getPartnerTypeList(int itemperpage, int page, String keyword){
+    public List getPartnerTypeList(int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PartnerTypeEntity.class);
         c.add(Restrictions.like("name", "%"+keyword+"%"));
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
         
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);

@@ -36,6 +36,11 @@ public class NumberingNameService {
 	public NumberingNameEntity getNumberingName(String id) {
 		return numberingnameDao.getNumberingName(id);
 	}
+        
+        @Transactional
+	public NumberingNameEntity getNumberingNameByName(String name) {
+		return numberingnameDao.getNumberingNameByName(name);
+	}
 
 	@Transactional
 	public void addNumberingName(NumberingNameEntity numberingname) {
@@ -48,8 +53,8 @@ public class NumberingNameService {
 	}
         
         @Transactional
-        public List getNumberingNameList(int itemperpage, int page, String keyword){
-            return numberingnameDao.getNumberingNameList(itemperpage, page, keyword);
+        public List getNumberingNameList(int itemperpage, int page, String sort, String keyword){
+            return numberingnameDao.getNumberingNameList(itemperpage, page, sort, keyword);
         }
         
         @Transactional

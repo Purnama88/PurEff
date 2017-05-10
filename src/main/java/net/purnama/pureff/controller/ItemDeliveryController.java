@@ -11,9 +11,10 @@ import net.purnama.pureff.entity.transactional.ItemDeliveryEntity;
 import net.purnama.pureff.service.DeliveryService;
 import net.purnama.pureff.service.ItemDeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +29,11 @@ public class ItemDeliveryController {
     @Autowired
     DeliveryService deliveryService;
     
-    @RequestMapping(value = "api/getItemDeliveryList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemDeliveryEntity> getItemDeliveryList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemDeliveryList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemDeliveryList(@RequestParam(value="id") String id) {
         DeliveryEntity ad = deliveryService.getDelivery(id);
         
-        return itemdeliveryService.getItemDeliveryList(ad);
+        return ResponseEntity.ok(itemdeliveryService.getItemDeliveryList(ad));
     }
 }

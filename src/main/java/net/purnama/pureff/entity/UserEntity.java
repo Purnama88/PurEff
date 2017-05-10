@@ -6,9 +6,7 @@
 
 package net.purnama.pureff.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Set;
@@ -35,6 +33,7 @@ public class UserEntity implements Serializable {
     private String id;
     
     @Column(name="code", unique=true)
+//    @NotBlank(message = "username can't empty!")
     private String code;
     
     @Column(name="name")
@@ -76,8 +75,7 @@ public class UserEntity implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Calendar lastmodified;
     
-//    @JsonIgnoreProperties("lastmodifiedby")
-    @JsonBackReference
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "lastmodifiedby")
     private UserEntity lastmodifiedby;

@@ -16,10 +16,11 @@ import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.RoleService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -34,29 +35,33 @@ public class RoleController {
     
     @RequestMapping(value = "/api/getRoleList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<RoleEntity> getRoleList() {
+    public ResponseEntity<?> getRoleList() {
         
         List<RoleEntity> ls = roleService.getRoleList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = "/api/getActiveRoleList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<RoleEntity> getActiveRoleList() {
+    public ResponseEntity<?> getActiveRoleList() {
         
-        List<RoleEntity> ls = roleService.getRoleList();
-        return ls;
+        List<RoleEntity> ls = roleService.getActiveRoleList();
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getRole/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public RoleEntity getRole(@PathVariable String id) {
-        return roleService.getRole(id);
+    @RequestMapping(value = "api/getRole", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getRole(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(roleService.getRole(id));
     }
 
     @RequestMapping(value = "api/addRole", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public RoleEntity addRole(HttpServletRequest httpRequest, @RequestBody RoleEntity role) {
+    public ResponseEntity<?> addRole(HttpServletRequest httpRequest, @RequestBody RoleEntity role) {
+        
+        if(roleService.getRoleByName(role.getName()) != null){
+            return ResponseEntity.badRequest().body("Name '" + role.getName() +"' already exist");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
@@ -68,12 +73,19 @@ public class RoleController {
         
         roleService.addRole(role);
         
-        return role;
+        return ResponseEntity.ok(role);
     }
 
     @RequestMapping(value = "api/updateRole", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public RoleEntity updateRole(HttpServletRequest httpRequest, @RequestBody RoleEntity role) {
+    public ResponseEntity<?> updateRole(HttpServletRequest httpRequest, @RequestBody RoleEntity role) {
+        
+        RoleEntity prev = roleService.getRoleByName(role.getName());
+        
+        if(prev != null && !prev.getId().equals(role.getId())){
+            return ResponseEntity.badRequest().body("Name '" + role.getName() +"' already exist");
+        }
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
@@ -83,37 +95,25 @@ public class RoleController {
         
         roleService.updateRole(role);
         
-        return role;
+        return ResponseEntity.ok(role);
     }
     
-    @RequestMapping(value = "/api/getRoleList/{itemperpage}/{page}/{keyword}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<RoleEntity> getRoleList(@PathVariable int itemperpage,
-            @PathVariable int page, @PathVariable String keyword) {
+    @RequestMapping(value = "/api/getRoleList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getRoleList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
         
-        List<RoleEntity> ls = roleService.getRoleList(itemperpage, page, keyword);
-        return ls;
-    }
-    
-    @RequestMapping(value = "/api/getRoleList/{itemperpage}/{page}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<RoleEntity> getRoleList(@PathVariable int itemperpage,
-            @PathVariable int page) {
-        List<RoleEntity> ls = roleService.getRoleList(itemperpage, page, "");
-        return ls;
-    }
-    
-    @RequestMapping(value = {"api/countRoleList/{keyword}"},
-            method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countRoleList(@PathVariable String keyword){
-        return roleService.countRoleList(keyword);
+        List<RoleEntity> ls = roleService.getRoleList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
     }
     
     @RequestMapping(value = {"api/countRoleList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public int countRoleList(){
-        return roleService.countRoleList("");
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countRoleList(@RequestParam(value="keyword") String keyword){
+        return ResponseEntity.ok(roleService.countRoleList(keyword));
     }
 }

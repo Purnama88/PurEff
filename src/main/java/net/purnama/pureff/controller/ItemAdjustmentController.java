@@ -5,15 +5,14 @@
  */
 package net.purnama.pureff.controller;
 
-import java.util.List;
 import net.purnama.pureff.entity.transactional.AdjustmentEntity;
-import net.purnama.pureff.entity.transactional.ItemAdjustmentEntity;
 import net.purnama.pureff.service.AdjustmentService;
 import net.purnama.pureff.service.ItemAdjustmentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +27,11 @@ public class ItemAdjustmentController {
     @Autowired
     AdjustmentService adjustmentService;
     
-    @RequestMapping(value = "api/getItemAdjustmentList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemAdjustmentEntity> getItemAdjustmentList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemAdjustmentList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemAdjustmentList(@RequestParam(value="id") String id){
         AdjustmentEntity ad = adjustmentService.getAdjustment(id);
         
-        return itemadjustmentService.getItemAdjustmentList(ad);
+        return ResponseEntity.ok(itemadjustmentService.getItemAdjustmentList(ad));
     }
 }

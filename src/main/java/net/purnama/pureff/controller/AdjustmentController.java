@@ -8,14 +8,23 @@ package net.purnama.pureff.controller;
 
 import java.util.Calendar;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.AdjustmentEntity;
+import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.AdjustmentService;
+import net.purnama.pureff.service.UserService;
+import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -26,36 +35,65 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdjustmentController {
     
     @Autowired
+    UserService userService;
+    
+    @Autowired
+    WarehouseService warehouseService;
+    
+    @Autowired
     AdjustmentService adjustmentService;
     
     @RequestMapping(value = "api/getAdjustmentList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<AdjustmentEntity> getAdjustmentList() {
+    public ResponseEntity<?> getAdjustmentList() {
         
         List<AdjustmentEntity> ls = adjustmentService.getAdjustmentList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getAdjustment/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public AdjustmentEntity getAdjustment(@PathVariable String id) {
-        return adjustmentService.getAdjustment(id);
-    }
-
-    @RequestMapping(value = "api/addAdjustment", method = RequestMethod.POST,
-            headers = "Accept=application/json")
-    public AdjustmentEntity addAdjustment(@RequestBody AdjustmentEntity adjustment) {
-        adjustment.setId(IdGenerator.generateId());
-        adjustment.setLastmodified(Calendar.getInstance());
-        
-        adjustmentService.addAdjustment(adjustment);
-        
-        return adjustment;
+    @RequestMapping(value = "api/getAdjustment", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getAdjustment(@RequestParam(value="id") String id){
+        return ResponseEntity.ok(adjustmentService.getAdjustment(id));
     }
 
     @RequestMapping(value = "api/updateAdjustment", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updateAdjustment(@RequestBody AdjustmentEntity adjustment) {
+    public ResponseEntity<?> updateAdjustment(HttpServletRequest httpRequest,
+            @RequestBody AdjustmentEntity adjustment) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        adjustment.setLastmodified(Calendar.getInstance());
+        adjustment.setWarehouse(warehouse);
+        adjustment.setLastmodifiedby(user);
+        
         adjustmentService.updateAdjustment(adjustment);
+        
+        return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = "/api/getAdjustmentList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getAdjustmentList(
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
+        
+        List<AdjustmentEntity> ls = adjustmentService.
+                getAdjustmentList(itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/countAdjustmentList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countAdjustmentList(
+            @RequestParam(value="keyword") String keyword){
+        
+        return ResponseEntity.ok(adjustmentService.countAdjustmentList(keyword));
     }
 }

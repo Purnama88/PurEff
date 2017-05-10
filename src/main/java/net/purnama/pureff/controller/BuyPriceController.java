@@ -16,10 +16,12 @@ import net.purnama.pureff.service.ItemService;
 import net.purnama.pureff.service.UomService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -40,58 +42,40 @@ public class BuyPriceController {
     
     @RequestMapping(value = "api/getBuyPriceList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<BuyPriceEntity> getBuyPriceList() {
+    public ResponseEntity<?> getBuyPriceList() {
         
         List<BuyPriceEntity> ls = buypriceService.getBuyPriceList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getBuyPriceList/{itemid}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<BuyPriceEntity> getBuyPriceList(@PathVariable String itemid) {
+    @RequestMapping(value = "api/getBuyPriceList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemid"})
+    public ResponseEntity<?> getBuyPriceList(@RequestParam(value="itemid") String itemid) {
         
         ItemEntity item = itemService.getItem(itemid);
         
         List<BuyPriceEntity> ls = buypriceService.getBuyPriceList(item);
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getBuyPrice/{itemid}/{uomid}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public BuyPriceEntity getBuyPrice(@PathVariable String itemid, @PathVariable String uomid) {
+    @RequestMapping(value = "api/getBuyPrice", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"itemid", "uomid"})
+    public ResponseEntity<?> getBuyPrice(
+        @RequestParam(value="itemid") String itemid,
+            @RequestParam(value="uomid") String uomid) {
         
         ItemEntity item = itemService.getItem(itemid);
         UomEntity uom = uomService.getUom(uomid);
         
-        return buypriceService.getBuyPrice(item, uom);
+        return ResponseEntity.ok(buypriceService.getBuyPrice(item, uom));
     }
     
-    @RequestMapping(value = "api/getBuyPrice/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public BuyPriceEntity getBuyPrice(@PathVariable String id) {
-        return buypriceService.getBuyPrice(id);
-    }
-
-    @RequestMapping(value = "api/addBuyPrice", method = RequestMethod.POST,
-            headers = "Accept=application/json")
-    public BuyPriceEntity addBuyPrice(@RequestBody BuyPriceEntity buyprice) {
-        buyprice.setId(IdGenerator.generateId());
-        buyprice.setLastmodified(Calendar.getInstance());
-        
-        buypriceService.addBuyPrice(buyprice);
-        
-        return buyprice;
-    }
-
     @RequestMapping(value = "api/updateBuyPrice", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updateBuyPrice(@RequestBody BuyPriceEntity buyprice) {
+    public ResponseEntity<?> updateBuyPrice(@RequestBody BuyPriceEntity buyprice) {
+        
         buypriceService.updateBuyPrice(buyprice);
-    }
-
-    @RequestMapping(value = "api/deleteBuyPrice/{id}", method = RequestMethod.DELETE, 
-            headers = "Accept=application/json")
-    public void deleteBuyPrice(@PathVariable String id) {
-        buypriceService.deleteBuyPrice(id);		
+        
+        return ResponseEntity.ok(buyprice);
     }
 }

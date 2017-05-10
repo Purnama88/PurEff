@@ -24,6 +24,11 @@ public class ItemInvoiceWarehouseOutService {
     ItemInvoiceWarehouseOutDao iteminvoicewarehouseoutDao;
     
     @Transactional
+    public void addItemInvoiceWarehouseOut(ItemInvoiceWarehouseOutEntity iteminvoicewarehouseout) {
+        iteminvoicewarehouseoutDao.addItemInvoiceWarehouseOut(iteminvoicewarehouseout);
+    }
+    
+    @Transactional
     public List<ItemInvoiceWarehouseOutEntity> getItemInvoiceWarehouseOutList(InvoiceWarehouseOutEntity invoicewarehouseout) {
         return iteminvoicewarehouseoutDao.getItemInvoiceWarehouseOutList(invoicewarehouseout);
     }

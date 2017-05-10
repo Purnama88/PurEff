@@ -7,14 +7,15 @@
 package net.purnama.pureff.controller;
 
 import java.util.List;
+import net.purnama.pureff.entity.transactional.ReturnSalesEntity;
+import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentInReturnSalesDraftEntity;
-import net.purnama.pureff.service.PaymentInDraftService;
 import net.purnama.pureff.service.PaymentInReturnSalesDraftService;
-import net.purnama.pureff.service.ReturnSalesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -27,31 +28,36 @@ public class PaymentInReturnSalesDraftController {
     @Autowired
     PaymentInReturnSalesDraftService paymentinreturnsalesdraftService;
     
-    @Autowired
-    PaymentInDraftService paymentindraftService;
-    
-    @Autowired
-    ReturnSalesService returnsalesService;
-    
     @RequestMapping(value = "api/getPaymentInReturnSalesDraftEntityList", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PaymentInReturnSalesDraftEntity> getPaymentInReturnSalesDraftEntityList(@PathVariable String id) {
+            headers = "Accept=application/json", params = {"paymentid"})
+    public ResponseEntity<?> getPaymentInReturnSalesDraftEntityList(@RequestParam(value="paymentid") String paymentid) {
+        
+        PaymentInDraftEntity paymentindraft = new PaymentInDraftEntity();
+        paymentindraft.setId(paymentid);
         
         List<PaymentInReturnSalesDraftEntity> ls = paymentinreturnsalesdraftService.
-                getPaymentInReturnSalesDraftEntityList(paymentindraftService.getPaymentInDraft(id));
-        return ls;
+                getPaymentInReturnSalesDraftEntityList(paymentindraft);
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPaymentInReturnSalesDraftEntity/{paymentid}/{invoiceid}",
+    @RequestMapping(value = "api/getPaymentInReturnSalesDraftEntity",
             method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public PaymentInReturnSalesDraftEntity 
-        getPaymentInReturnSalesDraftEntity(@PathVariable String paymentid, @PathVariable String invoiceid){
-        PaymentInReturnSalesDraftEntity piisde = paymentinreturnsalesdraftService.
-                getPaymentInReturnSalesDraftEntity(paymentindraftService.getPaymentInDraft(paymentid),
-                        returnsalesService.getReturnSales(invoiceid));
+            headers = "Accept=application/json", params = {"paymentid, invoiceid"})
+    public ResponseEntity<?> getPaymentInReturnSalesDraftEntity(
+                @RequestParam(value="paymentid") String paymentid,
+        @RequestParam(value="invoiceid") String invoiceid){
         
-        return piisde;
+        PaymentInDraftEntity paymentindraft = new PaymentInDraftEntity();
+        paymentindraft.setId(paymentid);
+        
+        ReturnSalesEntity returnsales = new ReturnSalesEntity();
+        returnsales.setId(invoiceid);
+        
+        PaymentInReturnSalesDraftEntity piisde = paymentinreturnsalesdraftService.
+                getPaymentInReturnSalesDraftEntity(paymentindraft,
+                        returnsales);
+        
+        return ResponseEntity.ok(piisde);
     }
     
 }

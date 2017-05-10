@@ -93,9 +93,6 @@ public class MenuEntity implements Serializable{
     @Column(name="name")
     private String name;
     
-//    @Column(name="numbering")
-//    private String numbering;
-    
     public int getId() {
         return id;
     }
@@ -119,11 +116,4 @@ public class MenuEntity implements Serializable{
         this.name = name;
     }
 
-//    public String getNumbering() {
-//        return numbering;
-//    }
-//
-//    public void setNumbering(String numbering) {
-//        this.numbering = numbering;
-//    }
 }

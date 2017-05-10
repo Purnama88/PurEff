@@ -8,6 +8,7 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentOutDraftDao;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,4 +47,14 @@ public class PaymentOutDraftService {
     public void deletePaymentOutDraft(String id) {
             paymentoutdraftDao.deletePaymentOutDraft(id);
     }
+    
+    @Transactional
+    public List getPaymentOutDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
+        return paymentoutdraftDao.getPaymentOutDraftList(itemperpage, page, sort, keyword, user);
+    }
+    
+    @Transactional
+    public int countPaymentOutDraftList(String keyword, UserEntity user){
+        return paymentoutdraftDao.countPaymentOutDraftList(keyword, user);
+    }    
 }

@@ -37,6 +37,11 @@ public class ItemGroupService {
     public ItemGroupEntity getItemGroup(String id) {
             return itemgroupDao.getItemGroup(id);
     }
+    
+    @Transactional
+    public ItemGroupEntity getItemGroupByCode(String code) {
+            return itemgroupDao.getItemGroupByCode(code);
+    }
 
     @Transactional
     public void addItemGroup(ItemGroupEntity itemgroup) {
@@ -54,8 +59,8 @@ public class ItemGroupService {
     }
     
     @Transactional
-    public List getItemGroupList(int itemperpage, int page, String keyword){
-        return itemgroupDao.getItemGroupList(itemperpage, page, keyword);
+    public List getItemGroupList(int itemperpage, int page, String sort, String keyword){
+        return itemgroupDao.getItemGroupList(itemperpage, page, sort, keyword);
     }
     
     @Transactional

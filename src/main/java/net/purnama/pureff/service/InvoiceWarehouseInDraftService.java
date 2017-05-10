@@ -9,6 +9,7 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.InvoiceWarehouseInDraftDao;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.draft.InvoiceWarehouseInDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,4 +48,14 @@ public class InvoiceWarehouseInDraftService {
     public void deleteInvoiceWarehouseInDraft(String id) {
             invoicewarehouseindraftDao.deleteInvoiceWarehouseInDraft(id);
     }
-}
+    
+    @Transactional
+    public List getInvoiceWarehouseInDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
+        return invoicewarehouseindraftDao.getInvoiceWarehouseInDraftList(itemperpage, page, sort, keyword, user);
+    }
+    
+    @Transactional
+    public int countInvoiceWarehouseInDraftList(String keyword, UserEntity user){{
+        return invoicewarehouseindraftDao.countInvoiceWarehouseInDraftList(keyword, user);
+    }
+}}

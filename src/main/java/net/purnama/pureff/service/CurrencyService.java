@@ -31,6 +31,11 @@ public class CurrencyService {
 	public List<CurrencyEntity> getCurrencyList() {
 		return currencyDao.getCurrencyList();
 	}
+        
+        @Transactional
+	public List<CurrencyEntity> getActiveCurrencyList() {
+		return currencyDao.getActiveCurrencyList();
+	}
 
         @Transactional
 	public CurrencyEntity getCurrencyByCode(String code) {
@@ -53,8 +58,8 @@ public class CurrencyService {
 	}
 
         @Transactional
-        public List getCurrencyList(int itemperpage, int page, String keyword){
-            return currencyDao.getCurrencyList(itemperpage, page, keyword);
+        public List getCurrencyList(int itemperpage, int page, String sort, String keyword){
+            return currencyDao.getCurrencyList(itemperpage, page, sort, keyword);
         }
         
         @Transactional

@@ -45,8 +45,8 @@ public class ItemWarehouseService {
     
     @Transactional
     public List getItemWarehouseList(WarehouseEntity warehouse, int itemperpage,
-            int page, String keyword){
-        return itemwarehouseDao.getItemWarehouseList(warehouse, itemperpage, page, keyword);
+            int page, String sort, String keyword){
+        return itemwarehouseDao.getItemWarehouseList(warehouse, itemperpage, page, sort, keyword);
     }
     
     @Transactional

@@ -7,6 +7,7 @@
 package net.purnama.pureff.service;
 
 import java.util.List;
+import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentOutReturnPurchaseDraftDao;
 import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity;
@@ -24,6 +25,27 @@ public class PaymentOutReturnPurchaseDraftService {
     @Autowired
     PaymentOutReturnPurchaseDraftDao paymentoutreturnpurchasedraftDao;
     
+    @Transactional
+    public void addPaymentOutReturnPurchaseDraft(PaymentOutReturnPurchaseDraftEntity paymentoutreturnpurchasedraft) {
+        paymentoutreturnpurchasedraftDao.addPaymentOutReturnPurchaseDraft(paymentoutreturnpurchasedraft);
+    }
+    
+    @Transactional
+    public void updatePaymentOutReturnPurchaseDraft(PaymentOutReturnPurchaseDraftEntity paymentoutreturnpurchasedraft) {
+        paymentoutreturnpurchasedraftDao.updatePaymentOutReturnPurchaseDraft(paymentoutreturnpurchasedraft);
+    }
+    
+    @Transactional
+    public void deletePaymentOutReturnPurchaseDraft(String id) {
+        paymentoutreturnpurchasedraftDao.deletePaymentOutReturnPurchaseDraft(id);
+    }
+    
+    @Transactional
+    public PaymentOutReturnPurchaseDraftEntity getPaymentOutReturnSalesDraft(String id) {
+        return paymentoutreturnpurchasedraftDao.getPaymentOutReturnPurchaseDraft(id);
+    }
+    
+    @Transactional
     public PaymentOutReturnPurchaseDraftEntity
      getPaymentOutReturnPurchaseDraftEntity(PaymentOutDraftEntity paymentoutdraft,
                  ReturnPurchaseEntity returnpurchase){
@@ -31,6 +53,7 @@ public class PaymentOutReturnPurchaseDraftService {
                  getPaymentOutReturnPurchaseDraftEntity(paymentoutdraft, returnpurchase);
     }
     
+    @Transactional
     public List<PaymentOutReturnPurchaseDraftEntity>
          getPaymentOutReturnPurchaseDraftEntityList(PaymentOutDraftEntity paymentoutdraft){
         return paymentoutreturnpurchasedraftDao.

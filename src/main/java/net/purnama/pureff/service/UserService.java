@@ -35,13 +35,18 @@ public class UserService {
     }
     
     @Transactional
-    public List<UserEntity> getUserList(int itemperpage, int page, String keyword) {
-            return userDao.getUserList(itemperpage, page, keyword);
+    public List<UserEntity> getUserList(int itemperpage, int page, String sort, String keyword) {
+            return userDao.getUserList(itemperpage, page, sort, keyword);
     }
     
     @Transactional
     public UserEntity getUser(String id) {
             return userDao.getUser(id);
+    }
+    
+    @Transactional
+    public UserEntity getUserByUsername(String username) {
+            return userDao.getUserByUsername(username);
     }
     
     @Transactional

@@ -26,6 +26,31 @@ public class ItemInvoiceWarehouseInDraftDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addItemInvoiceWarehouseInDraft(ItemInvoiceWarehouseInDraftEntity iteminvoicewarehouseindraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(iteminvoicewarehouseindraft);
+    }
+    
+    public void updateItemInvoiceWarehouseInDraft(ItemInvoiceWarehouseInDraftEntity iteminvoicewarehouseindraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(iteminvoicewarehouseindraft);
+    }
+    
+    public void deleteItemInvoiceWarehouseInDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        ItemInvoiceWarehouseInDraftEntity p = getItemInvoiceWarehouseInDraft(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    public ItemInvoiceWarehouseInDraftEntity getItemInvoiceWarehouseInDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        ItemInvoiceWarehouseInDraftEntity p = (ItemInvoiceWarehouseInDraftEntity) 
+                session.get(ItemInvoiceWarehouseInDraftEntity.class, id);
+        return p;
+    }
+    
     public List<ItemInvoiceWarehouseInDraftEntity> getItemInvoiceWarehouseInDraftList(InvoiceWarehouseInDraftEntity invoicewarehouseindraft) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemInvoiceWarehouseInDraftEntity.class);

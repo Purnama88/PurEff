@@ -53,9 +53,4 @@ public class MenuDao {
         session.persist(menu);
         return menu;
     }
-
-    public void updateMenu(MenuEntity menu) {
-        Session session = this.sessionFactory.getCurrentSession();
-        session.update(menu);
-    }
 }

@@ -7,9 +7,14 @@
 package net.purnama.pureff.dao;
 
 import java.util.List;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.draft.ExpensesDraftEntity;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -56,5 +61,37 @@ public class ExpensesDraftDao {
         if (null != p) {
                 session.delete(p);
         }
+    }
+    
+    public List getExpensesDraftList(int itemperpage, int page, String sort, 
+            String keyword, UserEntity user){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(ExpensesDraftEntity.class);
+        c.add(Restrictions.like("id", "%"+keyword+"%"));
+        c.add(Restrictions.eq("lastmodifiedby", user));
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
+        
+        c.setFirstResult(itemperpage * (page-1));
+        c.setMaxResults(itemperpage);
+        
+        return c.list();
+    }
+    
+    public int countExpensesDraftList(String keyword, UserEntity user) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(ExpensesDraftEntity.class);
+        c.add(Restrictions.like("id", "%"+keyword+"%"));
+        c.add(Restrictions.eq("lastmodifiedby", user));
+        c.setProjection(Projections.rowCount());
+        List result = c.list();
+        int resultint = Integer.valueOf(result.get(0).toString());
+        
+        return resultint;
     }
 }

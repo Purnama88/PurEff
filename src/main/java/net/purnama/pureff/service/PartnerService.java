@@ -35,6 +35,11 @@ public class PartnerService {
     public PartnerEntity getPartner(String id) {
             return partnerDao.getPartner(id);
     }
+    
+    @Transactional
+    public PartnerEntity getPartnerByCode(String code) {
+            return partnerDao.getPartnerByCode(code);
+    }
 
     @Transactional
     public void addPartner(PartnerEntity partner) {
@@ -47,12 +52,42 @@ public class PartnerService {
     }
     
     @Transactional
-    public List getPartnerList(int itemperpage, int page, String keyword){
-        return partnerDao.getPartnerList(itemperpage, page, keyword);
+    public List getPartnerList(int itemperpage, int page, String sort, String keyword){
+        return partnerDao.getPartnerList(itemperpage, page, sort, keyword);
     }
     
     @Transactional
     public int countPartnerList(String keyword){
         return partnerDao.countPartnerList(keyword);
+    }
+    
+    @Transactional
+    public List getCustomerList(){
+        return partnerDao.getCustomerList();
+    }
+    
+    @Transactional
+    public List getActiveCustomerList(){
+        return partnerDao.getActiveCustomerList();
+    }
+    
+    @Transactional
+    public List getVendorList(){
+        return partnerDao.getVendorList();
+    }
+    
+    @Transactional
+    public List getActiveVendorList(){
+        return partnerDao.getActiveVendorList();
+    }
+    
+    @Transactional
+    public List getNonTradeList(){
+        return partnerDao.getNonTradeList();
+    }
+    
+    @Transactional
+    public List getActiveNonTradeList(){
+        return partnerDao.getActiveNonTradeList();
     }
 }

@@ -18,10 +18,11 @@ import net.purnama.pureff.service.RateService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -37,33 +38,33 @@ public class RateController {
     @Autowired
     CurrencyService currencyService;
     
-    @RequestMapping(value = "api/getLastRate/{currencyid}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public RateEntity getLastRate(@PathVariable String currencyid) {
+    @RequestMapping(value = "api/getLastRate", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"currencyid"})
+    public ResponseEntity<?> getLastRate(@RequestParam(value="currencyid") String currencyid) {
         
         CurrencyEntity currency = currencyService.getCurrency(currencyid);
         
-        return rateService.getLastRate(currency);
+        return ResponseEntity.ok(rateService.getLastRate(currency));
         
     }
     
     @RequestMapping(value = "api/getRateList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<RateEntity> getRateList() {
+    public ResponseEntity<?> getRateList() {
         
         List<RateEntity> ls = rateService.getRateList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getRate/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public RateEntity getRate(@PathVariable String id) {
-        return rateService.getRate(id);
+    @RequestMapping(value = "api/getRate", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getRate(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(rateService.getRate(id));
     }
 
     @RequestMapping(value = "api/addRate", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public RateEntity addRate(HttpServletRequest httpRequest, @RequestBody RateEntity rate) {
+    public ResponseEntity<?> addRate(HttpServletRequest httpRequest, @RequestBody RateEntity rate) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
@@ -76,12 +77,14 @@ public class RateController {
         
         rateService.addRate(rate);
         
-        return rate;
+        return ResponseEntity.ok(rate);
     }
 
     @RequestMapping(value = "api/updateRate", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updateRate(@RequestBody RateEntity rate) {
+    public ResponseEntity<?> updateRate(@RequestBody RateEntity rate) {
         rateService.updateRate(rate);
+        
+        return ResponseEntity.ok(rate);
     }
 }

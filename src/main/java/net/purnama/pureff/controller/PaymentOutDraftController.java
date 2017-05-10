@@ -7,14 +7,31 @@ package net.purnama.pureff.controller;
 
 import java.util.Calendar;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.MenuEntity;
+import net.purnama.pureff.entity.NumberingEntity;
+import net.purnama.pureff.entity.RateEntity;
+import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity;
+import net.purnama.pureff.security.JwtUtil;
+import net.purnama.pureff.service.CurrencyService;
+import net.purnama.pureff.service.MenuService;
+import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PaymentOutDraftService;
+import net.purnama.pureff.service.RateService;
+import net.purnama.pureff.service.UserService;
+import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,37 +42,97 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentOutDraftController {
     
     @Autowired
+    UserService userService;
+    
+    @Autowired
+    WarehouseService warehouseService;
+    
+    @Autowired
     PaymentOutDraftService paymentoutdraftService;
+    
+    @Autowired
+    CurrencyService currencyService;
+    
+    @Autowired
+    RateService rateService;
+    
+    @Autowired
+    MenuService menuService;
+    
+    @Autowired
+    NumberingService numberingService;
     
     @RequestMapping(value = "api/getPaymentOutDraftList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<PaymentOutDraftEntity> getPaymentOutDraftList() {
+    public ResponseEntity<?> getPaymentOutDraftList() {
         
         List<PaymentOutDraftEntity> ls = paymentoutdraftService.getPaymentOutDraftList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPaymentOutDraft/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public PaymentOutDraftEntity getPaymentOutDraft(@PathVariable String id) {
-        return paymentoutdraftService.getPaymentOutDraft(id);
+    @RequestMapping(value = "api/getPaymentOutDraft", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getPaymentOutDraft(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(paymentoutdraftService.getPaymentOutDraft(id));
     }
 
-    @RequestMapping(value = "api/addPaymentOutDraft", method = RequestMethod.POST,
+    @RequestMapping(value = "api/addPaymentOutDraft", method = RequestMethod.GET,
             headers = "Accept=application/json")
-    public PaymentOutDraftEntity addPaymentOutDraft(@RequestBody PaymentOutDraftEntity paymentoutdraft) {
+    public ResponseEntity<?> addPaymentOutDraft(HttpServletRequest httpRequest) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        MenuEntity menu = menuService.getMenu(16);
+        
+        NumberingEntity numbering = numberingService.getDefaultNumbering(menu, warehouse);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("You have not set default numbering for menu outgoing payment");
+        }
+        
+        CurrencyEntity currency = currencyService.getDefaultCurrency();
+        RateEntity rate = rateService.getLastRate(currency);
+        Calendar date = Calendar.getInstance();
+        
+        PaymentOutDraftEntity paymentoutdraft = new PaymentOutDraftEntity();
         paymentoutdraft.setId(IdGenerator.generateId());
-        paymentoutdraft.setLastmodified(Calendar.getInstance());
+        paymentoutdraft.setDate(date);
+        paymentoutdraft.setDuedate(date);
+        paymentoutdraft.setAmount(0);
+        paymentoutdraft.setWarehouse(warehouse);
+        paymentoutdraft.setNote("");
+        paymentoutdraft.setLastmodified(date);
+        paymentoutdraft.setLastmodifiedby(user);
+        paymentoutdraft.setCurrency(currencyService.getDefaultCurrency());
+        if(rate == null){
+            paymentoutdraft.setRate(1);
+        }
+        else{
+            paymentoutdraft.setRate(rate.getValue());
+        }
         
         paymentoutdraftService.addPaymentOutDraft(paymentoutdraft);
         
-        return paymentoutdraft;
+        return ResponseEntity.ok(paymentoutdraft.getId());
     }
 
     @RequestMapping(value = "api/updatePaymentOutDraft", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updatePaymentOutDraft(@RequestBody PaymentOutDraftEntity paymentoutdraft) {
+    public ResponseEntity<?> updatePaymentOutDraft(HttpServletRequest httpRequest,
+            @RequestBody PaymentOutDraftEntity paymentoutdraft) {
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        paymentoutdraft.setLastmodified(Calendar.getInstance());
+        paymentoutdraft.setWarehouse(warehouse);
+        paymentoutdraft.setLastmodifiedby(user);
+        
         paymentoutdraftService.updatePaymentOutDraft(paymentoutdraft);
+        
+        return ResponseEntity.ok("");
     }
 
     @RequestMapping(value = "api/deletePaymentOutDraft/{id}", method = RequestMethod.DELETE, 
@@ -63,5 +140,36 @@ public class PaymentOutDraftController {
     public void deletePaymentOutDraft(@PathVariable String id) {
         paymentoutdraftService.deletePaymentOutDraft(id);		
     }
+    
+    @RequestMapping(value = "/api/getPaymentOutDraftList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getPaymentOutDraftList(HttpServletRequest httpRequest,
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        List<PaymentOutDraftEntity> ls = paymentoutdraftService.
+                getPaymentOutDraftList(itemperpage, page, sort, keyword, user);
+        return ResponseEntity.ok(ls);
+    }
+    
+    
+    @RequestMapping(value = {"api/countPaymentOutDraftList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> countPaymentOutDraftList(HttpServletRequest httpRequest,
+            @RequestParam(value="keyword") String keyword){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        return ResponseEntity.ok(paymentoutdraftService.countPaymentOutDraftList(keyword, user));
+    }
+    
 }
 

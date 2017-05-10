@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,13 @@ public class ItemGroupDao {
         return p;
     }
     
+    public ItemGroupEntity getItemGroupByCode(String code) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(ItemGroupEntity.class);
+        c.add(Restrictions.eq("code", code));
+        return (ItemGroupEntity)c.uniqueResult();
+    }
+    
     public ItemGroupEntity addItemGroup(ItemGroupEntity itemgroup) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(itemgroup);
@@ -70,13 +78,20 @@ public class ItemGroupDao {
         }
     }
     
-    public List getItemGroupList(int itemperpage, int page, String keyword){
+    public List getItemGroupList(int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemGroupEntity.class);
         Criterion code = Restrictions.like("code", "%"+keyword+"%");
         Criterion desc = Restrictions.like("name", "%"+keyword+"%");
         LogicalExpression orExp = Restrictions.or(code,desc);
         c.add(orExp);
+        
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
         
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);

@@ -27,6 +27,31 @@ public class PaymentOutReturnPurchaseDraftDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addPaymentOutReturnPurchaseDraft(PaymentOutReturnPurchaseDraftEntity paymentoutreturnpurchasedraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymentoutreturnpurchasedraft);
+    }
+    
+    public void updatePaymentOutReturnPurchaseDraft(PaymentOutReturnPurchaseDraftEntity paymentoutreturnpurchasedraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymentoutreturnpurchasedraft);
+    }
+    
+    public void deletePaymentOutReturnPurchaseDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentOutReturnPurchaseDraftEntity p = getPaymentOutReturnPurchaseDraft(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    public PaymentOutReturnPurchaseDraftEntity getPaymentOutReturnPurchaseDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentOutReturnPurchaseDraftEntity p = (PaymentOutReturnPurchaseDraftEntity) 
+                session.get(PaymentOutReturnPurchaseDraftEntity.class, id);
+        return p;
+    }
+    
     public PaymentOutReturnPurchaseDraftEntity
      getPaymentOutReturnPurchaseDraftEntity(PaymentOutDraftEntity paymentoutdraft,
                  ReturnPurchaseEntity returnpurchase){

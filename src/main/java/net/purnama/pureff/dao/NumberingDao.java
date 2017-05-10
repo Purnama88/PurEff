@@ -9,10 +9,12 @@ package net.purnama.pureff.dao;
 import java.util.List;
 import net.purnama.pureff.entity.MenuEntity;
 import net.purnama.pureff.entity.NumberingEntity;
+import net.purnama.pureff.entity.NumberingNameEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,11 +39,19 @@ public class NumberingDao {
         return ls;
     }
     
+    public List<NumberingEntity> getActiveNumberingList(WarehouseEntity warehouse) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(NumberingEntity.class);
+        c.add(Restrictions.eq("warehouse", warehouse));
+        return c.list();
+    }
+    
     public List<NumberingEntity> getNumberingList(WarehouseEntity warehouse, MenuEntity menu) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(NumberingEntity.class);
         c.add(Restrictions.eq("warehouse", warehouse));
         c.add(Restrictions.eq("menu", menu));
+        c.addOrder(Order.asc("prefix"));
         return c.list();
     }
     
@@ -58,6 +68,17 @@ public class NumberingDao {
         Session session = this.sessionFactory.getCurrentSession();
         NumberingEntity p = (NumberingEntity) session.get(NumberingEntity.class, id);
         return p;
+    }
+    
+    public NumberingEntity getNumbering(String prefix, NumberingNameEntity numberingname,
+            WarehouseEntity warehouse, MenuEntity menu) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(NumberingEntity.class);
+        c.add(Restrictions.eq("prefix", prefix));
+        c.add(Restrictions.eq("numberingname", numberingname));
+        c.add(Restrictions.eq("warehouse", warehouse));
+        c.add(Restrictions.eq("menu", menu));
+        return (NumberingEntity)c.uniqueResult();
     }
     
     public NumberingEntity addNumbering(NumberingEntity numbering) {

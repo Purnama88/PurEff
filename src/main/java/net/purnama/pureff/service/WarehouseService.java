@@ -44,6 +44,11 @@ public class WarehouseService {
     }
     
     @Transactional
+    public WarehouseEntity getWarehouseByCode(String code) {
+            return warehouseDao.getWarehouseByCode(code);
+    }
+    
+    @Transactional
     public void addWarehouse(WarehouseEntity warehouse) {
             warehouseDao.addWarehouse(warehouse);
     }
@@ -54,8 +59,8 @@ public class WarehouseService {
     }
     
     @Transactional
-    public List getWarehouseList(int itemperpage, int page, String keyword){
-        return warehouseDao.getWarehouseList(itemperpage, page, keyword);
+    public List getWarehouseList(int itemperpage, int page, String sort, String keyword){
+        return warehouseDao.getWarehouseList(itemperpage, page, sort, keyword);
     }
     
     @Transactional

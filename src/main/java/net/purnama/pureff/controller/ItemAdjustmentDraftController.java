@@ -10,10 +10,13 @@ import net.purnama.pureff.entity.transactional.draft.AdjustmentDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.ItemAdjustmentDraftEntity;
 import net.purnama.pureff.service.AdjustmentDraftService;
 import net.purnama.pureff.service.ItemAdjustmentDraftService;
+import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,11 +32,43 @@ public class ItemAdjustmentDraftController {
     @Autowired
     AdjustmentDraftService adjustmentdraftService;
     
-    @RequestMapping(value = "api/getItemAdjustmentDraftList/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public List<ItemAdjustmentDraftEntity> getItemAdjustmentDraftList(@PathVariable String id) {
+    @RequestMapping(value = "api/getItemAdjustmentDraftList", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getItemAdjustmentDraftList(@RequestParam(value="id") String id) {
         AdjustmentDraftEntity ad = adjustmentdraftService.getAdjustmentDraft(id);
         
-        return itemadjustmentdraftService.getItemAdjustmentDraftList(ad);
+        return ResponseEntity.ok(itemadjustmentdraftService.getItemAdjustmentDraftList(ad));
+    }
+    
+    @RequestMapping(value = "api/saveItemAdjustmentDraftList", method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public void saveItemAdjustmentDraftList(
+            @RequestBody List<ItemAdjustmentDraftEntity> itemadjustmentdraftlist) {
+        
+        for(ItemAdjustmentDraftEntity itemadjustmentdraft : itemadjustmentdraftlist){
+            if(itemadjustmentdraft.getItem() != null){
+                if(itemadjustmentdraft.getId() != null){
+                    itemadjustmentdraftService.updateItemAdjustmentDraft(itemadjustmentdraft);
+                }
+                else{
+                    itemadjustmentdraft.setId(IdGenerator.generateId());
+                    itemadjustmentdraftService.addItemAdjustmentDraft(itemadjustmentdraft);
+                }
+            }
+        }
+    }
+    
+    @RequestMapping(value = "api/deleteItemAdjustmentDraftList", method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public void deleteItemAdjustmentDraftList(
+            @RequestBody List<ItemAdjustmentDraftEntity> itemadjustmentdraftlist){
+        
+        for(ItemAdjustmentDraftEntity itemadjustmentdraft : itemadjustmentdraftlist){
+            if(itemadjustmentdraft.getId() != null){
+                itemadjustmentdraftService.deleteItemAdjustmentDraft(itemadjustmentdraft.getId());
+            }
+            else{
+            }
+        }
     }
 }

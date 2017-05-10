@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.RoleEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,13 @@ public class RoleDao {
         return p;
     }
     
+    public RoleEntity getRoleByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(RoleEntity.class);
+        c.add(Restrictions.eq("name", name));
+        return (RoleEntity)c.uniqueResult();
+    }
+    
     public RoleEntity addRole(RoleEntity role) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(role);
@@ -61,11 +69,18 @@ public class RoleDao {
     }
     
     public List getRoleList(
-            int itemperpage, int page, String keyword){
+            int itemperpage, int page, String sort, String keyword){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(RoleEntity.class);
         c.add(Restrictions.like("name", "%"+keyword+"%"));
 
+        if(sort.contains("-")){
+            c.addOrder(Order.desc(sort.substring(1)));
+        }
+        else{
+            c.addOrder(Order.asc(sort));
+        }
+        
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

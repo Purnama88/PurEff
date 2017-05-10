@@ -9,6 +9,8 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ExpensesDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.transactional.ExpensesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,5 +43,21 @@ public class ExpensesService {
     @Transactional
     public void updateExpenses(ExpensesEntity expenses) {
             expensesDao.updateExpenses(expenses);
+    }
+    
+    @Transactional
+    public List getExpensesList(int itemperpage, int page, String sort, String keyword){
+        return expensesDao.getExpensesList(itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countExpensesList(String keyword){
+        return expensesDao.countExpensesList(keyword);
+    }
+    
+    @Transactional
+    public List getUnpaidExpensesList(PartnerEntity partner,
+            CurrencyEntity currency){
+        return expensesDao.getUnpaidExpensesList(partner, currency);
     }
 }

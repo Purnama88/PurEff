@@ -35,6 +35,11 @@ public class PartnerTypeService {
     public PartnerTypeEntity getPartnerType(String id) {
             return partnertypeDao.getPartnerType(id);
     }
+    
+    @Transactional
+    public PartnerTypeEntity getPartnerTypeByName(String name) {
+            return partnertypeDao.getPartnerTypeByName(name);
+    }
 
     @Transactional
     public void addPartnerType(PartnerTypeEntity partnertype) {
@@ -47,8 +52,8 @@ public class PartnerTypeService {
     }
     
     @Transactional
-    public List getPartnerTypeList(int itemperpage, int page, String keyword){
-        return partnertypeDao.getPartnerTypeList(itemperpage, page, keyword);
+    public List getPartnerTypeList(int itemperpage, int page, String sort, String keyword){
+        return partnertypeDao.getPartnerTypeList(itemperpage, page, sort, keyword);
     }
     
     @Transactional

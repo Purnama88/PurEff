@@ -24,6 +24,11 @@ public class ItemInvoiceWarehouseInService {
     ItemInvoiceWarehouseInDao iteminvoicewarehouseinDao;
     
     @Transactional
+    public void addItemInvoiceWarehouseIn(ItemInvoiceWarehouseInEntity invoicewarehousein) {
+        iteminvoicewarehouseinDao.addItemInvoiceWarehouseIn(invoicewarehousein);
+    }
+    
+    @Transactional
     public List<ItemInvoiceWarehouseInEntity> getItemInvoiceWarehouseInList(InvoiceWarehouseInEntity invoicewarehousein) {
         return iteminvoicewarehouseinDao.getItemInvoiceWarehouseInList(invoicewarehousein);
     }

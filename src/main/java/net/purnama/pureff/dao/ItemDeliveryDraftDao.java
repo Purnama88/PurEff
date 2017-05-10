@@ -33,4 +33,29 @@ public class ItemDeliveryDraftDao {
         c.addOrder(Order.asc("id"));
         return (List<ItemDeliveryDraftEntity>)c.list();
     }
+    
+    public ItemDeliveryDraftEntity getItemDeliveryDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        ItemDeliveryDraftEntity p = (ItemDeliveryDraftEntity) session.get(ItemDeliveryDraftEntity.class, id);
+        return p;
+    }
+    
+    public ItemDeliveryDraftEntity addItemDeliveryDraft(ItemDeliveryDraftEntity itemdeliverydraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(itemdeliverydraft);
+        return itemdeliverydraft;
+    }
+    
+    public void updateItemDeliveryDraft(ItemDeliveryDraftEntity itemdeliverydraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(itemdeliverydraft);
+    }
+    
+    public void deleteItemDeliveryDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        ItemDeliveryDraftEntity p = getItemDeliveryDraft(id);
+        if (null != p) {
+            session.delete(p);
+        }
+    }
 }

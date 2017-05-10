@@ -9,6 +9,7 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ReturnPurchaseDraftDao;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.draft.ReturnPurchaseDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,15 @@ public class ReturnPurchaseDraftService {
     @Transactional
     public void deleteReturnPurchaseDraft(String id) {
             returnpurchasedraftDao.deleteReturnPurchaseDraft(id);
+    }
+    
+    @Transactional
+    public List getReturnPurchaseDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
+        return returnpurchasedraftDao.getReturnPurchaseDraftList(itemperpage, page, sort, keyword, user);
+    }
+    
+    @Transactional
+    public int countReturnPurchaseDraftList(String keyword, UserEntity user){
+        return returnpurchasedraftDao.countReturnPurchaseDraftList(keyword, user);
     }
 }

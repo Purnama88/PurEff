@@ -7,6 +7,7 @@
 package net.purnama.pureff.service;
 
 import java.util.List;
+import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentOutReturnPurchaseDao;
 import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import net.purnama.pureff.entity.transactional.PaymentOutEntity;
@@ -24,6 +25,27 @@ public class PaymentOutReturnPurchaseService {
     @Autowired
     PaymentOutReturnPurchaseDao paymentoutreturnpurchaseDao;
     
+    @Transactional
+    public void addPaymentOutReturnPurchase(PaymentOutReturnPurchaseEntity paymentoutreturnpurchase) {
+        paymentoutreturnpurchaseDao.addPaymentOutReturnPurchase(paymentoutreturnpurchase);
+    }
+    
+    @Transactional
+    public void updatePaymentOutReturnPurchase(PaymentOutReturnPurchaseEntity paymentoutreturnpurchase) {
+        paymentoutreturnpurchaseDao.updatePaymentOutReturnPurchase(paymentoutreturnpurchase);
+    }
+    
+    @Transactional
+    public void deletePaymentOutReturnPurchase(String id) {
+        paymentoutreturnpurchaseDao.deletePaymentOutReturnPurchase(id);
+    }
+    
+    @Transactional
+    public PaymentOutReturnPurchaseEntity getPaymentOutReturnSales(String id) {
+        return paymentoutreturnpurchaseDao.getPaymentOutReturnPurchase(id);
+    }
+    
+    @Transactional
     public PaymentOutReturnPurchaseEntity
      getPaymentOutReturnPurchaseEntity(PaymentOutEntity paymentout,
                  ReturnPurchaseEntity returnpurchase){
@@ -31,12 +53,14 @@ public class PaymentOutReturnPurchaseService {
                  getPaymentOutReturnPurchaseEntity(paymentout, returnpurchase);
     }
     
+    @Transactional
     public List<PaymentOutReturnPurchaseEntity>
          getPaymentOutReturnPurchaseEntityList(PaymentOutEntity paymentout){
         return paymentoutreturnpurchaseDao.
                  getPaymentOutReturnPurchaseEntityList(paymentout);
     }
     
+    @Transactional
     public List<PaymentOutReturnPurchaseEntity>
          getPaymentOutReturnPurchaseEntityList(ReturnPurchaseEntity returnpurchase){
         return paymentoutreturnpurchaseDao.

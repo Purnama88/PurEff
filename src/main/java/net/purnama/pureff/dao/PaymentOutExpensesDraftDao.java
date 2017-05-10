@@ -27,6 +27,31 @@ public class PaymentOutExpensesDraftDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    public void addPaymentOutExpensesDraft(PaymentOutExpensesDraftEntity paymentoutexpensesdraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymentoutexpensesdraft);
+    }
+    
+    public void updatePaymentOutExpensesDraft(PaymentOutExpensesDraftEntity paymentoutexpensesdraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymentoutexpensesdraft);
+    }
+    
+    public void deletePaymentOutExpensesDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentOutExpensesDraftEntity p = getPaymentOutExpensesDraft(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    public PaymentOutExpensesDraftEntity getPaymentOutExpensesDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentOutExpensesDraftEntity p = (PaymentOutExpensesDraftEntity) 
+                session.get(PaymentOutExpensesDraftEntity.class, id);
+        return p;
+    }
+    
     public PaymentOutExpensesDraftEntity
      getPaymentOutExpensesDraftEntity(PaymentOutDraftEntity paymentoutdraft,
                  ExpensesEntity expenses){

@@ -11,6 +11,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.ItemWarehouseEntity;
+import net.purnama.pureff.entity.MenuEntity;
 import net.purnama.pureff.entity.NumberingEntity;
 import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.RateEntity;
@@ -27,6 +28,7 @@ import net.purnama.pureff.service.InvoiceSalesService;
 import net.purnama.pureff.service.ItemInvoiceSalesDraftService;
 import net.purnama.pureff.service.ItemInvoiceSalesService;
 import net.purnama.pureff.service.ItemWarehouseService;
+import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.RateService;
@@ -35,10 +37,11 @@ import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -76,6 +79,9 @@ public class InvoiceSalesDraftController {
     RateService rateService;
     
     @Autowired
+    MenuService menuService;
+    
+    @Autowired
     ItemWarehouseService itemwarehouseService;
     
     @Autowired
@@ -83,49 +89,33 @@ public class InvoiceSalesDraftController {
     
     @RequestMapping(value = "api/getInvoiceSalesDraftList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public List<InvoiceSalesDraftEntity> getInvoiceSalesDraftList() {
+    public ResponseEntity<?> getInvoiceSalesDraftList() {
         
         List<InvoiceSalesDraftEntity> ls = invoicesalesdraftService.getInvoiceSalesDraftList();
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getInvoiceSalesDraft/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public InvoiceSalesDraftEntity getInvoiceSalesDraft(@PathVariable String id) {
-        return invoicesalesdraftService.getInvoiceSalesDraft(id);
+    @RequestMapping(value = "api/getInvoiceSalesDraft", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getInvoiceSalesDraft(@RequestParam(value="id") String id) {
+        return ResponseEntity.ok(invoicesalesdraftService.getInvoiceSalesDraft(id));
     }
-
-    @RequestMapping(value = "api/saveInvoiceSalesDraft", method = RequestMethod.POST,
+    
+    @RequestMapping(value = "api/addInvoiceSalesDraft", method = RequestMethod.GET,
             headers = "Accept=application/json")
-    public InvoiceSalesDraftEntity saveInvoiceSalesDraft(HttpServletRequest httpRequest,
-            @RequestBody InvoiceSalesDraftEntity invoicesalesdraft) {
+    public ResponseEntity<?> addInvoiceSalesDraft(HttpServletRequest httpRequest) {
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
         WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
         
-        if(invoicesalesdraft.getId() == null){
-            invoicesalesdraft.setId(IdGenerator.generateId());
-            invoicesalesdraft.setLastmodified(Calendar.getInstance());
-            invoicesalesdraft.setWarehouse(warehouse);
-            invoicesalesdraft.setLastmodifiedby(user);
-            invoicesalesdraftService.addInvoiceSalesDraft(invoicesalesdraft);
-        }
-        else{
-            invoicesalesdraft.setLastmodified(Calendar.getInstance());
-            invoicesalesdraft.setLastmodifiedby(user);
-            invoicesalesdraftService.updateInvoiceSalesDraft(invoicesalesdraft);
-        }
+        MenuEntity menu = menuService.getMenu(8);
         
-        return invoicesalesdraft;
-    }
-    
-    @RequestMapping(value = "api/addInvoiceSalesDraft", method = RequestMethod.POST,
-            headers = "Accept=application/json")
-    public InvoiceSalesDraftEntity addInvoiceSalesDraft(HttpServletRequest httpRequest) {
+        NumberingEntity numbering = numberingService.getDefaultNumbering(menu, warehouse);
         
-        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("You have not set default numbering for menu invoice sales");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -136,6 +126,7 @@ public class InvoiceSalesDraftController {
         invoicesalesdraft.setDate(date);
         invoicesalesdraft.setDuedate(date);
         invoicesalesdraft.setWarehouse(warehouse);
+        invoicesalesdraft.setNumbering(numbering);
         invoicesalesdraft.setNote("");
         invoicesalesdraft.setSubtotal(0);
         invoicesalesdraft.setDiscount(0);
@@ -154,12 +145,12 @@ public class InvoiceSalesDraftController {
         
         invoicesalesdraftService.addInvoiceSalesDraft(invoicesalesdraft);
         
-        return invoicesalesdraft;
+        return ResponseEntity.ok(invoicesalesdraft.getId());
     }
 
-    @RequestMapping(value = "api/closeInvoiceSalesDraft/{id}", method = RequestMethod.GET,
-            headers = "Accept=application/json")
-    public String closeInvoiceSalesDraft(@PathVariable String id) {
+    @RequestMapping(value = "api/closeInvoiceSalesDraft", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> closeInvoiceSalesDraft(@RequestParam(value="id") String id) {
         InvoiceSalesDraftEntity invoicesalesdraft = invoicesalesdraftService.getInvoiceSalesDraft(id);
         
         NumberingEntity numbering = invoicesalesdraft.getNumbering();
@@ -193,17 +184,6 @@ public class InvoiceSalesDraftController {
         invoicesales.setWarehouse_code(invoicesales.getWarehouse().getCode());
         invoicesales.setPaid(0);
         invoicesalesService.addInvoiceSales(invoicesales);
-        
-        numbering.setCurrent(numbering.getCurrent()+1);
-        
-        if(numbering.getCurrent() != numbering.getEnd()){
-            
-        }
-        else{
-            numbering.setStatus(false);
-        }
-        
-        numberingService.updateNumbering(numbering);
         
         List<ItemInvoiceSalesDraftEntity> iisdelist = iteminvoicesalesdraftService.
                 getItemInvoiceSalesDraftList(invoicesalesdraft);
@@ -241,18 +221,83 @@ public class InvoiceSalesDraftController {
         partner.setBalance(partner.getBalance() + invoicesales.getTotal_defaultcurrency());
         partnerService.updatePartner(partner);
         
-        return invoicesales.getId();
+        numbering.setCurrent(numbering.getCurrent()+1);
+        
+        if(numbering.getCurrent() != numbering.getEnd()){
+            
+        }
+        else{
+            numbering.setStatus(false);
+        }
+        
+        numberingService.updateNumbering(numbering);
+        
+        for(ItemInvoiceSalesDraftEntity idd : iteminvoicesalesdraftService.getItemInvoiceSalesDraftList(invoicesalesdraft)){
+            iteminvoicesalesdraftService.deleteItemInvoiceSalesDraft(idd.getId());
+        }
+        
+        invoicesalesdraftService.deleteInvoiceSalesDraft(id);
+        
+        return ResponseEntity.ok(invoicesales.getId());
     }
     
     @RequestMapping(value = "api/updateInvoiceSalesDraft", method = RequestMethod.PUT,
             headers = "Accept=application/json")
-    public void updateInvoiceSalesDraft(@RequestBody InvoiceSalesDraftEntity invoicesalesdraft) {
+    public ResponseEntity<?> updateInvoiceSalesDraft(HttpServletRequest httpRequest, 
+            @RequestBody InvoiceSalesDraftEntity invoicesalesdraft) {
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        invoicesalesdraft.setLastmodified(Calendar.getInstance());
+        invoicesalesdraft.setWarehouse(warehouse);
+        invoicesalesdraft.setLastmodifiedby(user);
+        
         invoicesalesdraftService.updateInvoiceSalesDraft(invoicesalesdraft);
+        
+        return ResponseEntity.ok("");
     }
 
-    @RequestMapping(value = "api/deleteInvoiceSalesDraft/{id}", method = RequestMethod.DELETE, 
-            headers = "Accept=application/json")
-    public void deleteInvoiceSalesDraft(@PathVariable String id) {
-        invoicesalesdraftService.deleteInvoiceSalesDraft(id);		
+    @RequestMapping(value = "api/deleteInvoiceSalesDraft", method = RequestMethod.DELETE, 
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> deleteInvoiceSalesDraft(@RequestParam(value="id") String id) {
+        InvoiceSalesDraftEntity invoicesalesdraft = invoicesalesdraftService.getInvoiceSalesDraft(id);
+        
+        for(ItemInvoiceSalesDraftEntity idd : iteminvoicesalesdraftService.getItemInvoiceSalesDraftList(invoicesalesdraft)){
+            iteminvoicesalesdraftService.deleteItemInvoiceSalesDraft(idd.getId());
+        }
+        
+        invoicesalesdraftService.deleteInvoiceSalesDraft(id);
+        
+        return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = "/api/getInvoiceSalesDraftList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getInvoiceSalesDraftList(HttpServletRequest httpRequest,
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        List<InvoiceSalesDraftEntity> ls = invoicesalesdraftService.
+                getInvoiceSalesDraftList(itemperpage, page, sort, keyword, user);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/countInvoiceSalesDraftList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"keyword"})
+    public ResponseEntity<?> countInvoiceSalesDraftList(HttpServletRequest httpRequest,
+            @RequestParam(value="keyword") String keyword){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        return ResponseEntity.ok(invoicesalesdraftService.countInvoiceSalesDraftList(keyword, user));
     }
 }
