@@ -94,12 +94,6 @@ public class ItemGroupController {
         
         return ResponseEntity.ok(itemgroup);
     }
-
-//    @RequestMapping(value = "api/deleteItemGroup/{id}", method = RequestMethod.DELETE, 
-//            headers = "Accept=application/json")
-//    public void deleteItemGroup(@PathVariable String id) {
-//        itemgroupService.deleteItemGroup(id);		
-//    }
     
     @RequestMapping(value = "/api/getItemGroupList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})

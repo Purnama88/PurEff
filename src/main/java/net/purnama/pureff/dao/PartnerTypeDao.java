@@ -31,17 +31,36 @@ public class PartnerTypeDao {
         this.sessionFactory = sessionFactory;
     }
     
+    public List<PartnerTypeEntity> getActivePartnerTypeList(int parent) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerTypeEntity.class);
+        c.add(Restrictions.eq("status", true));
+        c.add(Restrictions.eq("parent", parent));
+        c.addOrder(Order.asc("name"));
+        return c.list();
+    }
+    
+    public List<PartnerTypeEntity> getPartnerTypeList(int parent) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerTypeEntity.class);
+        c.add(Restrictions.eq("parent", parent));
+        c.addOrder(Order.asc("name"));
+        return c.list();
+    }
+    
     public List<PartnerTypeEntity> getActivePartnerTypeList() {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PartnerTypeEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
     public List<PartnerTypeEntity> getPartnerTypeList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<PartnerTypeEntity> ls = session.createQuery("from PartnerTypeEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(PartnerTypeEntity.class);
+        c.addOrder(Order.asc("name"));
+        return c.list();
     }
     
     public PartnerTypeEntity getPartnerType(String id) {

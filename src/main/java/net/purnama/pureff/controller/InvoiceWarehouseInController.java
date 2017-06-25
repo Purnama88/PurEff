@@ -9,11 +9,16 @@ package net.purnama.pureff.controller;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.ItemEntity;
+import net.purnama.pureff.entity.ItemWarehouseEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoiceWarehouseInEntity;
+import net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseInEntity;
 import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.InvoiceWarehouseInService;
+import net.purnama.pureff.service.ItemInvoiceWarehouseInService;
+import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +45,12 @@ public class InvoiceWarehouseInController {
     
     @Autowired
     InvoiceWarehouseInService invoicewarehouseinService;
+    
+    @Autowired
+    ItemInvoiceWarehouseInService iteminvoicewarehouseinService;
+    
+    @Autowired
+    ItemWarehouseService itemwarehouseService;
     
     @RequestMapping(value = "api/getInvoiceWarehouseInList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -94,6 +105,45 @@ public class InvoiceWarehouseInController {
             @RequestParam(value="keyword") String keyword){
         
         return ResponseEntity.ok(invoicewarehouseinService.countInvoiceWarehouseInList(keyword));
+    }
+    
+    @RequestMapping(value = {"api/cancelInvoiceWarehouseIn"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> cancelInvoiceWarehouseIn(HttpServletRequest httpRequest,
+            @RequestParam(value="id") String id){
+        InvoiceWarehouseInEntity invoicewarehousein = invoicewarehouseinService.getInvoiceWarehouseIn(id);
+        
+        List<ItemInvoiceWarehouseInEntity> iislist = 
+                iteminvoicewarehouseinService.getItemInvoiceWarehouseInList(invoicewarehousein);
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = invoicewarehousein.getWarehouse();
+        
+        invoicewarehousein.setLastmodified(Calendar.getInstance());
+        invoicewarehousein.setLastmodifiedby(user);
+        invoicewarehousein.setStatus(false);
+        
+        for(ItemInvoiceWarehouseInEntity iis : iislist){
+            
+            ItemEntity item = iis.getItem();
+            
+            ItemWarehouseEntity iw = itemwarehouseService.getItemWarehouse(
+                    warehouse, item);
+            
+            iw.setStock(iw.getStock() - iis.getBasequantity());
+            
+            itemwarehouseService.updateItemWarehouse(iw);
+        }
+        
+        invoicewarehousein.setStatus(false);
+        invoicewarehousein.setLastmodified(Calendar.getInstance());
+        invoicewarehousein.setLastmodifiedby(user);
+        
+        invoicewarehouseinService.updateInvoiceWarehouseIn(invoicewarehousein);
+        
+        return ResponseEntity.ok("");
     }
 }
 

@@ -27,9 +27,9 @@ public class PaymentOutExpensesController {
     @Autowired
     PaymentOutExpensesService paymentoutexpensesService;
     
-    @RequestMapping(value = "api/getPaymentOutExpensesEntityList", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getPaymentOutExpensesList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid"})
-    public ResponseEntity<?> getPaymentOutExpensesEntityList(@RequestParam(value="paymentid") String paymentid) {
+    public ResponseEntity<?> getPaymentOutExpensesList(@RequestParam(value="paymentid") String paymentid) {
         
         PaymentOutEntity paymentout = new PaymentOutEntity();
         paymentout.setId(paymentid);
@@ -39,10 +39,10 @@ public class PaymentOutExpensesController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPaymentOutExpensesEntity",
+    @RequestMapping(value = "api/getPaymentOutExpenses",
             method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid, invoiceid"})
-    public ResponseEntity<?> getPaymentOutExpensesEntity(
+    public ResponseEntity<?> getPaymentOutExpenses(
         @RequestParam(value="paymentid") String paymentid,
         @RequestParam(value="invoiceid") String invoiceid){
         

@@ -6,11 +6,13 @@
 
 package net.purnama.pureff.service;
 
+import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.InvoiceSalesDao;
 import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,12 @@ public class InvoiceSalesService {
     public List getUnpaidInvoiceSalesList(PartnerEntity partner,
             CurrencyEntity currency){
         return invoicesalesDao.getUnpaidInvoiceSalesList(partner, currency);
+    }
+    
+    @Transactional
+    public List getInvoiceSalesList(Calendar start, Calendar end, WarehouseEntity warehouse,
+            PartnerEntity partner, CurrencyEntity currency){
+        return invoicesalesDao.getInvoiceSalesList(start, end, warehouse, partner, currency);
     }
 }
 

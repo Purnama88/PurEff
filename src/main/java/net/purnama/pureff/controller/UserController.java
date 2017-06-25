@@ -50,16 +50,25 @@ public class UserController {
         UserEntity user = userService.getUser(username, password);
         WarehouseEntity warehouse = warehouseService.getWarehouse(login.getWarehouseid());   
         
-        if(user != null && warehouse != null){
+        if(user != null && warehouse != null && user.isStatus()){
+            
+            boolean contain = false;
             
             for(WarehouseEntity temp : user.getWarehouses()){
-                
+                if(temp.getId().equals(warehouse.getId())){
+                    contain = true;
+                }
             }
             
-            String token = JwtUtil.generateToken(user.getId(), warehouse.getId());
-            response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-            
-            return ResponseEntity.ok(user.getRole());
+            if(contain){
+                String token = JwtUtil.generateToken(user.getId(), warehouse.getId());
+                response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+
+                return ResponseEntity.ok(user.getRole());
+            }
+            else{
+                return ResponseEntity.badRequest().body("Invalid Log In");
+            }
         }
         else{
             return ResponseEntity.badRequest().body("Invalid Log In");
@@ -84,8 +93,9 @@ public class UserController {
     @RequestMapping(value = "api/addUser", method = RequestMethod.POST,
             headers = "Accept=application/json")
     public ResponseEntity<?> addUser(HttpServletRequest httpRequest,
-            @RequestBody UserEntity user
-        ) {
+            @RequestBody UserEntity user){
+        
+        user.setUsername(user.getUsername().toLowerCase());
         
         if(userService.getUserByUsername(user.getUsername()) != null){
             return ResponseEntity.badRequest().body("Username '" + user.getUsername() +"' already exist");

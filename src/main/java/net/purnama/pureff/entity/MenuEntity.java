@@ -46,7 +46,7 @@ public class MenuEntity implements Serializable{
         true,
         
         false,
-        true,
+        false,
         false,
         false,
         false

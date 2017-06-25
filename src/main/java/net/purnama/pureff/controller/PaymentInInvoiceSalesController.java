@@ -28,10 +28,9 @@ public class PaymentInInvoiceSalesController {
     @Autowired
     PaymentInInvoiceSalesService paymentininvoicesalesService;
     
-    @RequestMapping(value = "api/getPaymentInInvoiceSalesEntityList", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getPaymentInInvoiceSalesList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid"})
-    public ResponseEntity<?> getPaymentInInvoiceSalesEntityList(@RequestParam(value="paymentid") String paymentid) {
-        
+    public ResponseEntity<?> getPaymentInInvoiceSalesList(@RequestParam(value="paymentid") String paymentid) {
         PaymentInEntity paymentin = new PaymentInEntity();
         paymentin.setId(paymentid);
         
@@ -40,10 +39,10 @@ public class PaymentInInvoiceSalesController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPaymentInInvoiceSalesEntity",
+    @RequestMapping(value = "api/getPaymentInInvoiceSales",
             method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid, invoiceid"})
-    public ResponseEntity<?> getPaymentInInvoiceSalesEntity(
+    public ResponseEntity<?> getPaymentInInvoiceSales(
         @RequestParam(value="paymentid") String paymentid,
         @RequestParam(value="invoiceid") String invoiceid){
         

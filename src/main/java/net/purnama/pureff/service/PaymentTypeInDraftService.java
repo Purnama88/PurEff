@@ -9,6 +9,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentTypeInDraftDao;
 import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
+import net.purnama.pureff.entity.transactional.draft.PaymentTypeInDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,27 @@ public class PaymentTypeInDraftService {
     PaymentTypeInDraftDao paymenttypeindraftDao;
     
     @Transactional
-    public List getPaymentTypeInDraftList(PaymentInDraftEntity paymentindraft){
+    public void addPaymentTypeInDraft(PaymentTypeInDraftEntity paymenttypeindraft) {
+        paymenttypeindraftDao.addPaymentTypeInDraft(paymenttypeindraft);
+    }
+    
+    @Transactional
+    public void updatePaymentTypeInDraft(PaymentTypeInDraftEntity paymenttypeindraft) {
+        paymenttypeindraftDao.updatePaymentTypeInDraft(paymenttypeindraft);
+    }
+    
+    @Transactional
+    public void deletePaymentTypeInDraft(String id) {
+        paymenttypeindraftDao.deletePaymentTypeInDraft(id);
+    }
+    
+    @Transactional
+    public PaymentTypeInDraftEntity getPaymentTypeInDraft(String id) {
+        return paymenttypeindraftDao.getPaymentTypeInDraft(id);
+    }
+    
+    @Transactional
+    public List<PaymentTypeInDraftEntity> getPaymentTypeInDraftList(PaymentInDraftEntity paymentindraft){
         return paymenttypeindraftDao.getPaymentTypeInDraftList(paymentindraft);
     }
     

@@ -43,6 +43,7 @@ public class NumberingDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(NumberingEntity.class);
         c.add(Restrictions.eq("warehouse", warehouse));
+        c.add(Restrictions.eq("status", true));
         return c.list();
     }
     
@@ -51,6 +52,16 @@ public class NumberingDao {
         Criteria c = session.createCriteria(NumberingEntity.class);
         c.add(Restrictions.eq("warehouse", warehouse));
         c.add(Restrictions.eq("menu", menu));
+        c.addOrder(Order.asc("prefix"));
+        return c.list();
+    }
+    
+    public List<NumberingEntity> getActiveNumberingList(WarehouseEntity warehouse, MenuEntity menu) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(NumberingEntity.class);
+        c.add(Restrictions.eq("warehouse", warehouse));
+        c.add(Restrictions.eq("menu", menu));
+        c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("prefix"));
         return c.list();
     }

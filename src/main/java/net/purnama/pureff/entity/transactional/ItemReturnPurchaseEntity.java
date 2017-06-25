@@ -63,7 +63,7 @@ public class ItemReturnPurchaseEntity implements Serializable {
     @Column(name="baseuom_name")
     private String baseuom_name;
     
-    @Column(name="basequantity")
+    @Column(name="basequantity", columnDefinition="Decimal(16, 4)")
     private double basequantity;
     
     @Column(name="invoice_ref")

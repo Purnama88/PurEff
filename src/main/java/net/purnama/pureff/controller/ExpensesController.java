@@ -23,6 +23,7 @@ import net.purnama.pureff.service.PaymentOutExpensesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -112,6 +113,21 @@ public class ExpensesController {
         return ResponseEntity.ok(expensesService.countExpensesList(keyword));
     }
     
+    @RequestMapping(value = {"api/closeExpenses"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> closeExpensesList(
+            @RequestParam(value="id") String id){
+        
+        ExpensesEntity expenses = expensesService.getExpenses(id);
+        
+        expenses.setPaid(expenses.getTotal_after_tax());
+        
+        expensesService.updateExpenses(expenses);
+        
+        return ResponseEntity.ok("");
+    }
+    
     @RequestMapping(value = {"api/getUnpaidExpensesList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"partnerid", "currencyid"})
@@ -144,10 +160,8 @@ public class ExpensesController {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
         
         expenses.setLastmodified(Calendar.getInstance());
-        expenses.setWarehouse(warehouse);
         expenses.setLastmodifiedby(user);
         expenses.setStatus(false);
         
@@ -158,5 +172,29 @@ public class ExpensesController {
         partnerService.updatePartner(partner);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getExpensesList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+    public ResponseEntity<?> getExpensesList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid){
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<ExpensesEntity> ls = expensesService.getExpensesList(start, end, warehouse, partner, currency);
+        
+        return ResponseEntity.ok(ls);
     }
 }

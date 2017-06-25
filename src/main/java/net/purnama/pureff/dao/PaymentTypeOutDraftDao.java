@@ -7,6 +7,7 @@
 package net.purnama.pureff.dao;
 
 import java.util.List;
+import javax.transaction.Transactional;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentTypeOutDraftEntity;
 import org.hibernate.Criteria;
@@ -30,6 +31,36 @@ public class PaymentTypeOutDraftDao {
         this.sessionFactory = sessionFactory;
     }
     
+    @Transactional
+    public void addPaymentTypeOutDraft(PaymentTypeOutDraftEntity paymenttypeoutdraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymenttypeoutdraft);
+    }
+    
+    @Transactional
+    public void updatePaymentTypeOutDraft(PaymentTypeOutDraftEntity paymenttypeoutdraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymenttypeoutdraft);
+    }
+    
+    @Transactional
+    public void deletePaymentTypeOutDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentTypeOutDraftEntity p = getPaymentTypeOutDraft(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    @Transactional
+    public PaymentTypeOutDraftEntity getPaymentTypeOutDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentTypeOutDraftEntity p = (PaymentTypeOutDraftEntity) 
+                session.get(PaymentTypeOutDraftEntity.class, id);
+        return p;
+    }
+    
+    @Transactional
     public List getPaymentTypeOutDraftList(PaymentOutDraftEntity paymentoutdraft){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentTypeOutDraftEntity.class);

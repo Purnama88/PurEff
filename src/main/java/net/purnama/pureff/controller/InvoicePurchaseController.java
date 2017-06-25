@@ -26,6 +26,7 @@ import net.purnama.pureff.service.PaymentOutInvoicePurchaseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -115,6 +116,21 @@ public class InvoicePurchaseController {
         return ResponseEntity.ok(invoicepurchaseService.countInvoicePurchaseList(keyword));
     }
     
+    @RequestMapping(value = {"api/closeInvoicePurchase"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> closeInvoicePurchaseList(
+            @RequestParam(value="id") String id){
+        
+        InvoicePurchaseEntity invoicepurchase = invoicepurchaseService.getInvoicePurchase(id);
+        
+        invoicepurchase.setPaid(invoicepurchase.getTotal_after_tax());
+        
+        invoicepurchaseService.updateInvoicePurchase(invoicepurchase);
+        
+        return ResponseEntity.ok("");
+    }
+    
     @RequestMapping(value = {"api/getUnpaidInvoicePurchaseList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"partnerid", "currencyid"})
@@ -147,10 +163,9 @@ public class InvoicePurchaseController {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        WarehouseEntity warehouse = invoicepurchase.getWarehouse();
         
         invoicepurchase.setLastmodified(Calendar.getInstance());
-        invoicepurchase.setWarehouse(warehouse);
         invoicepurchase.setLastmodifiedby(user);
         invoicepurchase.setStatus(false);
         
@@ -175,5 +190,29 @@ public class InvoicePurchaseController {
         partnerService.updatePartner(partner);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getInvoicePurchaseList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+    public ResponseEntity<?> getInvoicePurchaseList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid){
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<InvoicePurchaseEntity> ls = invoicepurchaseService.getInvoicePurchaseList(start, end, warehouse, partner, currency);
+        
+        return ResponseEntity.ok(ls);
     }
 }

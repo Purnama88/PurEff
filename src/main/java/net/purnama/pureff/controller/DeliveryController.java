@@ -55,17 +55,6 @@ public class DeliveryController {
         return ResponseEntity.ok(deliveryService.getDelivery(id));
     }
 
-    @RequestMapping(value = "api/addDelivery", method = RequestMethod.POST,
-            headers = "Accept=application/json")
-    public ResponseEntity<?> addDelivery(@RequestBody DeliveryEntity delivery) {
-        delivery.setId(IdGenerator.generateId());
-        delivery.setLastmodified(Calendar.getInstance());
-        
-        deliveryService.addDelivery(delivery);
-        
-        return ResponseEntity.ok(delivery);
-    }
-
     @RequestMapping(value = "api/updateDelivery", method = RequestMethod.PUT,
             headers = "Accept=application/json")
     public ResponseEntity<?> updateDelivery(@RequestBody DeliveryEntity delivery) {

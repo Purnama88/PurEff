@@ -26,6 +26,7 @@ import net.purnama.pureff.service.ReturnPurchaseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -115,6 +116,21 @@ public class ReturnPurchaseController {
         return ResponseEntity.ok(returnpurchaseService.countReturnPurchaseList(keyword));
     }
     
+    @RequestMapping(value = {"api/closeReturnPurchase"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> closeReturnPurchaseList(
+            @RequestParam(value="id") String id){
+        
+        ReturnPurchaseEntity returnpurchase = returnpurchaseService.getReturnPurchase(id);
+        
+        returnpurchase.setPaid(returnpurchase.getTotal_after_tax());
+        
+        returnpurchaseService.updateReturnPurchase(returnpurchase);
+        
+        return ResponseEntity.ok("");
+    }
+    
     @RequestMapping(value = {"api/getUnpaidReturnPurchaseList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"partnerid", "currencyid"})
@@ -147,10 +163,9 @@ public class ReturnPurchaseController {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        WarehouseEntity warehouse = returnpurchase.getWarehouse();
         
         returnpurchase.setLastmodified(Calendar.getInstance());
-        returnpurchase.setWarehouse(warehouse);
         returnpurchase.setLastmodifiedby(user);
         returnpurchase.setStatus(false);
         
@@ -175,5 +190,29 @@ public class ReturnPurchaseController {
         partnerService.updatePartner(partner);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getReturnPurchaseList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+    public ResponseEntity<?> getReturnPurchaseList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid){
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<ReturnPurchaseEntity> ls = returnpurchaseService.getReturnPurchaseList(start, end, warehouse, partner, currency);
+        
+        return ResponseEntity.ok(ls);
     }
 }

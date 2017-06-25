@@ -17,7 +17,6 @@ import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,9 +50,10 @@ public class ItemWarehouseController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getItemWarehouse/{itemid}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public ResponseEntity<?> getItemWarehouse(HttpServletRequest httpRequest, @PathVariable String itemid) {
+    @RequestMapping(value = "api/getItemWarehouse", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"itemid"})
+    public ResponseEntity<?> getItemWarehouse(HttpServletRequest httpRequest,
+            @RequestParam(value="itemid") String itemid) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity warehouse = new WarehouseEntity();

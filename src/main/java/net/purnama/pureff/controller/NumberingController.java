@@ -49,7 +49,7 @@ public class NumberingController {
     
     @RequestMapping(value = "api/getActiveNumberingList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
-    public ResponseEntity<?> getNumberingList(HttpServletRequest httpRequest) {
+    public ResponseEntity<?> getActiveNumberingList(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         WarehouseEntity wartemp = new WarehouseEntity();
@@ -71,6 +71,22 @@ public class NumberingController {
         MenuEntity menu = menuService.getMenu(menuid);
         
         List<NumberingEntity> ls = numberingService.getNumberingList(wartemp, menu);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getActiveNumberingList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"menuid"})
+    public ResponseEntity<?> getActiveNumberingList(HttpServletRequest httpRequest,
+            @RequestParam(value="menuid") int menuid) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity wartemp = new WarehouseEntity();
+        wartemp.setId(JwtUtil.parseToken2(header.substring(7)));
+        
+        MenuEntity menu = new MenuEntity();
+        menu.setId(menuid);
+        
+        List<NumberingEntity> ls = numberingService.getActiveNumberingList(wartemp, menu);
         return ResponseEntity.ok(ls);
     }
     

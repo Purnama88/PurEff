@@ -35,13 +35,15 @@ public class RoleDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(RoleEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
     public List<RoleEntity> getRoleList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<RoleEntity> ls = session.createQuery("from RoleEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(RoleEntity.class);
+        c.addOrder(Order.asc("name"));
+        return c.list();
     }
     
     public RoleEntity getRole(String id) {

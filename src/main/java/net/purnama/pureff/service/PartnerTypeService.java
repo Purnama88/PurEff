@@ -22,6 +22,16 @@ public class PartnerTypeService {
     PartnerTypeDao partnertypeDao;
 
     @Transactional
+    public List<PartnerTypeEntity> getActivePartnerTypeList(int parent) {
+            return partnertypeDao.getActivePartnerTypeList(parent);
+    }
+    
+    @Transactional
+    public List<PartnerTypeEntity> getPartnerTypeList(int parent) {
+            return partnertypeDao.getPartnerTypeList(parent);
+    }
+    
+    @Transactional
     public List<PartnerTypeEntity> getActivePartnerTypeList() {
             return partnertypeDao.getActivePartnerTypeList();
     }

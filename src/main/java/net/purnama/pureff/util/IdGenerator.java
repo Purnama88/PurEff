@@ -20,4 +20,8 @@ public class IdGenerator {
     public static String generateId(){
         return String.valueOf(new Date().getTime());
     }
+    
+    public static String generateInvoiceSalesId(){
+        return "";
+    }
 }

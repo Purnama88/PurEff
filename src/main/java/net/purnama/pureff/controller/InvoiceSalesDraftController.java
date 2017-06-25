@@ -272,7 +272,7 @@ public class InvoiceSalesDraftController {
         return ResponseEntity.ok("");
     }
     
-    @RequestMapping(value = "/api/getInvoiceSalesDraftList", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getInvoiceSalesDraftList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
     public ResponseEntity<?> getInvoiceSalesDraftList(HttpServletRequest httpRequest,
             @RequestParam(value="itemperpage") int itemperpage,

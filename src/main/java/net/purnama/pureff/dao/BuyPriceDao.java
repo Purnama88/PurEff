@@ -44,6 +44,13 @@ public class BuyPriceDao {
         return c.list();
     }
     
+    public List<BuyPriceEntity> getBuyPriceList(UomEntity uom) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(BuyPriceEntity.class);
+        c.add(Restrictions.eq("uom", uom));
+        return c.list();
+    }
+    
     public BuyPriceEntity getBuyPrice(ItemEntity item, UomEntity uom) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(BuyPriceEntity.class);

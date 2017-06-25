@@ -36,6 +36,11 @@ public class BuyPriceService {
     }
     
     @Transactional
+    public List<BuyPriceEntity> getBuyPriceList(UomEntity uom) {
+            return buypriceDao.getBuyPriceList(uom);
+    }
+    
+    @Transactional
     public BuyPriceEntity getBuyPrice(ItemEntity item, UomEntity uom) {
             return buypriceDao.getBuyPrice(item, uom);
     }

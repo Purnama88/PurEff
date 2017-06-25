@@ -5,6 +5,7 @@
  */
 package net.purnama.pureff.entity.transactional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -110,6 +111,11 @@ public class ItemAdjustmentEntity implements Serializable{
 
     public void setItem_name(String item_name) {
         this.item_name = item_name;
+    }
+    
+    @JsonIgnore
+    public double getDiff() {
+        return getQuantity() - getTstock();
     }
     
 }

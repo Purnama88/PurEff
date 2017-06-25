@@ -10,9 +10,13 @@ import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
+import net.purnama.pureff.entity.BuyPriceEntity;
+import net.purnama.pureff.entity.SellPriceEntity;
 import net.purnama.pureff.entity.UomEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.security.JwtUtil;
+import net.purnama.pureff.service.BuyPriceService;
+import net.purnama.pureff.service.SellPriceService;
 import net.purnama.pureff.service.UomService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,12 @@ public class UomController {
     
     @Autowired
     UomService uomService;
+    
+    @Autowired
+    SellPriceService sellpriceService;
+    
+    @Autowired
+    BuyPriceService buypriceService;
     
     @RequestMapping(value = "api/getActiveParentUomList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -95,6 +105,38 @@ public class UomController {
         
         uomService.addUom(uom);
         
+        if(uom.getParent() != null){
+            List<SellPriceEntity> ls = sellpriceService.getSellPriceList(uom.getParent());
+            
+            for(SellPriceEntity sellprice : ls){
+                SellPriceEntity newsellprice = new SellPriceEntity();
+                newsellprice.setId(IdGenerator.generateId());
+                newsellprice.setItem(sellprice.getItem());
+                newsellprice.setLastmodified(Calendar.getInstance());
+                newsellprice.setLastmodifiedby(user);
+                newsellprice.setNote("");
+                newsellprice.setStatus(true);
+                newsellprice.setUom(uom);
+                newsellprice.setValue(uom.getValue() * sellprice.getValue());
+                sellpriceService.addSellPrice(newsellprice);
+            }
+            
+            List<BuyPriceEntity> ls2 = buypriceService.getBuyPriceList(uom.getParent());
+            
+            for(BuyPriceEntity buyprice : ls2){
+                BuyPriceEntity newbuyprice = new BuyPriceEntity();
+                newbuyprice.setId(IdGenerator.generateId());
+                newbuyprice.setItem(buyprice.getItem());
+                newbuyprice.setLastmodified(Calendar.getInstance());
+                newbuyprice.setLastmodifiedby(user);
+                newbuyprice.setNote("");
+                newbuyprice.setStatus(true);
+                newbuyprice.setUom(uom);
+                newbuyprice.setValue(uom.getValue() * buyprice.getValue());
+                buypriceService.addBuyPrice(newbuyprice);
+            }
+        }
+        
         return ResponseEntity.ok(uom);
     }
 
@@ -121,7 +163,7 @@ public class UomController {
         return ResponseEntity.ok(uom);
     }
     
-    @RequestMapping(value = "/api/getParentUomList", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getParentUomList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
     public ResponseEntity<?> getParentUomList(
             @RequestParam(value="itemperpage") int itemperpage,

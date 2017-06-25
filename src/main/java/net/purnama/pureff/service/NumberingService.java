@@ -37,6 +37,11 @@ public class NumberingService {
     }
     
     @Transactional
+    public List<NumberingEntity> getActiveNumberingList(WarehouseEntity warehouse, MenuEntity menu) {
+            return numberingDao.getActiveNumberingList(warehouse, menu);
+    }
+    
+    @Transactional
     public List<NumberingEntity> getNumberingList(WarehouseEntity warehouse, MenuEntity menu) {
             return numberingDao.getNumberingList(warehouse, menu);
     }

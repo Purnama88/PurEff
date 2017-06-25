@@ -6,11 +6,21 @@
 
 package net.purnama.pureff.util;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+
 /**
  *
  * @author Purnama
  */
 public class GlobalFields {
+    
+    public static NumberFormat NUMBERFORMAT = DecimalFormat.getNumberInstance();
+    public static DateFormat DATEFORMAT = new SimpleDateFormat ("dd MMM YYYY");
+    
+    public static int DECIMALPLACES = 2;
     
     public static String PARENT_NAMES [] = {"Customer", "Supplier", "Non Trade"}; 
     

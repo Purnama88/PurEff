@@ -6,9 +6,11 @@
 
 package net.purnama.pureff.dao;
 
+import java.util.Calendar;
 import java.util.List;
 import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoicePurchaseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -107,7 +109,26 @@ public class InvoicePurchaseDao {
         c.add(Restrictions.eq("partner", partner));
         c.add(Restrictions.eq("currency", currency));
         c.add(Restrictions.eq("status", true));
-        c.add(Restrictions.gt("unpaid", 0.0));
+        c.add(Restrictions.gt("remaining", 0.0));
+        c.addOrder(Order.asc("date"));
+        List ls = c.list();
+        return ls;
+    }
+    
+    public List getInvoicePurchaseList(Calendar begin, Calendar end,
+            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(InvoicePurchaseEntity.class);
+        c.add(Restrictions.between("date", begin, end));
+        if(partner != null){
+            c.add(Restrictions.eq("partner", partner));
+        }
+        if(warehouse != null){
+            c.add(Restrictions.eq("warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("currency", currency));
+        }
         c.addOrder(Order.asc("date"));
         List ls = c.list();
         return ls;

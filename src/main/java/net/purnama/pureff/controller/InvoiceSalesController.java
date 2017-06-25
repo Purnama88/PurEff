@@ -26,6 +26,7 @@ import net.purnama.pureff.service.PaymentInInvoiceSalesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -116,13 +117,27 @@ public class InvoiceSalesController {
         return ResponseEntity.ok(invoicesalesService.countInvoiceSalesList(keyword));
     }
     
+    @RequestMapping(value = {"api/closeInvoiceSales"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> closeInvoiceSalesList(
+            @RequestParam(value="id") String id){
+        
+        InvoiceSalesEntity invoicesales = invoicesalesService.getInvoiceSales(id);
+        
+        invoicesales.setPaid(invoicesales.getTotal_after_tax());
+        
+        invoicesalesService.updateInvoiceSales(invoicesales);
+        
+        return ResponseEntity.ok("");
+    }
+    
     @RequestMapping(value = {"api/getUnpaidInvoiceSalesList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"partnerid", "currencyid"})
     public ResponseEntity<?> getUnpaidInvoiceSalesList(
             @RequestParam(value="partnerid") String partnerid,
-            @RequestParam(value="currencyid") String currencyid
-            ){
+            @RequestParam(value="currencyid") String currencyid){
         
         PartnerEntity partner = new PartnerEntity();
         partner.setId(partnerid);
@@ -148,10 +163,9 @@ public class InvoiceSalesController {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        WarehouseEntity warehouse = invoicesales.getWarehouse();
         
         invoicesales.setLastmodified(Calendar.getInstance());
-        invoicesales.setWarehouse(warehouse);
         invoicesales.setLastmodifiedby(user);
         invoicesales.setStatus(false);
         
@@ -176,5 +190,29 @@ public class InvoiceSalesController {
         partnerService.updatePartner(partner);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getInvoiceSalesList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+    public ResponseEntity<?> getInvoiceSalesList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid){
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<InvoiceSalesEntity> ls = invoicesalesService.getInvoiceSalesList(start, end, warehouse, partner, currency);
+        
+        return ResponseEntity.ok(ls);
     }
 }

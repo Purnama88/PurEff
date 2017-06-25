@@ -54,13 +54,15 @@ public class WarehouseDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(WarehouseEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("code"));
         return c.list();
     }
     
     public List<WarehouseEntity> getWarehouseList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<WarehouseEntity> ls = session.createQuery("from WarehouseEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(WarehouseEntity.class);
+        c.addOrder(Order.asc("code"));
+        return c.list();
     }
     
     public WarehouseEntity getWarehouse(String id) {

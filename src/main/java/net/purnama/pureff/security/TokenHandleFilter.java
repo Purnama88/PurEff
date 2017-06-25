@@ -43,8 +43,13 @@ public class TokenHandleFilter implements Filter{
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized");
         }
         else{
-            chain.doFilter(request, response);
-        
+            
+            if(JwtUtil.parseToken(header.substring(7)) != null){
+                chain.doFilter(request, response);
+            }
+            else{
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized");
+            }
         }
     }
 
@@ -52,5 +57,4 @@ public class TokenHandleFilter implements Filter{
     public void destroy() {
         System.out.println("destroy");
     }
-    
 }

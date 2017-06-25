@@ -9,6 +9,7 @@ package net.purnama.pureff.controller;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.ItemEntity;
 import net.purnama.pureff.entity.ItemWarehouseEntity;
 import net.purnama.pureff.entity.PartnerEntity;
@@ -25,6 +26,7 @@ import net.purnama.pureff.service.ReturnSalesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -114,6 +116,38 @@ public class ReturnSalesController {
         return ResponseEntity.ok(returnsalesService.countReturnSalesList(keyword));
     }
     
+    @RequestMapping(value = {"api/closeReturnSales"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> closeReturnSalesList(
+            @RequestParam(value="id") String id){
+        
+        ReturnSalesEntity returnsales = returnsalesService.getReturnSales(id);
+        
+        returnsales.setPaid(returnsales.getTotal_after_tax());
+        
+        returnsalesService.updateReturnSales(returnsales);
+        
+        return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getUnpaidReturnSalesList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"partnerid", "currencyid"})
+    public ResponseEntity<?> getUnpaidReturnSalesList(
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid
+            ){
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        return ResponseEntity.ok(returnsalesService.getUnpaidReturnSalesList(partner, currency));
+    }
+    
     @RequestMapping(value = {"api/cancelReturnSales"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"id"})
@@ -129,10 +163,9 @@ public class ReturnSalesController {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        WarehouseEntity warehouse = returnsales.getWarehouse();
         
         returnsales.setLastmodified(Calendar.getInstance());
-        returnsales.setWarehouse(warehouse);
         returnsales.setLastmodifiedby(user);
         returnsales.setStatus(false);
         
@@ -157,5 +190,29 @@ public class ReturnSalesController {
         partnerService.updatePartner(partner);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getReturnSalesList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+    public ResponseEntity<?> getReturnSalesList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid){
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<ReturnSalesEntity> ls = returnsalesService.getReturnSalesList(start, end, warehouse, partner, currency);
+        
+        return ResponseEntity.ok(ls);
     }
 }

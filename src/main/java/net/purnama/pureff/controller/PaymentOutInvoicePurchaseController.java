@@ -28,9 +28,9 @@ public class PaymentOutInvoicePurchaseController {
     @Autowired
     PaymentOutInvoicePurchaseService paymentoutinvoicepurchaseService;
     
-    @RequestMapping(value = "api/getPaymentOutInvoicePurchaseEntityList", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getPaymentOutInvoicePurchaseList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid"})
-    public ResponseEntity<?> getPaymentOutInvoicePurchaseEntityList(@RequestParam(value="paymentid") String paymentid) {
+    public ResponseEntity<?> getPaymentOutInvoicePurchaseList(@RequestParam(value="paymentid") String paymentid) {
         
         PaymentOutEntity paymentout = new PaymentOutEntity();
         paymentout.setId(paymentid);
@@ -40,10 +40,10 @@ public class PaymentOutInvoicePurchaseController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPaymentOutInvoicePurchaseEntity",
+    @RequestMapping(value = "api/getPaymentOutInvoicePurchase",
             method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid, invoiceid"})
-    public ResponseEntity<?> getPaymentOutInvoicePurchaseEntity(
+    public ResponseEntity<?> getPaymentOutInvoicePurchase(
         @RequestParam(value="paymentid") String paymentid,
         @RequestParam(value="invoiceid") String invoiceid){
         

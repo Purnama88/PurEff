@@ -37,13 +37,15 @@ public class ItemGroupDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemGroupEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
     public List<ItemGroupEntity> getItemGroupList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<ItemGroupEntity> ls = session.createQuery("from ItemGroupEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(ItemGroupEntity.class);
+        c.addOrder(Order.asc("name"));
+        return c.list();
     }
     
     public ItemGroupEntity getItemGroup(String id) {

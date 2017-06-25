@@ -54,7 +54,7 @@ public class ItemInvoiceWarehouseInEntity implements Serializable {
     @Column(name="baseuom_name")
     private String baseuom_name;
     
-    @Column(name="basequantity")
+    @Column(name="basequantity", columnDefinition="Decimal(16, 4)")
     private double basequantity;
 
     public String getId() {

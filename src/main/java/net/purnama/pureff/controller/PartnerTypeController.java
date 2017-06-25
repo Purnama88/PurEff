@@ -47,6 +47,22 @@ public class PartnerTypeController {
     }
     
     @RequestMapping(value = "api/getActivePartnerTypeList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"parent"})
+    public ResponseEntity<?> getActivePartnerTypeList(@RequestParam(value="parent") int parent) {
+        
+        List<PartnerTypeEntity> ls = partnertypeService.getActivePartnerTypeList(parent);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getPartnerTypeList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"parent"})
+    public ResponseEntity<?> getPartnerTypeList(@RequestParam(value="parent") int parent) {
+        
+        List<PartnerTypeEntity> ls = partnertypeService.getPartnerTypeList(parent);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getActivePartnerTypeList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
     public ResponseEntity<?> getActivePartnerTypeList() {
         

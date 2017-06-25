@@ -8,18 +8,29 @@ package net.purnama.pureff.controller;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
+import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
+import net.purnama.pureff.entity.transactional.PaymentInInvoiceSalesEntity;
+import net.purnama.pureff.entity.transactional.PaymentInReturnSalesEntity;
+import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
+import net.purnama.pureff.entity.transactional.ReturnSalesEntity;
 import net.purnama.pureff.security.JwtUtil;
+import net.purnama.pureff.service.InvoiceSalesService;
+import net.purnama.pureff.service.PartnerService;
+import net.purnama.pureff.service.PaymentInInvoiceSalesService;
+import net.purnama.pureff.service.PaymentInReturnSalesService;
 import net.purnama.pureff.service.PaymentInService;
+import net.purnama.pureff.service.PaymentTypeInService;
+import net.purnama.pureff.service.ReturnSalesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
-import net.purnama.pureff.util.IdGenerator;
+import net.purnama.pureff.util.GlobalFields;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,10 +48,28 @@ public class PaymentInController {
     UserService userService;
     
     @Autowired
+    PartnerService partnerService;
+    
+    @Autowired
     WarehouseService warehouseService;
     
     @Autowired
     PaymentInService paymentinService;
+    
+    @Autowired
+    InvoiceSalesService invoicesalesService;
+    
+    @Autowired
+    PaymentInInvoiceSalesService paymentininvoicesalesService;
+    
+    @Autowired
+    ReturnSalesService returnsalesService;
+    
+    @Autowired
+    PaymentInReturnSalesService paymentinreturnsalesService;
+    
+    @Autowired
+    PaymentTypeInService paymenttypeinService;
     
     @RequestMapping(value = "api/getPaymentInList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -86,12 +115,86 @@ public class PaymentInController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = {"api/countPaymentInList/{keyword}"},
+    @RequestMapping(value = {"api/countPaymentInList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
+            headers = "Accept=application/json", params = {"keyword"})
     public ResponseEntity<?> countPaymentInList(
-            @PathVariable String keyword){
+            @RequestParam(value="keyword") String keyword){
         
         return ResponseEntity.ok(paymentinService.countPaymentInList(keyword));
+    }
+    
+    @RequestMapping(value = "api/cancelPaymentIn", method = RequestMethod.DELETE, 
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> cancelPaymentIn(HttpServletRequest httpRequest,
+            @RequestParam(value="id") String id){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        
+        double totalbalance = 0;
+        
+        PaymentInEntity paymentin = paymentinService.getPaymentIn(id);
+        
+        List<PaymentInInvoiceSalesEntity> piislist = 
+                paymentininvoicesalesService.getPaymentInInvoiceSalesEntityList(paymentin);
+        
+        for(PaymentInInvoiceSalesEntity piis : piislist){
+            
+            InvoiceSalesEntity invoicesales = piis.getInvoicesales();
+            
+            invoicesales.setPaid(invoicesales.getPaid() - piis.getAmount());
+            
+            invoicesalesService.updateInvoiceSales(invoicesales);
+            
+            totalbalance += piis.getAmount() * invoicesales.getRate();
+            
+            piis.setInvoicesales(null);
+            
+            paymentininvoicesalesService.updatePaymentinInvoiceSales(piis);
+        }
+        
+        List<PaymentInReturnSalesEntity> pirslist = 
+                paymentinreturnsalesService.getPaymentInReturnSalesEntityList(paymentin);
+        
+        for(PaymentInReturnSalesEntity pirs : pirslist){
+            
+            ReturnSalesEntity returnsales = pirs.getReturnsales();
+            
+            returnsales.setPaid(returnsales.getPaid() - pirs.getAmount());
+            
+            returnsalesService.updateReturnSales(returnsales);
+            
+            totalbalance -= pirs.getAmount() * returnsales.getRate();
+            
+            pirs.setReturnsales(null);
+            
+            paymentinreturnsalesService.updatePaymentInReturnSales(pirs);
+        }
+        
+        for(PaymentTypeInEntity ptde : paymenttypeinService.
+                getPaymentTypeInList(paymentin)){
+            ptde.setStatus(false);
+            ptde.setValid(false);
+            
+            paymenttypeinService.updatePaymentTypeIn(ptde);
+        }
+        
+        paymentin.setStatus(false);
+        paymentin.setLastmodified(Calendar.getInstance());
+        paymentin.setLastmodifiedby(user);
+        
+        paymentinService.updatePaymentIn(paymentin);
+        
+        PartnerEntity partner = paymentin.getPartner();
+        if(partner.getPartnertype().getParent() == GlobalFields.CUSTOMER){
+            double remaining = paymentin.getAmount() - totalbalance;
+            partner.setBalance(partner.getBalance() + totalbalance + remaining);
+        }
+        else{
+            partner.setBalance(partner.getBalance() - (paymentin.getAmount() * paymentin.getRate()));
+        }
+        partnerService.updatePartner(partner);
+        
+        return ResponseEntity.ok("");
     }
 }

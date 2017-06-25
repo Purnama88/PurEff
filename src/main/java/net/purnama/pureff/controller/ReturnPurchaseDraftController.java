@@ -289,9 +289,9 @@ public class ReturnPurchaseDraftController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = {"api/countReturnPurchaseDraftList/{keyword}"},
+    @RequestMapping(value = {"api/countReturnPurchaseDraftList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json")
+            headers = "Accept=application/json", params = {"keyword"})
     public ResponseEntity<?> countReturnPurchaseDraftList(HttpServletRequest httpRequest,
             @RequestParam(value="keyword") String keyword){
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);

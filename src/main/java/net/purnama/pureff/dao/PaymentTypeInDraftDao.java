@@ -7,6 +7,7 @@
 package net.purnama.pureff.dao;
 
 import java.util.List;
+import javax.transaction.Transactional;
 import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentTypeInDraftEntity;
 import org.hibernate.Criteria;
@@ -27,10 +28,41 @@ public class PaymentTypeInDraftDao {
     @Autowired
     private SessionFactory sessionFactory;
     
+    @Transactional
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
+    @Transactional
+    public void addPaymentTypeInDraft(PaymentTypeInDraftEntity paymenttypeindraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(paymenttypeindraft);
+    }
+    
+    @Transactional
+    public void updatePaymentTypeInDraft(PaymentTypeInDraftEntity paymenttypeindraft) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.update(paymenttypeindraft);
+    }
+    
+    @Transactional
+    public void deletePaymentTypeInDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentTypeInDraftEntity p = getPaymentTypeInDraft(id);
+        if (null != p) {
+                session.delete(p);
+        }
+    }
+    
+    @Transactional
+    public PaymentTypeInDraftEntity getPaymentTypeInDraft(String id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        PaymentTypeInDraftEntity p = (PaymentTypeInDraftEntity) 
+                session.get(PaymentTypeInDraftEntity.class, id);
+        return p;
+    }
+    
+    @Transactional
     public List getPaymentTypeInDraftList(PaymentInDraftEntity paymentindraft){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentTypeInDraftEntity.class);

@@ -5,14 +5,16 @@
  */
 package net.purnama.pureff.controller;
 
+import java.util.Calendar;
 import java.util.List;
 import net.purnama.pureff.entity.transactional.PaymentOutEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeOutEntity;
 import net.purnama.pureff.service.PaymentOutService;
 import net.purnama.pureff.service.PaymentTypeOutService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +34,7 @@ public class PaymentTypeOutController {
     PaymentOutService paymentoutService;
     
     @RequestMapping(value = "api/getPaymentTypeOutList", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
+            headers = "Accept=application/json", params = {"paymentid"})
     public ResponseEntity<?> getPaymentTypeOutList(@RequestParam(value="paymentid") String paymentid) {
         
         PaymentOutEntity paymentout = paymentoutService.getPaymentOut(paymentid);
@@ -41,11 +43,25 @@ public class PaymentTypeOutController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPendingPaymentTypeOutList/{type}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PaymentTypeOutEntity> getPendingPaymentTypeOutList(@PathVariable int type) {
+    @RequestMapping(value = "api/getPendingPaymentTypeOutList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"type"})
+    public ResponseEntity<?> getPendingPaymentTypeOutList(@RequestParam(value="type") int type) {
         
         List<PaymentTypeOutEntity> ls = paymenttypeoutService.getPendingPaymentTypeOutList(type);
-        return ls;
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getPaymentTypeOutList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"startdate", "enddate", "accepted", "valid", "type"})
+    public ResponseEntity<?> getPaymentTypeOutList(
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="accepted") boolean accepted,
+            @RequestParam(value="valid") boolean valid,
+            @RequestParam(value="type") int type){
+        
+        List<PaymentTypeOutEntity> ls = paymenttypeoutService.getPaymentTypeOutList(type, accepted,
+                valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end));
+        return ResponseEntity.ok(ls);
     }
 }

@@ -69,6 +69,7 @@ public class ItemInvoiceSalesDraftController {
                 iteminvoicesalesdraftService.deleteItemInvoiceSalesDraft(iteminvoicesalesdraft.getId());
             }
             else{
+                
             }
         }
         

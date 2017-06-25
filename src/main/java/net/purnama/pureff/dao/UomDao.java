@@ -35,6 +35,7 @@ public class UomDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(UomEntity.class);
         c.add(Restrictions.isNull("parent"));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
@@ -43,6 +44,7 @@ public class UomDao {
         Criteria c = session.createCriteria(UomEntity.class);
         c.add(Restrictions.isNull("parent"));
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
@@ -56,14 +58,16 @@ public class UomDao {
     
     public List<UomEntity> getUomList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<UomEntity> ls = session.createQuery("from UomEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(UomEntity.class);
+        c.addOrder(Order.asc("name"));
+        return c.list();
     }
     
     public List<UomEntity> getActiveUomList(){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(UomEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     

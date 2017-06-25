@@ -6,7 +6,6 @@
 
 package net.purnama.pureff.controller;
 
-import java.util.Calendar;
 import java.util.List;
 import net.purnama.pureff.entity.BuyPriceEntity;
 import net.purnama.pureff.entity.ItemEntity;
@@ -14,10 +13,8 @@ import net.purnama.pureff.entity.UomEntity;
 import net.purnama.pureff.service.BuyPriceService;
 import net.purnama.pureff.service.ItemService;
 import net.purnama.pureff.service.UomService;
-import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,14 +36,6 @@ public class BuyPriceController {
     
     @Autowired
     UomService uomService;
-    
-    @RequestMapping(value = "api/getBuyPriceList", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public ResponseEntity<?> getBuyPriceList() {
-        
-        List<BuyPriceEntity> ls = buypriceService.getBuyPriceList();
-        return ResponseEntity.ok(ls);
-    }
     
     @RequestMapping(value = "api/getBuyPriceList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"itemid"})

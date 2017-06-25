@@ -44,6 +44,13 @@ public class SellPriceDao {
         return c.list();
     }
     
+    public List<SellPriceEntity> getSellPriceList(UomEntity uom) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(SellPriceEntity.class);
+        c.add(Restrictions.eq("uom", uom));
+        return c.list();
+    }
+    
     public SellPriceEntity getSellPrice(ItemEntity item, UomEntity uom) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(SellPriceEntity.class);

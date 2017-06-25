@@ -36,6 +36,11 @@ public class SellPriceService {
     }
     
     @Transactional
+    public List<SellPriceEntity> getSellPriceList(UomEntity uom) {
+            return sellpriceDao.getSellPriceList(uom);
+    }
+    
+    @Transactional
     public SellPriceEntity getSellPrice(ItemEntity item, UomEntity uom) {
             return sellpriceDao.getSellPrice(item, uom);
     }

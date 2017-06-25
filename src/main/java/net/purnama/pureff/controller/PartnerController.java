@@ -16,7 +16,6 @@ import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -116,6 +115,7 @@ public class PartnerController {
         
         partner.setId(IdGenerator.generateId());
         partner.setLastmodified(Calendar.getInstance());
+        partner.setBalance(0);
         partner.setLastmodifiedby(user);
         
         partnerService.addPartner(partner);

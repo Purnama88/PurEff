@@ -5,15 +5,19 @@
  */
 package net.purnama.pureff.controller;
 
+import java.util.Calendar;
 import java.util.List;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
 import net.purnama.pureff.service.PaymentInService;
 import net.purnama.pureff.service.PaymentTypeInService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,21 +33,35 @@ public class PaymentTypeInController {
     @Autowired
     PaymentInService paymentinService;
     
-    @RequestMapping(value = "api/getPaymentTypeInList/{paymentid}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PaymentTypeInEntity> getPaymentTypeInList(@PathVariable String paymentid) {
+    @RequestMapping(value = "api/getPaymentTypeInList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"paymentid"})
+    public ResponseEntity<?> getPaymentTypeInList(@RequestParam(value="paymentid") String paymentid){
         
         PaymentInEntity paymentin = paymentinService.getPaymentIn(paymentid);
         
         List<PaymentTypeInEntity> ls = paymenttypeinService.getPaymentTypeInList(paymentin);
-        return ls;
+        return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPendingPaymentTypeInList/{type}", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public List<PaymentTypeInEntity> getPendingPaymentTypeInList(@PathVariable int type) {
+    @RequestMapping(value = "api/getPendingPaymentTypeInList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"type"})
+    public ResponseEntity<?> getPendingPaymentTypeInList(@RequestParam(value="type") int type) {
         
         List<PaymentTypeInEntity> ls = paymenttypeinService.getPendingPaymentTypeInList(type);
-        return ls;
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getPaymentTypeInList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"startdate", "enddate", "accepted", "valid", "type"})
+    public ResponseEntity<?> getPaymentTypeInList(
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="accepted") boolean accepted,
+            @RequestParam(value="valid") boolean valid,
+            @RequestParam(value="type") int type){
+        
+        List<PaymentTypeInEntity> ls = paymenttypeinService.getPaymentTypeInList(type, accepted,
+                valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end));
+        return ResponseEntity.ok(ls);
     }
 }

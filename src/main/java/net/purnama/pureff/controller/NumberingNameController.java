@@ -12,6 +12,8 @@ import net.purnama.pureff.entity.NumberingNameEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.NumberingNameService;
+import net.purnama.pureff.util.CalendarUtil;
+import net.purnama.pureff.util.DateUtils;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -67,9 +69,15 @@ public class NumberingNameController {
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
         
+        numberingname.setBegin(CalendarUtil.toStartOfDay(numberingname.getBegin()));
+        numberingname.setEnd(CalendarUtil.toEndofDay(numberingname.getEnd()));
         numberingname.setId(IdGenerator.generateId());
         numberingname.setLastmodified(Calendar.getInstance());
         numberingname.setLastmodifiedby(temp);
+        
+        if(checkDateCollision(numberingname.getBegin(), numberingname.getEnd())){
+            return ResponseEntity.badRequest().body("You have a date collision with other numbering name");
+        }
         
         numberingnameService.addNumberingName(numberingname);
         
@@ -91,8 +99,15 @@ public class NumberingNameController {
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
         
+        numberingname.setBegin(CalendarUtil.toStartOfDay(numberingname.getBegin()));
+        numberingname.setEnd(CalendarUtil.toEndofDay(numberingname.getEnd()));
         numberingname.setLastmodified(Calendar.getInstance());
         numberingname.setLastmodifiedby(temp);
+        
+        
+        if(checkDateCollision(numberingname.getBegin(), numberingname.getEnd())){
+            return ResponseEntity.badRequest().body("You have a date collision with other numbering name");
+        }
         
         numberingnameService.updateNumberingName(numberingname);
         
@@ -116,5 +131,21 @@ public class NumberingNameController {
             headers = "Accept=application/json", params = {"keyword"})
     public ResponseEntity<?> countNumberingNameList(@RequestParam(value="keyword") String keyword){
         return ResponseEntity.ok(numberingnameService.countNumberingNameList(keyword));
+    }
+    
+    protected boolean checkDateCollision(Calendar begin, Calendar end){
+        boolean status = false;
+        
+        for(NumberingNameEntity numberingname : numberingnameService.getActiveNumberingNameList()){
+            
+            if(DateUtils.isBetween(begin, numberingname.getBegin(), numberingname.getEnd()) ||
+                    DateUtils.isBetween(end, numberingname.getBegin(), numberingname.getEnd()) ||
+                    DateUtils.isBetween(numberingname.getBegin(), begin, end) ||
+                    DateUtils.isBetween(numberingname.getEnd(), begin, end)){
+                status = true;
+                break;
+            }
+        }
+        return status;
     }
 }

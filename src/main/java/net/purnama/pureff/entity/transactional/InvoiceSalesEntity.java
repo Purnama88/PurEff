@@ -20,7 +20,8 @@ import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
-
+import net.purnama.pureff.util.GlobalFields;
+import org.hibernate.annotations.Formula;
 /**
  *
  * @author Purnama
@@ -108,6 +109,18 @@ public class InvoiceSalesEntity implements Serializable{
     @Column(name="status")
     private boolean status;
     
+    @Formula("subtotal - discount - rounding + freight + tax - paid")
+    private double remaining;
+    
+    @Formula("subtotal - discount - rounding + freight")
+    private double total_before_tax;
+    
+    @Formula("subtotal - discount - rounding + freight + tax")
+    private double total_after_tax;
+    
+    @Formula("(subtotal - discount - rounding + freight + tax) * rate")
+    private double total_defaultcurrency;
+    
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Calendar lastmodified;
     
@@ -116,18 +129,6 @@ public class InvoiceSalesEntity implements Serializable{
     @JoinColumn(name = "lastmodifiedby")
     private UserEntity lastmodifiedby;
 
-    private double discount_percentage;
-    
-    private double total_before_tax;
-    
-    private double tax_percentage;
-    
-    private double total_after_tax;
-    
-    private double total_defaultcurrency;
-    
-    private double remaining;
-    
     public String getId() {
         return id;
     }
@@ -343,13 +344,13 @@ public class InvoiceSalesEntity implements Serializable{
     public void setRounding(double rounding) {
         this.rounding = rounding;
     }
-
-    public double getDiscount_percentage() {
-        return discount_percentage;
+    
+    public double getRemaining() {
+        return remaining;
     }
 
-    public void setDiscount_percentage(double discount_percentage) {
-        this.discount_percentage = discount_percentage;
+    public void setRemaining(double remaining) {
+        this.remaining = remaining;
     }
 
     public double getTotal_before_tax() {
@@ -358,14 +359,6 @@ public class InvoiceSalesEntity implements Serializable{
 
     public void setTotal_before_tax(double total_before_tax) {
         this.total_before_tax = total_before_tax;
-    }
-
-    public double getTax_percentage() {
-        return tax_percentage;
-    }
-
-    public void setTax_percentage(double tax_percentage) {
-        this.tax_percentage = tax_percentage;
     }
 
     public double getTotal_after_tax() {
@@ -383,13 +376,19 @@ public class InvoiceSalesEntity implements Serializable{
     public void setTotal_defaultcurrency(double total_defaultcurrency) {
         this.total_defaultcurrency = total_defaultcurrency;
     }
-
-    public double getRemaining() {
-        return remaining;
-    }
-
-    public void setRemaining(double remaining) {
-        this.remaining = remaining;
+    
+    @JsonIgnore
+    public String getFormattedTotal_after_tax(){
+        return GlobalFields.NUMBERFORMAT.format(getTotal_after_tax());
     }
     
+    @JsonIgnore
+    public String getFormattedDate(){
+        return GlobalFields.DATEFORMAT.format(getDate().getTime());
+    }
+    
+    @JsonIgnore
+    public String getFormattedDueDate(){
+        return GlobalFields.DATEFORMAT.format(getDuedate().getTime());
+    }
 }

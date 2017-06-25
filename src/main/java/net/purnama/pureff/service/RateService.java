@@ -48,4 +48,14 @@ public class RateService {
     public void updateRate(RateEntity rate) {
             rateDao.updateRate(rate);
     }
+    
+    @Transactional
+    public List getRateList(CurrencyEntity currency, int itemperpage, int page, String sort, String keyword){
+        return rateDao.getRateList(currency, itemperpage, page, sort, keyword);
+    }
+    
+    @Transactional
+    public int countRateList(CurrencyEntity currency, String keyword){
+        return rateDao.countRateList(currency, keyword);
+    }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentTypeInDao;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
+import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +24,28 @@ public class PaymentTypeInService {
     PaymentTypeInDao paymenttypeinDao;
     
     @Transactional
-    public List getPaymentTypeInList(PaymentInEntity paymentin){
+    public void addPaymentTypeIn(PaymentTypeInEntity paymenttypein){
+        paymenttypeinDao.addPaymentTypeIn(paymenttypein);
+    }
+    
+    @Transactional
+    public void updatePaymentTypeIn(PaymentTypeInEntity paymenttypein){
+        paymenttypeinDao.addPaymentTypeIn(paymenttypein);
+    }
+    
+    @Transactional
+    public List<PaymentTypeInEntity> getPaymentTypeInList(PaymentInEntity paymentin){
         return paymenttypeinDao.getPaymentTypeInList(paymentin);
     }
     
     @Transactional
-    public List getPaymentTypeInList(int type, boolean accepted, boolean valid,
+    public List<PaymentTypeInEntity> getPaymentTypeInList(int type, boolean accepted, boolean valid,
             Calendar begin, Calendar end){
         return paymenttypeinDao.getPaymentTypeInList(type, accepted, valid, begin, end);
     }
     
     @Transactional
-    public List getPendingPaymentTypeInList(int type){
+    public List<PaymentTypeInEntity> getPendingPaymentTypeInList(int type){
         return paymenttypeinDao.getPendingPaymentTypeInList(type);
     }
 }

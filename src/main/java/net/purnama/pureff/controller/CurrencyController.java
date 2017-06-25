@@ -48,8 +48,6 @@ public class CurrencyController {
         return ResponseEntity.ok(ls);
     }
     
-    //
-    
     @RequestMapping(value = "api/getCurrency", method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"id"})
     public ResponseEntity<?> getCurrency(@RequestParam(value="id") String id) {
@@ -94,9 +92,7 @@ public class CurrencyController {
         return ResponseEntity.ok(currency);
     }
     
-    //api/getCurrencyList?itemperpage=9&
-    
-    @RequestMapping(value = "/api/getCurrencyList", method = RequestMethod.GET, 
+    @RequestMapping(value = "api/getCurrencyList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"itemperpage", "page", "sort", "keyword"})
     public ResponseEntity<?> getCurrencyList(
             @RequestParam(value="itemperpage") int itemperpage,

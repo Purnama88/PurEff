@@ -48,14 +48,6 @@ public class RateController {
         
     }
     
-    @RequestMapping(value = "api/getRateList", method = RequestMethod.GET, 
-            headers = "Accept=application/json")
-    public ResponseEntity<?> getRateList() {
-        
-        List<RateEntity> ls = rateService.getRateList();
-        return ResponseEntity.ok(ls);
-    }
-    
     @RequestMapping(value = "api/getRate", method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"id"})
     public ResponseEntity<?> getRate(@RequestParam(value="id") String id) {
@@ -86,5 +78,33 @@ public class RateController {
         rateService.updateRate(rate);
         
         return ResponseEntity.ok(rate);
+    }
+    
+    @RequestMapping(value = "api/getRateList", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {"currencyid", "itemperpage", "page", "sort", "keyword"})
+    public ResponseEntity<?> getRateList(
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="itemperpage") int itemperpage,
+            @RequestParam(value="page") int page,
+            @RequestParam(value="sort") String sort,
+            @RequestParam(value="keyword") String keyword) {
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<RateEntity> ls = rateService.getRateList(currency, itemperpage, page, sort, keyword);
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/countRateList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"currencyid", "keyword"})
+    public ResponseEntity<?> countRateList(
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="keyword") String keyword){
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        return ResponseEntity.ok(rateService.countRateList(currency, keyword));
     }
 }

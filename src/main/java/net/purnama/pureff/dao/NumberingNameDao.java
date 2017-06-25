@@ -34,13 +34,15 @@ public class NumberingNameDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(NumberingNameEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("name"));
         return c.list();
     }
     
     public List<NumberingNameEntity> getNumberingNameList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<NumberingNameEntity> ls = session.createQuery("from NumberingNameEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(NumberingNameEntity.class);
+        c.addOrder(Order.asc("name"));
+        return c.list();
     }
     
     public NumberingNameEntity getNumberingName(String id) {
