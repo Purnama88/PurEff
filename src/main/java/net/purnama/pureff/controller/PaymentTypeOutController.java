@@ -7,14 +7,20 @@ package net.purnama.pureff.controller;
 
 import java.util.Calendar;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.PaymentOutEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeOutEntity;
+import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.PaymentOutService;
 import net.purnama.pureff.service.PaymentTypeOutService;
 import net.purnama.pureff.util.CalendarUtil;
+import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,5 +69,46 @@ public class PaymentTypeOutController {
         List<PaymentTypeOutEntity> ls = paymenttypeoutService.getPaymentTypeOutList(type, accepted,
                 valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end));
         return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/updatePaymentTypeOut", method = RequestMethod.PUT,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> updatePaymentTypeOut(HttpServletRequest httpRequest,
+            @RequestBody PaymentTypeOutEntity paymenttypeout) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        paymenttypeout.setLastmodified(Calendar.getInstance());
+        paymenttypeout.setLastmodifiedby(user);
+        
+        paymenttypeoutService.updatePaymentTypeOut(paymenttypeout);
+        
+        return ResponseEntity.ok(paymenttypeout);
+    }
+    
+    @RequestMapping(value = "api/savePaymentTypeOutList", method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> savePaymentTypeOutList(
+            HttpServletRequest httpRequest,
+            @RequestBody List<PaymentTypeOutEntity> paymenttypeoutlist) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity temp = new UserEntity();
+        temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        for(PaymentTypeOutEntity paymenttypeout : paymenttypeoutlist){
+            paymenttypeout.setLastmodifiedby(temp);
+            if(paymenttypeout.getId() != null){
+                paymenttypeoutService.updatePaymentTypeOut(paymenttypeout);
+            }
+            else{
+                paymenttypeout.setId(IdGenerator.generateId());
+                paymenttypeoutService.addPaymentTypeOut(paymenttypeout);
+            }
+        }
+        
+        return ResponseEntity.ok("");
     }
 }

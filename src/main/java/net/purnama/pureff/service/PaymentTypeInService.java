@@ -30,7 +30,7 @@ public class PaymentTypeInService {
     
     @Transactional
     public void updatePaymentTypeIn(PaymentTypeInEntity paymenttypein){
-        paymenttypeinDao.addPaymentTypeIn(paymenttypein);
+        paymenttypeinDao.updatePaymentTypeIn(paymenttypein);
     }
     
     @Transactional

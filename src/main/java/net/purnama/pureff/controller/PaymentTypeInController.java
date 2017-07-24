@@ -7,14 +7,20 @@ package net.purnama.pureff.controller;
 
 import java.util.Calendar;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
+import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.PaymentInService;
 import net.purnama.pureff.service.PaymentTypeInService;
 import net.purnama.pureff.util.CalendarUtil;
+import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,5 +69,29 @@ public class PaymentTypeInController {
         List<PaymentTypeInEntity> ls = paymenttypeinService.getPaymentTypeInList(type, accepted,
                 valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end));
         return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/savePaymentTypeInList", method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> savePaymentTypeInList(
+            HttpServletRequest httpRequest,
+            @RequestBody List<PaymentTypeInEntity> paymenttypeinlist) {
+        
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity temp = new UserEntity();
+        temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        for(PaymentTypeInEntity paymenttypein : paymenttypeinlist){
+            paymenttypein.setLastmodifiedby(temp);
+            if(paymenttypein.getId() != null){
+                paymenttypeinService.updatePaymentTypeIn(paymenttypein);
+            }
+            else{
+                paymenttypein.setId(IdGenerator.generateId());
+                paymenttypeinService.addPaymentTypeIn(paymenttypein);
+            }
+        }
+        
+        return ResponseEntity.ok("");
     }
 }
