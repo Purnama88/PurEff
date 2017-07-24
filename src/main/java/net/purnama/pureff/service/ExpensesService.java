@@ -65,7 +65,7 @@ public class ExpensesService {
     
     @Transactional
     public List getExpensesList(Calendar start, Calendar end, WarehouseEntity warehouse,
-            PartnerEntity partner, CurrencyEntity currency){
-        return expensesDao.getExpensesList(start, end, warehouse, partner, currency);
+            PartnerEntity partner, CurrencyEntity currency, boolean status){
+        return expensesDao.getExpensesList(start, end, warehouse, partner, currency, status);
     }
 }

@@ -6,11 +6,14 @@
 
 package net.purnama.pureff.dao;
 
+import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.DeliveryEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -34,8 +37,10 @@ public class DeliveryDao {
     
     public List<DeliveryEntity> getDeliveryList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<DeliveryEntity> ls = session.createQuery("from DeliveryEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(DeliveryEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public DeliveryEntity getDelivery(String id) {
@@ -71,7 +76,7 @@ public class DeliveryDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         
@@ -92,5 +97,20 @@ public class DeliveryDao {
         int resultint = Integer.valueOf(result.get(0).toString());
         
         return resultint;
+    }
+    
+    public List getDeliveryList(Calendar begin, Calendar end,
+            WarehouseEntity warehouse, boolean status){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(DeliveryEntity.class);
+        c.add(Restrictions.between("date", begin, end));
+        if(warehouse != null){
+            c.add(Restrictions.eq("warehouse", warehouse));
+        }
+        c.add(Restrictions.eq("status", status));
+        c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        List ls = c.list();
+        return ls;
     }
 }

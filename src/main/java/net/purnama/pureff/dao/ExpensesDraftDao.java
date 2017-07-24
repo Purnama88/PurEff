@@ -12,6 +12,7 @@ import net.purnama.pureff.entity.transactional.draft.ExpensesDraftEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -34,8 +35,10 @@ public class ExpensesDraftDao {
     
     public List<ExpensesDraftEntity> getExpensesDraftList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<ExpensesDraftEntity> ls = session.createQuery("from ExpensesDraftEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(ExpensesDraftEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public ExpensesDraftEntity getExpensesDraft(String id) {
@@ -76,7 +79,7 @@ public class ExpensesDraftDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

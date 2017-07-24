@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +33,12 @@ public class PaymentTypeInDao {
         this.sessionFactory = sessionFactory;
     }
     
-    public List getPaymentTypeInList(PaymentInEntity paymentin){
+    public List<PaymentTypeInEntity> getPaymentTypeInList(PaymentInEntity paymentin){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentTypeInEntity.class);
         c.add(Restrictions.eq("paymentin", paymentin));
-        c.addOrder(Order.asc("date"));
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -68,6 +70,7 @@ public class PaymentTypeInDao {
         c.add(Restrictions.eq("valid", valid));
         c.add(Restrictions.between("duedate", begin, end));
         c.addOrder(Order.asc("duedate"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -79,6 +82,7 @@ public class PaymentTypeInDao {
         }
         c.add(Restrictions.eq("valid", true));
         c.add(Restrictions.eq("status", false));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
 }

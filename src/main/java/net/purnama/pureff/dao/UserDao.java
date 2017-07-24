@@ -7,10 +7,12 @@
 package net.purnama.pureff.dao;
 
 import java.util.List;
+import net.purnama.pureff.entity.RoleEntity;
 import net.purnama.pureff.entity.UserEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
@@ -41,10 +43,21 @@ public class UserDao {
         return (UserEntity)c.uniqueResult();
     }
     
+    public List<UserEntity> getActiveUserList() {
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(RoleEntity.class);
+        c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("username"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+    
     public List<UserEntity> getUserList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<UserEntity> ls = session.createQuery("from UserEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(RoleEntity.class);
+        c.addOrder(Order.asc("username"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public UserEntity getUser(String id) {
@@ -87,8 +100,10 @@ public class UserDao {
             c.addOrder(Order.asc(sort));
         }
 
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
+        
         
         return c.list();
     }

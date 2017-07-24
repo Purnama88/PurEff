@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.UomEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,14 +34,16 @@ public class SellPriceDao {
     
     public List<SellPriceEntity> getSellPriceList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<SellPriceEntity> ls = session.createQuery("from SellPriceEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(SellPriceEntity.class);
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public List<SellPriceEntity> getSellPriceList(ItemEntity item) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(SellPriceEntity.class);
         c.add(Restrictions.eq("item", item));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -48,6 +51,7 @@ public class SellPriceDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(SellPriceEntity.class);
         c.add(Restrictions.eq("uom", uom));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     

@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.PartnerEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
@@ -36,13 +37,15 @@ public class PartnerDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PartnerEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
     public List<PartnerEntity> getPartnerList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<PartnerEntity> ls = session.createQuery("from PartnerEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(PartnerEntity.class);
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public PartnerEntity getPartner(String id) {
@@ -83,7 +86,7 @@ public class PartnerDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         
@@ -109,6 +112,7 @@ public class PartnerDao {
         Criteria c = session.createCriteria(PartnerEntity.class);
         c.addOrder(Order.asc("name"));
         c.createCriteria("partnertype").add(Restrictions.eq("parent", 1));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
@@ -119,6 +123,7 @@ public class PartnerDao {
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("name"));
         c.createCriteria("partnertype").add(Restrictions.eq("parent", 1));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
@@ -128,6 +133,7 @@ public class PartnerDao {
         Criteria c = session.createCriteria(PartnerEntity.class);
         c.addOrder(Order.asc("name"));
         c.createCriteria("partnertype").add(Restrictions.eq("parent", 0));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
@@ -138,6 +144,7 @@ public class PartnerDao {
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("name"));
         c.createCriteria("partnertype").add(Restrictions.eq("parent", 0));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
@@ -147,6 +154,7 @@ public class PartnerDao {
         Criteria c = session.createCriteria(PartnerEntity.class);
         c.addOrder(Order.asc("name"));
         c.createCriteria("partnertype").add(Restrictions.eq("parent", 2));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
@@ -157,6 +165,7 @@ public class PartnerDao {
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("name"));
         c.createCriteria("partnertype").add(Restrictions.eq("parent", 2));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }

@@ -38,14 +38,23 @@ public class PaymentOutInvoicePurchaseDraftController {
     InvoicePurchaseService invoicepurchaseService;
     
     @RequestMapping(value = "api/getSelectedPaymentOutInvoicePurchaseDraftList", method = RequestMethod.GET, 
-            headers = "Accept=application/json", params = {"paymentid"})
-    public ResponseEntity<?> getSelectedPaymentOutInvoicePurchaseDraftList(@RequestParam(value="paymentid") String paymentid) {
+            headers = "Accept=application/json", params = {"paymentid", "partnerid", "currencyid"})
+    public ResponseEntity<?> getSelectedPaymentOutInvoicePurchaseDraftList(
+            @RequestParam(value="paymentid") String paymentid,
+            @RequestParam(value="partnerid")String partnerid,
+            @RequestParam(value="currencyid")String currencyid) {
         
         PaymentOutDraftEntity paymentoutdraft = new PaymentOutDraftEntity();
         paymentoutdraft.setId(paymentid);
         
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
         List<PaymentOutInvoicePurchaseDraftEntity> ls = paymentoutinvoicepurchasedraftService.
-                getPaymentOutInvoicePurchaseDraftEntityList(paymentoutdraft);
+                getPaymentOutInvoicePurchaseDraftEntityList(paymentoutdraft, partner, currency);
         return ResponseEntity.ok(ls);
     }
     
@@ -119,25 +128,24 @@ public class PaymentOutInvoicePurchaseDraftController {
     }
     
     @RequestMapping(value = "api/savePaymentOutInvoicePurchaseDraftList", method = RequestMethod.POST,
-            headers = "Accept=application/json")
+            headers = "Accept=application/json", params = {"paymentid"})
     public ResponseEntity<?> savePaymentOutInvoicePurchaseDraftList(
+            @RequestParam(value="paymentid") String paymentid,
             @RequestBody List<PaymentOutInvoicePurchaseDraftEntity> paymentoutinvoicepurchasedraftlist) {
         
-        if(!paymentoutinvoicepurchasedraftlist.isEmpty()){
-            PaymentOutInvoicePurchaseDraftEntity piisde = paymentoutinvoicepurchasedraftlist.get(0);
-            
-            PaymentOutDraftEntity pid = piisde.getPaymentoutdraft();
-            
-            for(PaymentOutInvoicePurchaseDraftEntity piisdetemp : 
-                    paymentoutinvoicepurchasedraftService.getPaymentOutInvoicePurchaseDraftEntityList(pid)){
-                paymentoutinvoicepurchasedraftService.deletePaymentOutInvoicePurchaseDraft(piisdetemp.getId());
-            }
-            
-            for(PaymentOutInvoicePurchaseDraftEntity piisdetemp : paymentoutinvoicepurchasedraftlist){
-                    piisdetemp.setId(IdGenerator.generateId());
-                    paymentoutinvoicepurchasedraftService.addPaymentOutInvoicePurchaseDraft(piisdetemp);
-            }
+        PaymentOutDraftEntity pode = new PaymentOutDraftEntity();
+        pode.setId(paymentid);
+        
+        for(PaymentOutInvoicePurchaseDraftEntity piisdetemp : 
+                paymentoutinvoicepurchasedraftService.getPaymentOutInvoicePurchaseDraftEntityList(pode)){
+            paymentoutinvoicepurchasedraftService.deletePaymentOutInvoicePurchaseDraft(piisdetemp.getId());
         }
+
+        for(PaymentOutInvoicePurchaseDraftEntity piisdetemp : paymentoutinvoicepurchasedraftlist){
+                piisdetemp.setId(IdGenerator.generateId());
+                paymentoutinvoicepurchasedraftService.addPaymentOutInvoicePurchaseDraft(piisdetemp);
+        }
+        
         return ResponseEntity.ok("");
     }
 }

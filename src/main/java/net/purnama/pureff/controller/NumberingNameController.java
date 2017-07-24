@@ -75,7 +75,7 @@ public class NumberingNameController {
         numberingname.setLastmodified(Calendar.getInstance());
         numberingname.setLastmodifiedby(temp);
         
-        if(checkDateCollision(numberingname.getBegin(), numberingname.getEnd())){
+        if(checkDateCollision("", numberingname.getBegin(), numberingname.getEnd())){
             return ResponseEntity.badRequest().body("You have a date collision with other numbering name");
         }
         
@@ -104,8 +104,7 @@ public class NumberingNameController {
         numberingname.setLastmodified(Calendar.getInstance());
         numberingname.setLastmodifiedby(temp);
         
-        
-        if(checkDateCollision(numberingname.getBegin(), numberingname.getEnd())){
+        if(checkDateCollision(numberingname.getId(), numberingname.getBegin(), numberingname.getEnd())){
             return ResponseEntity.badRequest().body("You have a date collision with other numbering name");
         }
         
@@ -133,17 +132,23 @@ public class NumberingNameController {
         return ResponseEntity.ok(numberingnameService.countNumberingNameList(keyword));
     }
     
-    protected boolean checkDateCollision(Calendar begin, Calendar end){
+    protected boolean checkDateCollision(String exid, Calendar begin, Calendar end){
         boolean status = false;
         
         for(NumberingNameEntity numberingname : numberingnameService.getActiveNumberingNameList()){
             
-            if(DateUtils.isBetween(begin, numberingname.getBegin(), numberingname.getEnd()) ||
-                    DateUtils.isBetween(end, numberingname.getBegin(), numberingname.getEnd()) ||
-                    DateUtils.isBetween(numberingname.getBegin(), begin, end) ||
-                    DateUtils.isBetween(numberingname.getEnd(), begin, end)){
-                status = true;
-                break;
+            if(exid.equals(numberingname.getId())){
+                
+            }
+            else{
+                if(DateUtils.isBetween(begin, numberingname.getBegin(), numberingname.getEnd()) ||
+                        DateUtils.isBetween(end, numberingname.getBegin(), numberingname.getEnd()) ||
+                        DateUtils.isBetween(numberingname.getBegin(), begin, end) ||
+                        DateUtils.isBetween(numberingname.getEnd(), begin, end)){
+
+                        status = true;
+                        break;
+                }
             }
         }
         return status;

@@ -12,6 +12,7 @@ import net.purnama.pureff.entity.RateEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -51,8 +52,10 @@ public class RateDao {
     
     public List<RateEntity> getRateList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<RateEntity> ls = session.createQuery("from RateEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(RateEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public RateEntity getRate(String id) {
@@ -88,7 +91,7 @@ public class RateDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

@@ -38,6 +38,14 @@ public class BuyPriceController {
     UomService uomService;
     
     @RequestMapping(value = "api/getBuyPriceList", method = RequestMethod.GET, 
+            headers = "Accept=application/json")
+    public ResponseEntity<?> getBuyPriceList() {
+        
+        List<BuyPriceEntity> ls = buypriceService.getBuyPriceList();
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = "api/getBuyPriceList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"itemid"})
     public ResponseEntity<?> getBuyPriceList(@RequestParam(value="itemid") String itemid) {
         

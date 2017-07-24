@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.transactional.PaymentInReturnSalesEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -67,6 +68,7 @@ public class PaymentInReturnSalesDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentInReturnSalesEntity.class);
         c.add(Restrictions.eq("paymentin", paymentin));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
          
@@ -75,6 +77,7 @@ public class PaymentInReturnSalesDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentInReturnSalesEntity.class);
         c.add(Restrictions.eq("returnsales", returnsales));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     

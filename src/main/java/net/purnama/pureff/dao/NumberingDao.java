@@ -14,6 +14,7 @@ import net.purnama.pureff.entity.WarehouseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,10 @@ public class NumberingDao {
     
     public List<NumberingEntity> getNumberingList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<NumberingEntity> ls = session.createQuery("from NumberingEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(NumberingEntity.class);
+        c.addOrder(Order.asc("prefix"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public List<NumberingEntity> getActiveNumberingList(WarehouseEntity warehouse) {
@@ -44,6 +47,7 @@ public class NumberingDao {
         Criteria c = session.createCriteria(NumberingEntity.class);
         c.add(Restrictions.eq("warehouse", warehouse));
         c.add(Restrictions.eq("status", true));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -53,6 +57,7 @@ public class NumberingDao {
         c.add(Restrictions.eq("warehouse", warehouse));
         c.add(Restrictions.eq("menu", menu));
         c.addOrder(Order.asc("prefix"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -63,6 +68,7 @@ public class NumberingDao {
         c.add(Restrictions.eq("menu", menu));
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("prefix"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     

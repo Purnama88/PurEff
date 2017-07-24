@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.transactional.ItemAdjustmentEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class ItemAdjustmentDao {
         Criteria c = session.createCriteria(ItemAdjustmentEntity.class);
         c.add(Restrictions.eq("adjustment", adjustment));
         c.addOrder(Order.asc("id"));
-        return (List<ItemAdjustmentEntity>)c.list();
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
 }

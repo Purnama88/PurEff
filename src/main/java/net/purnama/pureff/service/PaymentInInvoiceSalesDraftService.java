@@ -9,6 +9,8 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentInInvoiceSalesDraftDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentInInvoiceSalesDraftEntity;
@@ -58,5 +60,13 @@ public class PaymentInInvoiceSalesDraftService {
          getPaymentInInvoiceSalesDraftEntityList(PaymentInDraftEntity paymentindraft){
         return paymentininvoicesalesdraftDao.
                  getPaymentInInvoiceSalesDraftEntityList(paymentindraft);
+    }
+     
+    @Transactional
+    public List<PaymentInInvoiceSalesDraftEntity>
+         getPaymentInInvoiceSalesDraftEntityList(PaymentInDraftEntity paymentindraft,
+                 PartnerEntity partner, CurrencyEntity currency){
+        return paymentininvoicesalesdraftDao.
+                 getPaymentInInvoiceSalesDraftEntityList(paymentindraft, partner, currency);
     }
 }

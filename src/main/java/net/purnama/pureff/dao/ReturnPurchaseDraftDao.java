@@ -12,6 +12,7 @@ import net.purnama.pureff.entity.transactional.draft.ReturnPurchaseDraftEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -34,8 +35,10 @@ public class ReturnPurchaseDraftDao {
     
     public List<ReturnPurchaseDraftEntity> getReturnPurchaseDraftList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<ReturnPurchaseDraftEntity> ls = session.createQuery("from ReturnPurchaseDraftEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(ReturnPurchaseDraftEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public ReturnPurchaseDraftEntity getReturnPurchaseDraft(String id) {
@@ -75,7 +78,7 @@ public class ReturnPurchaseDraftDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

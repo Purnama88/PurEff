@@ -194,16 +194,20 @@ public class ReturnSalesController {
     
     @RequestMapping(value = {"api/getReturnSalesList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "partnerid",
+                "currencyid", "status"})
     public ResponseEntity<?> getReturnSalesList(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
             @RequestParam(value="partnerid") String partnerid,
-            @RequestParam(value="currencyid") String currencyid){
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="status") boolean status){
         
-        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(warehouseid);
         
         PartnerEntity partner = new PartnerEntity();
         partner.setId(partnerid);
@@ -211,7 +215,8 @@ public class ReturnSalesController {
         CurrencyEntity currency = new CurrencyEntity();
         currency.setId(currencyid);
         
-        List<ReturnSalesEntity> ls = returnsalesService.getReturnSalesList(start, end, warehouse, partner, currency);
+        List<ReturnSalesEntity> ls = returnsalesService.getReturnSalesList(start, end, 
+                warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

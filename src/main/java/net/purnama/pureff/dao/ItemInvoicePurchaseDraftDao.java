@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.transactional.draft.ItemInvoicePurchaseDraftEnt
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class ItemInvoicePurchaseDraftDao {
         Criteria c = session.createCriteria(ItemInvoicePurchaseDraftEntity.class);
         c.add(Restrictions.eq("invoicepurchasedraft", invoicepurchasedraft));
         c.addOrder(Order.asc("id"));
-        return (List<ItemInvoicePurchaseDraftEntity>)c.list();
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
 }

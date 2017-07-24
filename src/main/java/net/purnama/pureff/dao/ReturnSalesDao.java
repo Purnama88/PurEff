@@ -15,6 +15,7 @@ import net.purnama.pureff.entity.transactional.ReturnSalesEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -38,8 +39,10 @@ public class ReturnSalesDao {
     
     public List<ReturnSalesEntity> getReturnSalesList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<ReturnSalesEntity> ls = session.createQuery("from ReturnSalesEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(ReturnSalesEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public ReturnSalesEntity getReturnSales(String id) {
@@ -77,7 +80,7 @@ public class ReturnSalesDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         
@@ -112,12 +115,14 @@ public class ReturnSalesDao {
         c.add(Restrictions.eq("status", true));
         c.add(Restrictions.gt("remaining", 0.0));
         c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
     
     public List getReturnSalesList(Calendar begin, Calendar end,
-            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency){
+            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency,
+            boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ReturnSalesEntity.class);
         c.add(Restrictions.between("date", begin, end));
@@ -130,7 +135,9 @@ public class ReturnSalesDao {
         if(currency != null){
             c.add(Restrictions.eq("currency", currency));
         }
+        c.add(Restrictions.eq("status", status));
         c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }

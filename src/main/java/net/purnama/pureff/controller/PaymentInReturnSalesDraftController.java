@@ -38,14 +38,23 @@ public class PaymentInReturnSalesDraftController {
     ReturnSalesService returnsalesService;
     
     @RequestMapping(value = "api/getSelectedPaymentInReturnSalesDraftList", method = RequestMethod.GET, 
-            headers = "Accept=application/json", params = {"paymentid"})
-    public ResponseEntity<?> getSelectedPaymentInReturnSalesDraftList(@RequestParam(value="paymentid") String paymentid) {
+            headers = "Accept=application/json", params = {"paymentid", "partnerid", "currencyid"})
+    public ResponseEntity<?> getSelectedPaymentInReturnSalesDraftList(
+            @RequestParam(value="paymentid") String paymentid,
+            @RequestParam(value="partnerid")String partnerid,
+            @RequestParam(value="currencyid")String currencyid) {
         
         PaymentInDraftEntity paymentindraft = new PaymentInDraftEntity();
         paymentindraft.setId(paymentid);
         
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+                
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
         List<PaymentInReturnSalesDraftEntity> ls = paymentinreturnsalesdraftService.
-                getPaymentInReturnSalesDraftEntityList(paymentindraft);
+                getPaymentInReturnSalesDraftEntityList(paymentindraft, partner, currency);
         return ResponseEntity.ok(ls);
     }
     
@@ -120,25 +129,24 @@ public class PaymentInReturnSalesDraftController {
     }
     
     @RequestMapping(value = "api/savePaymentInReturnSalesDraftList", method = RequestMethod.POST,
-            headers = "Accept=application/json")
+            headers = "Accept=application/json", params = {"paymentid"})
     public ResponseEntity<?> savePaymentInReturnSalesDraftList(
+            @RequestParam(value="paymentid") String paymentid,
             @RequestBody List<PaymentInReturnSalesDraftEntity> paymentinreturnsalesdraftlist) {
         
-        if(!paymentinreturnsalesdraftlist.isEmpty()){
-            PaymentInReturnSalesDraftEntity piisde = paymentinreturnsalesdraftlist.get(0);
-            
-            PaymentInDraftEntity pid = piisde.getPaymentindraft();
-            
-            for(PaymentInReturnSalesDraftEntity piisdetemp : 
-                    paymentinreturnsalesdraftService.getPaymentInReturnSalesDraftEntityList(pid)){
-                paymentinreturnsalesdraftService.deletePaymentInReturnSalesDraft(piisdetemp.getId());
-            }
-            
-            for(PaymentInReturnSalesDraftEntity piisdetemp : paymentinreturnsalesdraftlist){
-                    piisdetemp.setId(IdGenerator.generateId());
-                    paymentinreturnsalesdraftService.addPaymentInReturnSalesDraft(piisdetemp);
-            }
+        PaymentInDraftEntity pide = new PaymentInDraftEntity();
+        pide.setId(paymentid);
+        
+        for(PaymentInReturnSalesDraftEntity piisdetemp : 
+                paymentinreturnsalesdraftService.getPaymentInReturnSalesDraftEntityList(pide)){
+            paymentinreturnsalesdraftService.deletePaymentInReturnSalesDraft(piisdetemp.getId());
         }
+
+        for(PaymentInReturnSalesDraftEntity piisdetemp : paymentinreturnsalesdraftlist){
+                piisdetemp.setId(IdGenerator.generateId());
+                paymentinreturnsalesdraftService.addPaymentInReturnSalesDraft(piisdetemp);
+        }
+        
         return ResponseEntity.ok("");
     }
 }

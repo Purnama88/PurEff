@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.transactional.PaymentOutEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -33,8 +34,10 @@ public class PaymentOutDao {
     
     public List<PaymentOutEntity> getPaymentOutList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<PaymentOutEntity> ls = session.createQuery("from PaymentOutEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(PaymentOutEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public PaymentOutEntity getPaymentOut(String id) {
@@ -72,7 +75,7 @@ public class PaymentOutDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

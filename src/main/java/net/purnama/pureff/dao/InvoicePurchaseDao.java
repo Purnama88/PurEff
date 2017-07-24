@@ -15,6 +15,7 @@ import net.purnama.pureff.entity.transactional.InvoicePurchaseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -38,8 +39,10 @@ public class InvoicePurchaseDao {
     
     public List<InvoicePurchaseEntity> getInvoicePurchaseList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<InvoicePurchaseEntity> ls = session.createQuery("from InvoicePurchaseEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(InvoicePurchaseEntity.class);
+        c.addOrder(Order.desc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public InvoicePurchaseEntity getInvoicePurchase(String id) {
@@ -77,7 +80,7 @@ public class InvoicePurchaseDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         
@@ -111,12 +114,14 @@ public class InvoicePurchaseDao {
         c.add(Restrictions.eq("status", true));
         c.add(Restrictions.gt("remaining", 0.0));
         c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }
     
     public List getInvoicePurchaseList(Calendar begin, Calendar end,
-            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency){
+            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency,
+            boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(InvoicePurchaseEntity.class);
         c.add(Restrictions.between("date", begin, end));
@@ -129,7 +134,9 @@ public class InvoicePurchaseDao {
         if(currency != null){
             c.add(Restrictions.eq("currency", currency));
         }
+        c.add(Restrictions.eq("status", status));
         c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
     }

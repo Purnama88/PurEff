@@ -65,7 +65,7 @@ public class ReturnSalesService {
     
     @Transactional
     public List getReturnSalesList(Calendar start, Calendar end, WarehouseEntity warehouse,
-            PartnerEntity partner, CurrencyEntity currency){
-        return returnsalesDao.getReturnSalesList(start, end, warehouse, partner, currency);
+            PartnerEntity partner, CurrencyEntity currency, boolean status){
+        return returnsalesDao.getReturnSalesList(start, end, warehouse, partner, currency, status);
     }
 }

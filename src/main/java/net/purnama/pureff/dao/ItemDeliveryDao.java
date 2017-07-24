@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.transactional.ItemDeliveryEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class ItemDeliveryDao {
         Criteria c = session.createCriteria(ItemDeliveryEntity.class);
         c.add(Restrictions.eq("delivery", delivery));
         c.addOrder(Order.asc("id"));
-        return (List<ItemDeliveryEntity>)c.list();
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
 }

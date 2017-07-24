@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.transactional.ItemInvoiceSalesEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class ItemInvoiceSalesDao {
         Criteria c = session.createCriteria(ItemInvoiceSalesEntity.class);
         c.add(Restrictions.eq("invoicesales", invoicesales));
         c.addOrder(Order.asc("id"));
-        return (List<ItemInvoiceSalesEntity>)c.list();
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
 }

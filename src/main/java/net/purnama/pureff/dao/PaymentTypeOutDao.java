@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.transactional.PaymentTypeOutEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class PaymentTypeOutDao {
         Criteria c = session.createCriteria(PaymentTypeOutEntity.class);
         c.add(Restrictions.eq("paymentout", paymentout));
         c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -68,6 +70,7 @@ public class PaymentTypeOutDao {
         c.add(Restrictions.eq("valid", valid));
         c.add(Restrictions.between("duedate", begin, end));
         c.addOrder(Order.asc("duedate"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -79,6 +82,7 @@ public class PaymentTypeOutDao {
         }
         c.add(Restrictions.eq("valid", true));
         c.add(Restrictions.eq("status", false));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
 }

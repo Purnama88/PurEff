@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.WarehouseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
@@ -55,6 +56,7 @@ public class WarehouseDao {
         Criteria c = session.createCriteria(WarehouseEntity.class);
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("code"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -62,6 +64,7 @@ public class WarehouseDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(WarehouseEntity.class);
         c.addOrder(Order.asc("code"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -104,6 +107,7 @@ public class WarehouseDao {
             c.addOrder(Order.asc(sort));
         }
         
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

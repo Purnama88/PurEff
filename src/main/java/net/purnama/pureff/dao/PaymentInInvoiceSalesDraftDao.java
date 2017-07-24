@@ -7,12 +7,15 @@
 package net.purnama.pureff.dao;
 
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentInInvoiceSalesDraftEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -60,12 +63,28 @@ public class PaymentInInvoiceSalesDraftDao {
         c.add(Restrictions.eq("invoicesales", invoicesales));
         return (PaymentInInvoiceSalesDraftEntity)c.uniqueResult();
     }
-         
+       
     public List<PaymentInInvoiceSalesDraftEntity>
          getPaymentInInvoiceSalesDraftEntityList(PaymentInDraftEntity paymentindraft){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentInInvoiceSalesDraftEntity.class);
         c.add(Restrictions.eq("paymentindraft", paymentindraft));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+     
+    public List<PaymentInInvoiceSalesDraftEntity>
+         getPaymentInInvoiceSalesDraftEntityList(PaymentInDraftEntity paymentindraft,
+                 PartnerEntity partner,
+                 CurrencyEntity currency){
+        Session session = this.sessionFactory.getCurrentSession();
+        
+        Criteria c = session.createCriteria(PaymentInInvoiceSalesDraftEntity.class, "paymentininvoicesalesdraft");
+        c.add(Restrictions.eq("paymentindraft", paymentindraft));
+        c.createAlias("paymentininvoicesalesdraft.invoicesales", "invoicesales");
+        c.add(Restrictions.eq("invoicesales.partner", partner));
+        c.add(Restrictions.eq("invoicesales.currency", currency));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     

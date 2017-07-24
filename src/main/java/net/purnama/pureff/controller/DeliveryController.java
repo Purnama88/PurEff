@@ -17,6 +17,7 @@ import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -104,5 +105,26 @@ public class DeliveryController {
         deliveryService.updateDelivery(delivery);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getDeliveryList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "status"})
+    public ResponseEntity<?> getInvoiceSalesList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="status") boolean status){
+        
+        
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(warehouseid);
+        
+        List<DeliveryEntity> ls = deliveryService.
+                getDeliveryList(start, end, warehouse, status);
+        
+        return ResponseEntity.ok(ls);
     }
 }

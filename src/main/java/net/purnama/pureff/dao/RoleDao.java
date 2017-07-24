@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.RoleEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -36,6 +37,7 @@ public class RoleDao {
         Criteria c = session.createCriteria(RoleEntity.class);
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("name"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -43,6 +45,7 @@ public class RoleDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(RoleEntity.class);
         c.addOrder(Order.asc("name"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -82,7 +85,7 @@ public class RoleDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

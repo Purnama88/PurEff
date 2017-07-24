@@ -10,6 +10,7 @@ import net.purnama.pureff.entity.CurrencyEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
@@ -44,13 +45,15 @@ public class CurrencyDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(CurrencyEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
     public List<CurrencyEntity> getCurrencyList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<CurrencyEntity> ls = session.createQuery("from CurrencyEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(CurrencyEntity.class);
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public CurrencyEntity getCurrencyByCode(String code) {
@@ -91,7 +94,7 @@ public class CurrencyDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

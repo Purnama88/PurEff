@@ -37,15 +37,23 @@ public class PaymentOutExpensesDraftController {
     ExpensesService expensesService;
     
     @RequestMapping(value = "api/getSelectedPaymentOutExpensesDraftList", method = RequestMethod.GET, 
-            headers = "Accept=application/json", params = {"paymentid"})
+            headers = "Accept=application/json", params = {"paymentid", "partnerid", "currencyid"})
     public ResponseEntity<?> getSelectedPaymentOutExpensesDraftList(
-            @RequestParam(value="paymentid") String paymentid) {
+            @RequestParam(value="paymentid") String paymentid,
+            @RequestParam(value="partnerid")String partnerid,
+            @RequestParam(value="currencyid")String currencyid) {
         
         PaymentOutDraftEntity paymentoutdraft = new PaymentOutDraftEntity();
         paymentoutdraft.setId(paymentid);
         
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
         List<PaymentOutExpensesDraftEntity> ls = paymentoutexpensesdraftService.
-                getPaymentOutExpensesDraftEntityList(paymentoutdraft);
+                getPaymentOutExpensesDraftEntityList(paymentoutdraft, partner, currency);
         return ResponseEntity.ok(ls);
     }
     
@@ -119,25 +127,24 @@ public class PaymentOutExpensesDraftController {
     }
     
     @RequestMapping(value = "api/savePaymentOutExpensesDraftList", method = RequestMethod.POST,
-            headers = "Accept=application/json")
+            headers = "Accept=application/json", params = {"paymentid"})
     public ResponseEntity<?> savePaymentOutExpensesDraftList(
+            @RequestParam(value="paymentid") String paymentid,
             @RequestBody List<PaymentOutExpensesDraftEntity> paymentoutexpensesdraftlist) {
         
-        if(!paymentoutexpensesdraftlist.isEmpty()){
-            PaymentOutExpensesDraftEntity piisde = paymentoutexpensesdraftlist.get(0);
-            
-            PaymentOutDraftEntity pid = piisde.getPaymentoutdraft();
-            
-            for(PaymentOutExpensesDraftEntity piisdetemp : 
-                    paymentoutexpensesdraftService.getPaymentOutExpensesDraftEntityList(pid)){
-                paymentoutexpensesdraftService.deletePaymentOutExpensesDraft(piisdetemp.getId());
-            }
-            
-            for(PaymentOutExpensesDraftEntity piisdetemp : paymentoutexpensesdraftlist){
-                    piisdetemp.setId(IdGenerator.generateId());
-                    paymentoutexpensesdraftService.addPaymentOutExpensesDraft(piisdetemp);
-            }
+        PaymentOutDraftEntity pode = new PaymentOutDraftEntity();
+        pode.setId(paymentid);
+        
+        for(PaymentOutExpensesDraftEntity piisdetemp : 
+                paymentoutexpensesdraftService.getPaymentOutExpensesDraftEntityList(pode)){
+            paymentoutexpensesdraftService.deletePaymentOutExpensesDraft(piisdetemp.getId());
         }
+
+        for(PaymentOutExpensesDraftEntity piisdetemp : paymentoutexpensesdraftlist){
+                piisdetemp.setId(IdGenerator.generateId());
+                paymentoutexpensesdraftService.addPaymentOutExpensesDraft(piisdetemp);
+        }
+        
         return ResponseEntity.ok("");
     }
 }

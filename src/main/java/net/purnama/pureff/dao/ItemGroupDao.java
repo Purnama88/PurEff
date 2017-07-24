@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.ItemGroupEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
@@ -38,6 +39,7 @@ public class ItemGroupDao {
         Criteria c = session.createCriteria(ItemGroupEntity.class);
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("name"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -45,6 +47,7 @@ public class ItemGroupDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemGroupEntity.class);
         c.addOrder(Order.asc("name"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
@@ -94,7 +97,7 @@ public class ItemGroupDao {
         else{
             c.addOrder(Order.asc(sort));
         }
-        
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         c.setFirstResult(itemperpage * (page-1));
         c.setMaxResults(itemperpage);
         

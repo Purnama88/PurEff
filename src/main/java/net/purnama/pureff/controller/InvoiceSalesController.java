@@ -194,24 +194,29 @@ public class InvoiceSalesController {
     
     @RequestMapping(value = {"api/getInvoiceSalesList"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json", params = {"startdate", "enddate", "partnerid", "currencyid"})
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "partnerid",
+                "currencyid", "status"})
     public ResponseEntity<?> getInvoiceSalesList(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
             @RequestParam(value="partnerid") String partnerid,
-            @RequestParam(value="currencyid") String currencyid){
-        
-        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="status") boolean status){
         
         PartnerEntity partner = new PartnerEntity();
         partner.setId(partnerid);
         
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(warehouseid);
+        
         CurrencyEntity currency = new CurrencyEntity();
         currency.setId(currencyid);
         
-        List<InvoiceSalesEntity> ls = invoicesalesService.getInvoiceSalesList(start, end, warehouse, partner, currency);
+        List<InvoiceSalesEntity> ls = invoicesalesService.
+                getInvoiceSalesList(start, end, warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

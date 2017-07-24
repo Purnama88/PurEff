@@ -11,6 +11,7 @@ import net.purnama.pureff.entity.transactional.draft.ItemInvoiceWarehouseOutDraf
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class ItemInvoiceWarehouseOutDraftDao {
         Criteria c = session.createCriteria(ItemInvoiceWarehouseOutDraftEntity.class);
         c.add(Restrictions.eq("invoicewarehouseoutdraft", invoicewarehouseoutdraft));
         c.addOrder(Order.asc("id"));
-        return (List<ItemInvoiceWarehouseOutDraftEntity>)c.list();
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
 }

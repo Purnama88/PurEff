@@ -7,12 +7,15 @@
 package net.purnama.pureff.dao;
 
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.transactional.ExpensesEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutExpensesDraftEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -67,7 +70,21 @@ public class PaymentOutExpensesDraftDao {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(PaymentOutExpensesDraftEntity.class);
         c.add(Restrictions.eq("paymentoutdraft", paymentoutdraft));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     
+    public List<PaymentOutExpensesDraftEntity>
+         getPaymentOutExpensesDraftEntityList(PaymentOutDraftEntity paymentoutdraft, 
+                 PartnerEntity partner, CurrencyEntity currency){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PaymentOutExpensesDraftEntity.class, 
+                "paymentoutexpensesdraft");
+        c.add(Restrictions.eq("paymentoutdraft", paymentoutdraft));
+        c.createAlias("paymentoutexpensesdraft.expenses", "expenses");
+        c.add(Restrictions.eq("expenses.partner", partner));
+        c.add(Restrictions.eq("expenses.currency", currency));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
 }

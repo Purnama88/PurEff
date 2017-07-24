@@ -11,6 +11,8 @@ import net.purnama.pureff.entity.ItemEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,14 +33,18 @@ public class ItemDao {
     
     public List<ItemEntity> getItemList() {
         Session session = this.sessionFactory.getCurrentSession();
-        List<ItemEntity> ls = session.createQuery("from ItemEntity").list();
-        return ls;
+        Criteria c = session.createCriteria(ItemEntity.class);
+        c.addOrder(Order.asc("code"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
     
     public List<ItemEntity> getActiveItemList() {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ItemEntity.class);
         c.add(Restrictions.eq("status", true));
+        c.addOrder(Order.asc("code"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
     

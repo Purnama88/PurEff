@@ -6,9 +6,11 @@
 
 package net.purnama.pureff.service;
 
+import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.DeliveryDao;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.DeliveryEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,5 +53,10 @@ public class DeliveryService {
     @Transactional
     public int countDeliveryList(String keyword){
         return deliveryDao.countDeliveryList(keyword);
+    }
+    
+    @Transactional
+    public List getDeliveryList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+        return deliveryDao.getDeliveryList(start, end, warehouse, status);
     }
 }

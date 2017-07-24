@@ -58,7 +58,7 @@ public class PaymentOutEntity implements Serializable{
     @JoinColumn(name = "currency_id")
     private CurrencyEntity currency;
     
-    @Column(name="rate")
+    @Column(name="rate", columnDefinition="Decimal(16, 4)")
     private double rate;
     
     @ManyToOne
