@@ -5,7 +5,9 @@
  */
 package net.purnama.pureff.dao;
 
+import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoiceWarehouseOutEntity;
 import net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseOutEntity;
 import org.hibernate.Criteria;
@@ -37,6 +39,19 @@ public class ItemInvoiceWarehouseOutDao {
         Criteria c = session.createCriteria(ItemInvoiceWarehouseOutEntity.class);
         c.add(Restrictions.eq("invoicewarehouseout", invoicewarehouseout));
         c.addOrder(Order.asc("id"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+    
+    public List<ItemInvoiceWarehouseOutEntity>
+         getItemInvoiceWarehouseOutList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+        Session session = this.sessionFactory.getCurrentSession();
+        
+        Criteria c = session.createCriteria(ItemInvoiceWarehouseOutEntity.class, "iteminvoicewarehouseout");
+        c.createAlias("iteminvoicewarehouseout.invoicewarehouseout", "invoicewarehouseout");
+        c.add(Restrictions.between("invoicewarehouseout.date", start, end));
+        c.add(Restrictions.eq("invoicewarehouseout.warehouse", warehouse));
+        c.add(Restrictions.eq("invoicewarehouseout.status", status));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

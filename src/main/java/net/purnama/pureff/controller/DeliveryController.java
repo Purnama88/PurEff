@@ -111,7 +111,7 @@ public class DeliveryController {
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"startdate", "enddate", 
                 "warehouseid", "status"})
-    public ResponseEntity<?> getInvoiceSalesList(
+    public ResponseEntity<?> getDeliveryList(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,

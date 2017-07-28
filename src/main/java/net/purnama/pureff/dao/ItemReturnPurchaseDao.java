@@ -5,9 +5,11 @@
  */
 package net.purnama.pureff.dao;
 
+import java.util.Calendar;
 import java.util.List;
-import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.ItemReturnPurchaseEntity;
+import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -37,6 +39,19 @@ public class ItemReturnPurchaseDao {
         Criteria c = session.createCriteria(ItemReturnPurchaseEntity.class);
         c.add(Restrictions.eq("returnpurchase", returnpurchase));
         c.addOrder(Order.asc("id"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+    
+    public List<ItemReturnPurchaseEntity>
+         getItemReturnPurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+        Session session = this.sessionFactory.getCurrentSession();
+        
+        Criteria c = session.createCriteria(ItemReturnPurchaseEntity.class, "itemreturnpurchase");
+        c.createAlias("itemreturnpurchase.returnpurchase", "returnpurchase");
+        c.add(Restrictions.between("returnpurchase.date", start, end));
+        c.add(Restrictions.eq("returnpurchase.warehouse", warehouse));
+        c.add(Restrictions.eq("returnpurchase.status", status));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

@@ -5,9 +5,11 @@
  */
 package net.purnama.pureff.service;
 
+import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ItemExpensesDao;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.ExpensesEntity;
 import net.purnama.pureff.entity.transactional.ItemExpensesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,4 +34,10 @@ public class ItemExpensesService {
     public List<ItemExpensesEntity> getItemExpensesList(ExpensesEntity expenses) {
         return itemexpensesDao.getItemExpensesList(expenses);
     }
+    
+    @Transactional
+    public List<ItemExpensesEntity>
+         getItemExpensesList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+             return itemexpensesDao.getItemExpensesList(start, end, warehouse, status);
+         }
 }
