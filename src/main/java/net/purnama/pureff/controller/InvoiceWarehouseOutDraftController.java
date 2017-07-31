@@ -19,8 +19,10 @@ import net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseOutEntity;
 import net.purnama.pureff.entity.transactional.draft.InvoiceWarehouseOutDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.ItemInvoiceWarehouseOutDraftEntity;
 import net.purnama.pureff.security.JwtUtil;
+import net.purnama.pureff.service.InvoiceWarehouseInDraftService;
 import net.purnama.pureff.service.InvoiceWarehouseOutDraftService;
 import net.purnama.pureff.service.InvoiceWarehouseOutService;
+import net.purnama.pureff.service.ItemInvoiceWarehouseInDraftService;
 import net.purnama.pureff.service.ItemInvoiceWarehouseOutDraftService;
 import net.purnama.pureff.service.ItemInvoiceWarehouseOutService;
 import net.purnama.pureff.service.ItemWarehouseService;
@@ -45,6 +47,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class InvoiceWarehouseOutDraftController {
+    
+    @Autowired
+    InvoiceWarehouseInDraftService invoicewarehouseindraftService;
+    
+    @Autowired
+    ItemInvoiceWarehouseInDraftService iteminvoicewarehouseindraftService;
     
     @Autowired
     InvoiceWarehouseOutDraftService invoicewarehouseoutdraftService;
