@@ -169,6 +169,13 @@ public class ReturnSalesDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("Numbering is not valid");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(returnsalesdraft.getLastmodifiedby());
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         else if(returnsalesdraft.getCurrency() == null){
             return ResponseEntity.badRequest().body("Currency is not valid");
         }

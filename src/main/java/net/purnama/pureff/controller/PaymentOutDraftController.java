@@ -290,6 +290,13 @@ public class PaymentOutDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("Numbering is not valid");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(paymentoutdraft.getLastmodifiedby());
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         else if(paymentoutdraft.getCurrency() == null){
             return ResponseEntity.badRequest().body("Currency is not valid");
         }

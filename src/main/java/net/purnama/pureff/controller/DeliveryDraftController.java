@@ -182,6 +182,13 @@ public class DeliveryDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("Numbering is not valid");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(deliverydraft.getLastmodifiedby());
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         else if(deliverydraft.getDestination().isEmpty()){
             return ResponseEntity.badRequest().body("Destination is not valid");
         }

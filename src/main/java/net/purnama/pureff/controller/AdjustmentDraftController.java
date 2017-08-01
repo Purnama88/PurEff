@@ -139,6 +139,13 @@ public class AdjustmentDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("Numbering is not valid");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(adjustmentdraft.getLastmodifiedby());
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
         }

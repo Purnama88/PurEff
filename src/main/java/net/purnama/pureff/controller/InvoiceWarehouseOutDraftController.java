@@ -152,6 +152,13 @@ public class InvoiceWarehouseOutDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("Numbering is not valid");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(invoicewarehouseoutdraft.getLastmodifiedby());
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         else if(invoicewarehouseoutdraft.getWarehouse().getId().equals(invoicewarehouseoutdraft.getDestination().getId())){
             return ResponseEntity.badRequest().body("Origin & Destination is the same warehouse");
         }
