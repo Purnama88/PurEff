@@ -141,6 +141,13 @@ public class PaymentInDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu incoming payment");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -256,6 +263,22 @@ public class PaymentInDraftController {
         
         NumberingEntity numbering = paymentindraft.getNumbering();
         
+        List<PaymentTypeInDraftEntity> iisdelist = paymenttypeindraftService.
+                getPaymentTypeInDraftList(paymentindraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(paymentindraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(paymentindraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         PaymentInEntity paymentin = new PaymentInEntity();
         paymentin.setId(IdGenerator.generateId());
         paymentin.setNumber(numbering.getCurrentId());
@@ -331,8 +354,7 @@ public class PaymentInDraftController {
             totalbalance += pirsd.getAmount() * rs.getRate();
         }
         
-        for(PaymentTypeInDraftEntity ptide : paymenttypeindraftService.
-                getPaymentTypeInDraftList(paymentindraft)){
+        for(PaymentTypeInDraftEntity ptide : iisdelist){
             
             PaymentTypeInEntity ptie = new PaymentTypeInEntity();
             ptie.setAmount(ptide.getAmount());

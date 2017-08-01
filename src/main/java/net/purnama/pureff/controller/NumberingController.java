@@ -106,6 +106,12 @@ public class NumberingController {
         if(numbering.getCurrent() == numbering.getEnd()){
             return ResponseEntity.badRequest().body("Numbering has reach its limit");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         numbering.setStatus(true);
         numbering.setLastmodifiedby(temp);

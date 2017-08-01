@@ -116,6 +116,13 @@ public class InvoiceSalesDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu invoice sales");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -155,6 +162,22 @@ public class InvoiceSalesDraftController {
         
         NumberingEntity numbering = invoicesalesdraft.getNumbering();
         
+        List<ItemInvoiceSalesDraftEntity> iisdelist = iteminvoicesalesdraftService.
+                getItemInvoiceSalesDraftList(invoicesalesdraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(invoicesalesdraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(invoicesalesdraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         InvoiceSalesEntity invoicesales = new InvoiceSalesEntity();
         invoicesales.setId(IdGenerator.generateId());
         invoicesales.setNumber(numbering.getCurrentId());
@@ -184,9 +207,6 @@ public class InvoiceSalesDraftController {
         invoicesales.setWarehouse_code(invoicesales.getWarehouse().getCode());
         invoicesales.setPaid(0);
         invoicesalesService.addInvoiceSales(invoicesales);
-        
-        List<ItemInvoiceSalesDraftEntity> iisdelist = iteminvoicesalesdraftService.
-                getItemInvoiceSalesDraftList(invoicesalesdraft);
         
         for(ItemInvoiceSalesDraftEntity iisde : iisdelist){
             ItemInvoiceSalesEntity iise = new ItemInvoiceSalesEntity();

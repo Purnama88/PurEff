@@ -116,6 +116,13 @@ public class ReturnPurchaseDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu return purchase");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -155,6 +162,22 @@ public class ReturnPurchaseDraftController {
         
         NumberingEntity numbering = returnpurchasedraft.getNumbering();
         
+        List<ItemReturnPurchaseDraftEntity> iisdelist = itemreturnpurchasedraftService.
+                getItemReturnPurchaseDraftList(returnpurchasedraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(returnpurchasedraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(returnpurchasedraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         ReturnPurchaseEntity returnpurchase = new ReturnPurchaseEntity();
         returnpurchase.setId(IdGenerator.generateId());
         returnpurchase.setNumber(numbering.getCurrentId());
@@ -185,8 +208,7 @@ public class ReturnPurchaseDraftController {
         returnpurchase.setPaid(0);
         returnpurchaseService.addReturnPurchase(returnpurchase);
         
-        List<ItemReturnPurchaseDraftEntity> iisdelist = itemreturnpurchasedraftService.
-                getItemReturnPurchaseDraftList(returnpurchasedraft);
+        
         
         for(ItemReturnPurchaseDraftEntity iisde : iisdelist){
             ItemReturnPurchaseEntity iise = new ItemReturnPurchaseEntity();

@@ -38,7 +38,6 @@ import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -117,6 +116,14 @@ public class ReturnSalesDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu return sales");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            System.out.println(numbering.getNumberingname().getEnd().after(Calendar.getInstance()));
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -156,6 +163,22 @@ public class ReturnSalesDraftController {
         
         NumberingEntity numbering = returnsalesdraft.getNumbering();
         
+        List<ItemReturnSalesDraftEntity> iisdelist = itemreturnsalesdraftService.
+                getItemReturnSalesDraftList(returnsalesdraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(returnsalesdraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(returnsalesdraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         ReturnSalesEntity returnsales = new ReturnSalesEntity();
         returnsales.setId(IdGenerator.generateId());
         returnsales.setNumber(numbering.getCurrentId());
@@ -185,9 +208,6 @@ public class ReturnSalesDraftController {
         returnsales.setWarehouse_code(returnsales.getWarehouse().getCode());
         returnsales.setPaid(0);
         returnsalesService.addReturnSales(returnsales);
-        
-        List<ItemReturnSalesDraftEntity> iisdelist = itemreturnsalesdraftService.
-                getItemReturnSalesDraftList(returnsalesdraft);
         
         for(ItemReturnSalesDraftEntity iisde : iisdelist){
             ItemReturnSalesEntity iise = new ItemReturnSalesEntity();

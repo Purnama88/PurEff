@@ -116,6 +116,13 @@ public class InvoicePurchaseDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu invoice purchase");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -155,6 +162,22 @@ public class InvoicePurchaseDraftController {
         
         NumberingEntity numbering = invoicepurchasedraft.getNumbering();
         
+        List<ItemInvoicePurchaseDraftEntity> iisdelist = iteminvoicepurchasedraftService.
+                getItemInvoicePurchaseDraftList(invoicepurchasedraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(invoicepurchasedraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(invoicepurchasedraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         InvoicePurchaseEntity invoicepurchase = new InvoicePurchaseEntity();
         invoicepurchase.setId(IdGenerator.generateId());
         invoicepurchase.setNumber(numbering.getCurrentId());
@@ -184,9 +207,6 @@ public class InvoicePurchaseDraftController {
         invoicepurchase.setWarehouse_code(invoicepurchase.getWarehouse().getCode());
         invoicepurchase.setPaid(0);
         invoicepurchaseService.addInvoicePurchase(invoicepurchase);
-        
-        List<ItemInvoicePurchaseDraftEntity> iisdelist = iteminvoicepurchasedraftService.
-                getItemInvoicePurchaseDraftList(invoicepurchasedraft);
         
         for(ItemInvoicePurchaseDraftEntity iisde : iisdelist){
             ItemInvoicePurchaseEntity iise = new ItemInvoicePurchaseEntity();

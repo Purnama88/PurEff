@@ -104,6 +104,13 @@ public class InvoiceWarehouseInDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu invoice warehouse in");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         Calendar date = Calendar.getInstance();
         
@@ -131,6 +138,19 @@ public class InvoiceWarehouseInDraftController {
         
         NumberingEntity numbering = invoicewarehouseindraft.getNumbering();
         
+        List<ItemInvoiceWarehouseInDraftEntity> iisdelist = iteminvoicewarehouseindraftService.
+                getItemInvoiceWarehouseInDraftList(invoicewarehouseindraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(invoicewarehouseindraft.getWarehouse().getId().equals(invoicewarehouseindraft.getOrigin().getId())){
+            return ResponseEntity.badRequest().body("Origin & Destination is the same warehouse");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         InvoiceWarehouseInEntity invoicewarehousein = new InvoiceWarehouseInEntity();
         invoicewarehousein.setId(IdGenerator.generateId());
         invoicewarehousein.setNumber(numbering.getCurrentId());
@@ -149,9 +169,6 @@ public class InvoiceWarehouseInDraftController {
         invoicewarehousein.setShipping_number(invoicewarehouseindraft.getShipping_number());
         
         invoicewarehouseinService.addInvoiceWarehouseIn(invoicewarehousein);
-        
-        List<ItemInvoiceWarehouseInDraftEntity> iisdelist = iteminvoicewarehouseindraftService.
-                getItemInvoiceWarehouseInDraftList(invoicewarehouseindraft);
         
         for(ItemInvoiceWarehouseInDraftEntity iisde : iisdelist){
             ItemInvoiceWarehouseInEntity iise = new ItemInvoiceWarehouseInEntity();

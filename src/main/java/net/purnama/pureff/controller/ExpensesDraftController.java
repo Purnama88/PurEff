@@ -114,6 +114,13 @@ public class ExpensesDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu expenses");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -153,6 +160,22 @@ public class ExpensesDraftController {
         
         NumberingEntity numbering = expensesdraft.getNumbering();
         
+        List<ItemExpensesDraftEntity> iisdelist = itemexpensesdraftService.
+                getItemExpensesDraftList(expensesdraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(expensesdraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(expensesdraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         ExpensesEntity expenses = new ExpensesEntity();
         expenses.setId(IdGenerator.generateId());
         expenses.setNumber(numbering.getCurrentId());
@@ -182,9 +205,6 @@ public class ExpensesDraftController {
         expenses.setWarehouse_code(expenses.getWarehouse().getCode());
         expenses.setPaid(0);
         expensesService.addExpenses(expenses);
-        
-        List<ItemExpensesDraftEntity> iisdelist = itemexpensesdraftService.
-                getItemExpensesDraftList(expensesdraft);
         
         for(ItemExpensesDraftEntity iisde : iisdelist){
             ItemExpensesEntity iise = new ItemExpensesEntity();

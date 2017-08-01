@@ -156,6 +156,13 @@ public class PaymentOutDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu outgoing payment");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         CurrencyEntity currency = currencyService.getDefaultCurrency();
         RateEntity rate = rateService.getLastRate(currency);
@@ -277,6 +284,22 @@ public class PaymentOutDraftController {
         
         NumberingEntity numbering = paymentoutdraft.getNumbering();
         
+        List<PaymentTypeOutDraftEntity> iisdelist = paymenttypeoutdraftService.
+                getPaymentTypeOutDraftList(paymentoutdraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(paymentoutdraft.getCurrency() == null){
+            return ResponseEntity.badRequest().body("Currency is not valid");
+        }
+        else if(paymentoutdraft.getPartner() == null){
+            return ResponseEntity.badRequest().body("Partner is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         PaymentOutEntity paymentout = new PaymentOutEntity();
         paymentout.setId(IdGenerator.generateId());
         paymentout.setNumber(paymentoutdraft.getNumbering().getCurrentId());
@@ -379,8 +402,7 @@ public class PaymentOutDraftController {
             totalbalance += pirsd.getAmount() * rs.getRate();
         }
         
-        for(PaymentTypeOutDraftEntity ptode : paymenttypeoutdraftService.
-                getPaymentTypeOutDraftList(paymentoutdraft)){
+        for(PaymentTypeOutDraftEntity ptode : iisdelist){
             
             PaymentTypeOutEntity ptoe = new PaymentTypeOutEntity();
             ptoe.setAmount(ptode.getAmount());

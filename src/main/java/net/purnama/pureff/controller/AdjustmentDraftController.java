@@ -101,6 +101,13 @@ public class AdjustmentDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu adjustment");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         Calendar date = Calendar.getInstance();
         
@@ -126,6 +133,16 @@ public class AdjustmentDraftController {
         
         NumberingEntity numbering = adjustmentdraft.getNumbering();
         
+        List<ItemAdjustmentDraftEntity> iisdelist = itemadjustmentdraftService.
+                getItemAdjustmentDraftList(adjustmentdraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         AdjustmentEntity adjustment = new AdjustmentEntity();
         adjustment.setId(IdGenerator.generateId());
         adjustment.setNumber(numbering.getCurrentId());
@@ -140,9 +157,6 @@ public class AdjustmentDraftController {
         adjustment.setUser_code(adjustment.getLastmodifiedby().getCode());
         adjustment.setWarehouse_code(adjustment.getWarehouse().getCode());
         adjustmentService.addAdjustment(adjustment);
-        
-        List<ItemAdjustmentDraftEntity> iisdelist = itemadjustmentdraftService.
-                getItemAdjustmentDraftList(adjustmentdraft);
         
         for(ItemAdjustmentDraftEntity iisde : iisdelist){
             ItemAdjustmentEntity iise = new ItemAdjustmentEntity();

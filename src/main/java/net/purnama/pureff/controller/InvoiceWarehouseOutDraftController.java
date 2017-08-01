@@ -112,6 +112,13 @@ public class InvoiceWarehouseOutDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu invoice warehouse out");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         Calendar date = Calendar.getInstance();
         
@@ -139,6 +146,19 @@ public class InvoiceWarehouseOutDraftController {
         
         NumberingEntity numbering = invoicewarehouseoutdraft.getNumbering();
         
+        List<ItemInvoiceWarehouseOutDraftEntity> iisdelist = iteminvoicewarehouseoutdraftService.
+                getItemInvoiceWarehouseOutDraftList(invoicewarehouseoutdraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(invoicewarehouseoutdraft.getWarehouse().getId().equals(invoicewarehouseoutdraft.getDestination().getId())){
+            return ResponseEntity.badRequest().body("Origin & Destination is the same warehouse");
+        }
+        else if(iisdelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         InvoiceWarehouseOutEntity invoicewarehouseout = new InvoiceWarehouseOutEntity();
         invoicewarehouseout.setId(IdGenerator.generateId());
         invoicewarehouseout.setNumber(numbering.getCurrentId());
@@ -157,9 +177,6 @@ public class InvoiceWarehouseOutDraftController {
         invoicewarehouseout.setShipping_number(invoicewarehouseoutdraft.getShipping_number());
         
         invoicewarehouseoutService.addInvoiceWarehouseOut(invoicewarehouseout);
-        
-        List<ItemInvoiceWarehouseOutDraftEntity> iisdelist = iteminvoicewarehouseoutdraftService.
-                getItemInvoiceWarehouseOutDraftList(invoicewarehouseoutdraft);
         
         for(ItemInvoiceWarehouseOutDraftEntity iisde : iisdelist){
             ItemInvoiceWarehouseOutEntity iise = new ItemInvoiceWarehouseOutEntity();

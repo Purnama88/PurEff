@@ -95,6 +95,13 @@ public class DeliveryDraftController {
         if(numbering == null){
             return ResponseEntity.badRequest().body("You have not set default numbering for menu delivery");
         }
+        else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering.setStatus(false);
+            numbering.setLastmodified(Calendar.getInstance());
+            numbering.setLastmodifiedby(user);
+            numberingService.updateNumbering(numbering);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
         
         Calendar date = Calendar.getInstance();
         
@@ -167,9 +174,24 @@ public class DeliveryDraftController {
         
         DeliveryDraftEntity deliverydraft = deliverydraftService.getDeliveryDraft(id);
         
+        NumberingEntity numbering = deliverydraft.getNumbering();
+        
+        List<ItemDeliveryDraftEntity> iddelist = itemdeliverydraftService.
+                getItemDeliveryDraftList(deliverydraft);
+        
+        if(numbering == null){
+            return ResponseEntity.badRequest().body("Numbering is not valid");
+        }
+        else if(deliverydraft.getDestination().isEmpty()){
+            return ResponseEntity.badRequest().body("Destination is not valid");
+        }
+        else if(iddelist.isEmpty()){
+            return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
         DeliveryEntity delivery = new DeliveryEntity();
         delivery.setId(IdGenerator.generateId());
-        delivery.setNumber(deliverydraft.getNumbering().getCurrentId());
+        delivery.setNumber(numbering.getCurrentId());
         delivery.setDate(deliverydraft.getDate());
         delivery.setPrinted(0);
         delivery.setWarehouse(deliverydraft.getWarehouse());
@@ -187,9 +209,6 @@ public class DeliveryDraftController {
         
         deliveryService.addDelivery(delivery);
         
-        List<ItemDeliveryDraftEntity> iddelist = itemdeliverydraftService.
-                getItemDeliveryDraftList(deliverydraft);
-        
         for(ItemDeliveryDraftEntity idde : iddelist){
             ItemDeliveryEntity ide = new ItemDeliveryEntity();
             ide.setId(IdGenerator.generateId());
@@ -200,8 +219,14 @@ public class DeliveryDraftController {
             itemdeliveryService.addItemDelivery(ide);
         }
         
-        NumberingEntity numbering = deliverydraft.getNumbering();
         numbering.setCurrent(numbering.getCurrent() + 1);
+        
+        if(numbering.getCurrent() != numbering.getEnd()){
+            
+        }
+        else{
+            numbering.setStatus(false);
+        }
         
         numberingService.updateNumbering(numbering);
         
