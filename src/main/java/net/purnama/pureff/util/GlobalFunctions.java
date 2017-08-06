@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  *
@@ -55,5 +56,18 @@ public class GlobalFunctions {
         catch(ParseException e){
             return 0;
         }
+    }
+    
+    public static String getRandomString() {
+        String SALTCHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 8) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        String saltStr = salt.toString();
+        return saltStr;
+
     }
 }

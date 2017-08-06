@@ -9,9 +9,11 @@ import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ItemReturnPurchaseDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
-import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import net.purnama.pureff.entity.transactional.ItemReturnPurchaseEntity;
+import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +39,10 @@ public class ItemReturnPurchaseService {
     
     @Transactional
     public List<ItemReturnPurchaseEntity>
-         getItemReturnPurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
-             return itemreturnpurchaseDao.getItemReturnPurchaseList(start, end, warehouse, status);
+         getItemReturnPurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse, 
+                 PartnerEntity partner, 
+                 CurrencyEntity currency, boolean status){
+             return itemreturnpurchaseDao.getItemReturnPurchaseList(start, end, warehouse, 
+                     partner, currency, status);
          }
 }

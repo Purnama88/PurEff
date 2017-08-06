@@ -8,6 +8,8 @@ package net.purnama.pureff.controller;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoicePurchaseEntity;
 import net.purnama.pureff.entity.transactional.ItemInvoicePurchaseEntity;
@@ -44,20 +46,28 @@ public class ItemInvoicePurchaseController {
     @RequestMapping(value = {"api/getItemInvoicePurchaseList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"startdate", "enddate", 
-                "warehouseid", "status"})
+                "warehouseid", "partnerid",
+                "currencyid", "status"})
     public ResponseEntity<?> getItemInvoicePurchaseList(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
             @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid,
             @RequestParam(value="status") boolean status){
-        
         
         WarehouseEntity warehouse = new WarehouseEntity();
         warehouse.setId(warehouseid);
         
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
         List<ItemInvoicePurchaseEntity> ls = iteminvoicepurchaseService.
-                getItemInvoicePurchaseList(start, end, warehouse, status);
+                getItemInvoicePurchaseList(start, end, warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

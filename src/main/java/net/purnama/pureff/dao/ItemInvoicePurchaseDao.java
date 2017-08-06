@@ -7,6 +7,8 @@ package net.purnama.pureff.dao;
 
 import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoicePurchaseEntity;
 import net.purnama.pureff.entity.transactional.ItemInvoicePurchaseEntity;
@@ -44,14 +46,25 @@ public class ItemInvoicePurchaseDao {
     }
     
     public List<ItemInvoicePurchaseEntity>
-         getItemInvoicePurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+         getItemInvoicePurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse,
+                 PartnerEntity partner, 
+                 CurrencyEntity currency, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(ItemInvoicePurchaseEntity.class, "iteminvoicepurchase");
         c.createAlias("iteminvoicepurchase.invoicepurchase", "invoicepurchase");
         c.add(Restrictions.between("invoicepurchase.date", start, end));
-        c.add(Restrictions.eq("invoicepurchase.warehouse", warehouse));
+        if(warehouse != null){
+            c.add(Restrictions.eq("invoicepurchase.warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("invoicepurchase.currency", currency));
+        }
+        if(partner != null){
+            c.add(Restrictions.eq("invoicepurchase.partner", currency));
+        }
         c.add(Restrictions.eq("invoicepurchase.status", status));
+        c.addOrder(Order.asc("invoicepurchase.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

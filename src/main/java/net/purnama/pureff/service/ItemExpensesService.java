@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ItemExpensesDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.ExpensesEntity;
 import net.purnama.pureff.entity.transactional.ItemExpensesEntity;
@@ -37,7 +39,10 @@ public class ItemExpensesService {
     
     @Transactional
     public List<ItemExpensesEntity>
-         getItemExpensesList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
-             return itemexpensesDao.getItemExpensesList(start, end, warehouse, status);
+         getItemExpensesList(Calendar start, Calendar end, WarehouseEntity warehouse,
+                 PartnerEntity partner,
+                 CurrencyEntity currency, boolean status){
+             return itemexpensesDao.getItemExpensesList(start, end, warehouse, 
+                     partner, currency, status);
          }
 }

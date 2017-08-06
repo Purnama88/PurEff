@@ -15,7 +15,7 @@ import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.DeliveryService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
-import net.purnama.pureff.util.IdGenerator;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -122,8 +122,10 @@ public class DeliveryController {
         WarehouseEntity warehouse = new WarehouseEntity();
         warehouse.setId(warehouseid);
         
+        
+        
         List<DeliveryEntity> ls = deliveryService.
-                getDeliveryList(start, end, warehouse, status);
+                getDeliveryList(CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end), warehouse, status);
         
         return ResponseEntity.ok(ls);
     }

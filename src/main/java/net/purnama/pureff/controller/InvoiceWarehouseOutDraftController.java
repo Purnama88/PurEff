@@ -16,6 +16,7 @@ import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoiceWarehouseOutEntity;
 import net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseOutEntity;
+import net.purnama.pureff.entity.transactional.draft.InvoiceWarehouseInDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.InvoiceWarehouseOutDraftEntity;
 import net.purnama.pureff.entity.transactional.draft.ItemInvoiceWarehouseOutDraftEntity;
 import net.purnama.pureff.security.JwtUtil;
@@ -184,6 +185,36 @@ public class InvoiceWarehouseOutDraftController {
         invoicewarehouseout.setShipping_number(invoicewarehouseoutdraft.getShipping_number());
         
         invoicewarehouseoutService.addInvoiceWarehouseOut(invoicewarehouseout);
+        
+        MenuEntity menu = menuService.getMenu(5);
+        NumberingEntity numbering2 = numberingService.getDefaultNumbering(menu, invoicewarehouseoutdraft.getWarehouse());
+        
+        if(numbering2 == null){
+            return ResponseEntity.badRequest().body("You have not set default numbering for menu invoice warehouse in");
+        }
+        else if(numbering2.getNumberingname().getEnd().before(Calendar.getInstance())){
+            numbering2.setStatus(false);
+            numbering2.setLastmodified(Calendar.getInstance());
+            numbering2.setLastmodifiedby(invoicewarehouseoutdraft.getLastmodifiedby());
+            numberingService.updateNumbering(numbering2);
+            return ResponseEntity.badRequest().body("Numbering is out of date");
+        }
+        
+        Calendar date = Calendar.getInstance();
+        
+        InvoiceWarehouseInDraftEntity invoicewarehouseindraft = new InvoiceWarehouseInDraftEntity();
+        invoicewarehouseindraft.setId(IdGenerator.generateId());
+        invoicewarehouseindraft.setDate(date);
+        invoicewarehouseindraft.setLastmodified(date);
+        invoicewarehouseindraft.setLastmodifiedby(invoicewarehouseoutdraft.getLastmodifiedby());
+        invoicewarehouseindraft.setNote("");
+        invoicewarehouseindraft.setNumbering(numbering);
+        invoicewarehouseindraft.setShipping_number(invoicewarehouseoutdraft.getShipping_number());
+        invoicewarehouseindraft.setStatus(true);
+        invoicewarehouseindraft.setWarehouse(invoicewarehouseoutdraft.getDestination());
+        invoicewarehouseindraft.setOrigin(invoicewarehouseoutdraft.getWarehouse());
+        
+        invoicewarehouseindraftService.addInvoiceWarehouseInDraft(invoicewarehouseindraft);
         
         for(ItemInvoiceWarehouseOutDraftEntity iisde : iisdelist){
             ItemInvoiceWarehouseOutEntity iise = new ItemInvoiceWarehouseOutEntity();

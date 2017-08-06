@@ -16,6 +16,7 @@ import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.util.GlobalFunctions;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -123,20 +124,53 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @RequestMapping(value = "api/resetUserPassword", method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> resetUserPassword(HttpServletRequest httpRequest, 
+            @RequestParam(value="id") String id) {
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity temp = new UserEntity();
+        temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        UserEntity user = userService.getUser(id);
+        
+        String password = GlobalFunctions.getRandomString();
+        
+        try{
+            user.setPassword(GlobalFunctions.encrypt(password));
+        }
+        catch(Exception ex){
+            return ResponseEntity.badRequest().body("");
+        }
+        
+        user.setLastmodifiedby(temp);
+        
+        userService.updateUser(user);
+        
+        return ResponseEntity.ok(password);
+    }
+    
+    @RequestMapping(value = "api/changeUserPassword", method = RequestMethod.PUT,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> changeUserPassword(HttpServletRequest httpRequest, 
+            @RequestBody UserEntity user) {
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity temp = new UserEntity();
+        temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        user.setLastmodifiedby(temp);
+        
+        userService.updateUser(user);
+        
+        return ResponseEntity.ok(user);
+    }
+    
     @RequestMapping(value = "api/updateUser", method = RequestMethod.PUT,
             headers = "Accept=application/json")
     public ResponseEntity<?> updateUser(HttpServletRequest httpRequest, @RequestBody UserEntity user) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
-        
-        try{
-            String password = user.getPassword();
-            user.setPassword(net.purnama.pureff.util.GlobalFunctions.encrypt(password));
-        }
-        catch(Exception ex){
-            return ResponseEntity.badRequest().body("");
-        }
         
         user.setLastmodifiedby(temp);
         

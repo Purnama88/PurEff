@@ -7,6 +7,8 @@ package net.purnama.pureff.dao;
 
 import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.ExpensesEntity;
 import net.purnama.pureff.entity.transactional.ItemExpensesEntity;
@@ -44,14 +46,25 @@ public class ItemExpensesDao {
     }
     
     public List<ItemExpensesEntity>
-         getItemExpensesList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+         getItemExpensesList(Calendar start, Calendar end, WarehouseEntity warehouse,
+                 PartnerEntity partner,
+                 CurrencyEntity currency, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(ItemExpensesEntity.class, "itemexpenses");
         c.createAlias("itemexpenses.expenses", "expenses");
         c.add(Restrictions.between("expenses.date", start, end));
-        c.add(Restrictions.eq("expenses.warehouse", warehouse));
+        if(warehouse != null){
+            c.add(Restrictions.eq("expenses.warehouse", warehouse));
+        }
+        if(partner != null){
+            c.add(Restrictions.eq("expenses.partner", partner));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("expenses.currency", currency));
+        }
         c.add(Restrictions.eq("expenses.status", status));
+        c.addOrder(Order.asc("expenses.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

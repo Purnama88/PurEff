@@ -7,6 +7,8 @@ package net.purnama.pureff.dao;
 
 import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.ItemReturnPurchaseEntity;
 import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
@@ -44,14 +46,25 @@ public class ItemReturnPurchaseDao {
     }
     
     public List<ItemReturnPurchaseEntity>
-         getItemReturnPurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+         getItemReturnPurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse, 
+                 PartnerEntity partner, 
+                 CurrencyEntity currency, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(ItemReturnPurchaseEntity.class, "itemreturnpurchase");
         c.createAlias("itemreturnpurchase.returnpurchase", "returnpurchase");
         c.add(Restrictions.between("returnpurchase.date", start, end));
-        c.add(Restrictions.eq("returnpurchase.warehouse", warehouse));
+        if(warehouse != null){
+            c.add(Restrictions.eq("returnpurchase.warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("returnpurchase.currency", currency));
+        }
+        if(partner != null){
+            c.add(Restrictions.eq("returnpurchase.partner", partner));
+        }
         c.add(Restrictions.eq("returnpurchase.status", status));
+        c.addOrder(Order.asc("returnpurchase.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
