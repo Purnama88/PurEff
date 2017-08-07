@@ -5,7 +5,11 @@
  */
 package net.purnama.pureff.dao;
 
+import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -99,5 +103,27 @@ public class PaymentInDao {
         int resultint = Integer.valueOf(result.get(0).toString());
         
         return resultint;
+    }
+    
+    public List getPaymentInList(Calendar begin, Calendar end,
+            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency, 
+            boolean status){
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PaymentInEntity.class);
+        c.add(Restrictions.between("date", begin, end));
+        if(partner != null){
+            c.add(Restrictions.eq("partner", partner));
+        }
+        if(warehouse != null){
+            c.add(Restrictions.eq("warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("currency", currency));
+        }
+        c.add(Restrictions.eq("status", status));
+        c.addOrder(Order.asc("date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        List ls = c.list();
+        return ls;
     }
 }

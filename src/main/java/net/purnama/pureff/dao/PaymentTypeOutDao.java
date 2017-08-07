@@ -8,6 +8,9 @@ package net.purnama.pureff.dao;
 
 import java.util.Calendar;
 import java.util.List;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentOutEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeOutEntity;
 import org.hibernate.Criteria;
@@ -82,6 +85,34 @@ public class PaymentTypeOutDao {
         }
         c.add(Restrictions.eq("valid", true));
         c.add(Restrictions.eq("status", false));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+    
+    public List<PaymentTypeOutEntity>
+         getPaymentTypeOutList(Calendar start, Calendar end, WarehouseEntity warehouse, 
+                 PartnerEntity partner,
+                 CurrencyEntity currency, int type, boolean status){
+        Session session = this.sessionFactory.getCurrentSession();
+        
+        Criteria c = session.createCriteria(PaymentTypeOutEntity.class, "paymenttypeout");
+        c.createAlias("paymenttypeout.paymentout", "paymentin");
+        c.add(Restrictions.between("paymentout.date", start, end));
+        if(warehouse != null){
+            c.add(Restrictions.eq("paymentout.warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("paymentout.currency", currency));
+        }
+        if(partner != null){
+            c.add(Restrictions.eq("paymentout.partner", partner));
+        }
+        if(type < 4){
+            c.add(Restrictions.eq("type", type));
+        }
+        c.add(Restrictions.eq("paymentout.status", status));
+        c.addOrder(Order.asc("paymentout.date"));
+        
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

@@ -8,7 +8,10 @@ package net.purnama.pureff.controller;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
 import net.purnama.pureff.security.JwtUtil;
@@ -93,5 +96,35 @@ public class PaymentTypeInController {
         }
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getPaymentTypeInList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "partnerid",
+                "currencyid", "type", "status"})
+    public ResponseEntity<?> getPaymentTypeInList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="type") int type,
+            @RequestParam(value="status") boolean status){
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(warehouseid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<PaymentTypeInEntity> ls = paymenttypeinService.
+                getPaymentTypeInList(start, end, warehouse, partner, currency, type, status);
+        
+        return ResponseEntity.ok(ls);
     }
 }

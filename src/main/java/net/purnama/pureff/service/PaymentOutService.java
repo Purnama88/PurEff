@@ -5,9 +5,13 @@
  */
 package net.purnama.pureff.service;
 
+import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentOutDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentOutEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,5 +55,11 @@ public class PaymentOutService {
     public int countPaymentOutList(String keyword){
         return paymentoutDao.countPaymentOutList(keyword);
     }
+    
+    @Transactional
+    public List getPaymentOutList(Calendar begin, Calendar end,
+            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency, 
+            boolean status){
+        return paymentoutDao.getPaymentOutList(begin, end, warehouse, partner, currency, status);
+    }
 }
-

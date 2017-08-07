@@ -44,14 +44,21 @@ public class ItemInvoiceWarehouseOutDao {
     }
     
     public List<ItemInvoiceWarehouseOutEntity>
-         getItemInvoiceWarehouseOutList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+         getItemInvoiceWarehouseOutList(Calendar start, Calendar end, WarehouseEntity warehouse,
+                 WarehouseEntity destination, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(ItemInvoiceWarehouseOutEntity.class, "iteminvoicewarehouseout");
         c.createAlias("iteminvoicewarehouseout.invoicewarehouseout", "invoicewarehouseout");
         c.add(Restrictions.between("invoicewarehouseout.date", start, end));
-        c.add(Restrictions.eq("invoicewarehouseout.warehouse", warehouse));
+        if(warehouse != null){
+            c.add(Restrictions.eq("invoicewarehouseout.warehouse", warehouse));
+        }
+        if(destination != null){
+            c.add(Restrictions.eq("invoicewarehouseout.destination", destination));
+        }
         c.add(Restrictions.eq("invoicewarehouseout.status", status));
+        c.addOrder(Order.asc("invoicewarehouseout.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

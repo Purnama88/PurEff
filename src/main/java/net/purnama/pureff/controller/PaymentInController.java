@@ -8,6 +8,7 @@ package net.purnama.pureff.controller;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
@@ -29,6 +30,7 @@ import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.GlobalFields;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -196,5 +198,34 @@ public class PaymentInController {
         partnerService.updatePartner(partner);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getPaymentInList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "partnerid",
+                "currencyid", "status"})
+    public ResponseEntity<?> getPaymentInList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="status") boolean status){
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(warehouseid);
+        
+        CurrencyEntity currency = new CurrencyEntity();
+        currency.setId(currencyid);
+        
+        List<PaymentInEntity> ls = paymentinService.
+                getPaymentInList(start, end, warehouse, partner, currency, status);
+        
+        return ResponseEntity.ok(ls);
     }
 }

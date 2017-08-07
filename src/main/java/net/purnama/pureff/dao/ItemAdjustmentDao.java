@@ -50,8 +50,11 @@ public class ItemAdjustmentDao {
         Criteria c = session.createCriteria(ItemAdjustmentEntity.class, "itemadjustment");
         c.createAlias("itemadjustment.adjustment", "adjustment");
         c.add(Restrictions.between("adjustment.date", start, end));
-        c.add(Restrictions.eq("adjustment.warehouse", warehouse));
+        if(warehouse != null){
+            c.add(Restrictions.eq("adjustment.warehouse", warehouse));
+        }
         c.add(Restrictions.eq("adjustment.status", status));
+        c.addOrder(Order.asc("adjustment.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

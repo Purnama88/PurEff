@@ -44,20 +44,24 @@ public class ItemInvoiceWarehouseInController {
     @RequestMapping(value = {"api/getItemInvoiceWarehouseInList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"startdate", "enddate", 
-                "warehouseid", "status"})
+                "warehouseid", "originid", "status"})
     public ResponseEntity<?> getItemInvoiceWarehouseInList(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
             @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="originid") String originid,
             @RequestParam(value="status") boolean status){
         
         
         WarehouseEntity warehouse = new WarehouseEntity();
         warehouse.setId(warehouseid);
         
+        WarehouseEntity origin = new WarehouseEntity();
+        origin.setId(originid);
+        
         List<ItemInvoiceWarehouseInEntity> ls = iteminvoicewarehouseinService.
-                getItemInvoiceWarehouseInList(start, end, warehouse, status);
+                getItemInvoiceWarehouseInList(start, end, warehouse, origin, status);
         
         return ResponseEntity.ok(ls);
     }

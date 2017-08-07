@@ -38,7 +38,8 @@ public class ItemInvoiceWarehouseOutService {
     @Transactional
     public List<ItemInvoiceWarehouseOutEntity>
          getItemInvoiceWarehouseOutList(Calendar start, Calendar end, 
-                 WarehouseEntity warehouse, boolean status){
-             return iteminvoicewarehouseoutDao.getItemInvoiceWarehouseOutList(start, end, warehouse, status);
+                 WarehouseEntity warehouse, WarehouseEntity destination, boolean status){
+             return iteminvoicewarehouseoutDao.getItemInvoiceWarehouseOutList(start, end, warehouse,
+                     destination, status);
          }
 }

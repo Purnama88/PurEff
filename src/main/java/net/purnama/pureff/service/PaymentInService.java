@@ -5,9 +5,13 @@
  */
 package net.purnama.pureff.service;
 
+import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentInDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +54,13 @@ public class PaymentInService {
     @Transactional
     public int countPaymentInList(String keyword){
         return paymentinDao.countPaymentInList(keyword);
+    }
+    
+    @Transactional
+    public List getPaymentInList(Calendar begin, Calendar end,
+            WarehouseEntity warehouse, PartnerEntity partner, CurrencyEntity currency, 
+            boolean status){
+        return paymentinDao.getPaymentInList(begin, end, warehouse, partner, currency, status);
     }
 }
 

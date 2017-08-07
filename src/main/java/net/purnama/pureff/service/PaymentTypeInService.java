@@ -9,6 +9,9 @@ import java.util.Calendar;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentTypeInDao;
+import net.purnama.pureff.entity.CurrencyEntity;
+import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +50,12 @@ public class PaymentTypeInService {
     @Transactional
     public List<PaymentTypeInEntity> getPendingPaymentTypeInList(int type){
         return paymenttypeinDao.getPendingPaymentTypeInList(type);
+    }
+    
+    @Transactional
+    public List<PaymentTypeInEntity> getPaymentTypeInList(Calendar start, Calendar end, WarehouseEntity warehouse, 
+                 PartnerEntity partner,
+                 CurrencyEntity currency, int type, boolean status){
+        return paymenttypeinDao.getPaymentTypeInList(start, end, warehouse, partner, currency, type, status);
     }
 }
