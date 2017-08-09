@@ -70,7 +70,7 @@ public class PaymentTypeInController {
             @RequestParam(value="type") int type){
         
         List<PaymentTypeInEntity> ls = paymenttypeinService.getPaymentTypeInList(type, accepted,
-                valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end));
+                valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndOfDay(end));
         return ResponseEntity.ok(ls);
     }
     
@@ -123,7 +123,8 @@ public class PaymentTypeInController {
         currency.setId(currencyid);
         
         List<PaymentTypeInEntity> ls = paymenttypeinService.
-                getPaymentTypeInList(start, end, warehouse, partner, currency, type, status);
+                getPaymentTypeInList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, type, status);
         
         return ResponseEntity.ok(ls);
     }

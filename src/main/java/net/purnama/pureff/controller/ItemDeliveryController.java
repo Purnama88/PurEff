@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.transactional.DeliveryEntity;
 import net.purnama.pureff.entity.transactional.ItemDeliveryEntity;
 import net.purnama.pureff.service.DeliveryService;
 import net.purnama.pureff.service.ItemDeliveryService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,8 @@ public class ItemDeliveryController {
         warehouse.setId(warehouseid);
         
         List<ItemDeliveryEntity> ls = itemdeliveryService.
-                getItemDeliveryList(start, end, warehouse, status);
+                getItemDeliveryList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, status);
         
         return ResponseEntity.ok(ls);
     }

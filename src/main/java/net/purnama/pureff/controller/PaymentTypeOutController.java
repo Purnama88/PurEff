@@ -70,7 +70,7 @@ public class PaymentTypeOutController {
             @RequestParam(value="type") int type){
         
         List<PaymentTypeOutEntity> ls = paymenttypeoutService.getPaymentTypeOutList(type, accepted,
-                valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end));
+                valid, CalendarUtil.toStartOfDay(start), CalendarUtil.toEndOfDay(end));
         return ResponseEntity.ok(ls);
     }
     
@@ -140,7 +140,8 @@ public class PaymentTypeOutController {
         currency.setId(currencyid);
         
         List<PaymentTypeOutEntity> ls = paymenttypeoutService.
-                getPaymentTypeOutList(start, end, warehouse, partner, currency, type, status);
+                getPaymentTypeOutList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, type, status);
         
         return ResponseEntity.ok(ls);
     }

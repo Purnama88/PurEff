@@ -15,6 +15,7 @@ import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
 import net.purnama.pureff.entity.transactional.ItemInvoiceSalesEntity;
 import net.purnama.pureff.service.InvoiceSalesService;
 import net.purnama.pureff.service.ItemInvoiceSalesService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +68,8 @@ public class ItemInvoiceSalesController {
         currency.setId(currencyid);
         
         List<ItemInvoiceSalesEntity> ls = iteminvoicesalesService.
-                getItemInvoiceSalesList(start, end, warehouse, partner, currency, status);
+                getItemInvoiceSalesList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

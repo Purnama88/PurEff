@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.transactional.InvoiceWarehouseOutEntity;
 import net.purnama.pureff.entity.transactional.ItemInvoiceWarehouseOutEntity;
 import net.purnama.pureff.service.InvoiceWarehouseOutService;
 import net.purnama.pureff.service.ItemInvoiceWarehouseOutService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,8 @@ public class ItemInvoiceWarehouseOutController {
         destination.setId(destinationid);
         
         List<ItemInvoiceWarehouseOutEntity> ls = iteminvoicewarehouseoutService.
-                getItemInvoiceWarehouseOutList(start, end, warehouse, destination, status);
+                getItemInvoiceWarehouseOutList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, destination, status);
         
         return ResponseEntity.ok(ls);
     }

@@ -16,6 +16,8 @@ import java.util.GregorianCalendar;
  */
 public class CalendarUtil {
     
+    public static int TIME_ZONE = -7;
+    
     public static Calendar toStartOfYear(int year) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
@@ -43,7 +45,7 @@ public class CalendarUtil {
     }
     
     public static Calendar toEndofMonth(Calendar calendar){
-        toEndofDay(calendar);
+        toEndOfDay(calendar);
         calendar.set(Calendar.DAY_OF_MONTH,
         calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         return calendar;
@@ -64,19 +66,22 @@ public class CalendarUtil {
     }
 
     public static Calendar toStartOfDay(Calendar calendar) {
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.AM_PM, 0);
+        calendar.set(Calendar.HOUR, 0 + TIME_ZONE);
+        calendar.set(Calendar.HOUR_OF_DAY, 0 + + TIME_ZONE);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 1);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
     }
 
-    public static Calendar toEndofDay(Calendar calendar) {
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
+    public static Calendar toEndOfDay(Calendar calendar) {
+        calendar.set(Calendar.AM_PM, 1);
+        calendar.set(Calendar.HOUR, 11 + TIME_ZONE);
+        calendar.set(Calendar.HOUR_OF_DAY, 23 + TIME_ZONE);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 999);
         return calendar;
     }
     

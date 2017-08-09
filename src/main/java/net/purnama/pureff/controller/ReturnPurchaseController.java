@@ -25,6 +25,7 @@ import net.purnama.pureff.service.PaymentOutReturnPurchaseService;
 import net.purnama.pureff.service.ReturnPurchaseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -215,7 +216,9 @@ public class ReturnPurchaseController {
         CurrencyEntity currency = new CurrencyEntity();
         currency.setId(currencyid);
         
-        List<ReturnPurchaseEntity> ls = returnpurchaseService.getReturnPurchaseList(start, end,
+        List<ReturnPurchaseEntity> ls = returnpurchaseService.getReturnPurchaseList(
+                CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end),
                 warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);

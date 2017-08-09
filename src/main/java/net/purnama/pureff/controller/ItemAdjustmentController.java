@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.transactional.AdjustmentEntity;
 import net.purnama.pureff.entity.transactional.ItemAdjustmentEntity;
 import net.purnama.pureff.service.AdjustmentService;
 import net.purnama.pureff.service.ItemAdjustmentService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,8 @@ public class ItemAdjustmentController {
         warehouse.setId(warehouseid);
         
         List<ItemAdjustmentEntity> ls = itemadjustmentService.
-                getItemAdjustmentList(start, end, warehouse, status);
+                getItemAdjustmentList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, status);
         
         return ResponseEntity.ok(ls);
     }

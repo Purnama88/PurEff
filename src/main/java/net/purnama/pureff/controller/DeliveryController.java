@@ -122,10 +122,9 @@ public class DeliveryController {
         WarehouseEntity warehouse = new WarehouseEntity();
         warehouse.setId(warehouseid);
         
-        
-        
         List<DeliveryEntity> ls = deliveryService.
-                getDeliveryList(CalendarUtil.toStartOfDay(start), CalendarUtil.toEndofDay(end), warehouse, status);
+                getDeliveryList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, status);
         
         return ResponseEntity.ok(ls);
     }

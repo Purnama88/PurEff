@@ -15,6 +15,7 @@ import net.purnama.pureff.entity.transactional.ItemReturnPurchaseEntity;
 import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import net.purnama.pureff.service.ItemReturnPurchaseService;
 import net.purnama.pureff.service.ReturnPurchaseService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +69,8 @@ public class ItemReturnPurchaseController {
         currency.setId(currencyid);
         
         List<ItemReturnPurchaseEntity> ls = itemreturnpurchaseService.
-                getItemReturnPurchaseList(start, end, warehouse, partner, currency, status);
+                getItemReturnPurchaseList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

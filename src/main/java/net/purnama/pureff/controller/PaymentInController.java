@@ -28,6 +28,7 @@ import net.purnama.pureff.service.PaymentTypeInService;
 import net.purnama.pureff.service.ReturnSalesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.util.CalendarUtil;
 import net.purnama.pureff.util.GlobalFields;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -224,7 +225,8 @@ public class PaymentInController {
         currency.setId(currencyid);
         
         List<PaymentInEntity> ls = paymentinService.
-                getPaymentInList(start, end, warehouse, partner, currency, status);
+                getPaymentInList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

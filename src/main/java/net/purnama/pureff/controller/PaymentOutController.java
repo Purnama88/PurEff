@@ -32,6 +32,7 @@ import net.purnama.pureff.service.PaymentTypeOutService;
 import net.purnama.pureff.service.ReturnPurchaseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.util.CalendarUtil;
 import net.purnama.pureff.util.GlobalFields;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -253,7 +254,8 @@ public class PaymentOutController {
         currency.setId(currencyid);
         
         List<PaymentOutEntity> ls = paymentoutService.
-                getPaymentOutList(start, end, warehouse, partner, currency, status);
+                getPaymentOutList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

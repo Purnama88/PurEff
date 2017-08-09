@@ -15,6 +15,7 @@ import net.purnama.pureff.entity.transactional.ExpensesEntity;
 import net.purnama.pureff.entity.transactional.ItemExpensesEntity;
 import net.purnama.pureff.service.ExpensesService;
 import net.purnama.pureff.service.ItemExpensesService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +68,8 @@ public class ItemExpensesController {
         currency.setId(currencyid);
         
         List<ItemExpensesEntity> ls = itemexpensesService.
-                getItemExpensesList(start, end, warehouse, partner, currency, status);
+                getItemExpensesList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

@@ -22,6 +22,7 @@ import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.PaymentOutExpensesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -197,7 +198,8 @@ public class ExpensesController {
         CurrencyEntity currency = new CurrencyEntity();
         currency.setId(currencyid);
         
-        List<ExpensesEntity> ls = expensesService.getExpensesList(start, end, warehouse, 
+        List<ExpensesEntity> ls = expensesService.getExpensesList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, 
                 partner, currency, status);
         
         return ResponseEntity.ok(ls);

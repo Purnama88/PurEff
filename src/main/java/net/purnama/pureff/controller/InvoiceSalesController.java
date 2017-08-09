@@ -25,6 +25,7 @@ import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.PaymentInInvoiceSalesService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.util.CalendarUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -216,7 +217,8 @@ public class InvoiceSalesController {
         currency.setId(currencyid);
         
         List<InvoiceSalesEntity> ls = invoicesalesService.
-                getInvoiceSalesList(start, end, warehouse, partner, currency, status);
+                getInvoiceSalesList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
     }

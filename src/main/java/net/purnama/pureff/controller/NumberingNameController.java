@@ -70,7 +70,8 @@ public class NumberingNameController {
         temp.setId(JwtUtil.parseToken(header.substring(7)));
         
         numberingname.setBegin(CalendarUtil.toStartOfDay(numberingname.getBegin()));
-        numberingname.setEnd(CalendarUtil.toEndofDay(numberingname.getEnd()));
+        numberingname.setEnd(CalendarUtil.toEndOfDay(numberingname.getEnd()));
+        
         numberingname.setId(IdGenerator.generateId());
         numberingname.setLastmodified(Calendar.getInstance());
         numberingname.setLastmodifiedby(temp);
@@ -100,7 +101,7 @@ public class NumberingNameController {
         temp.setId(JwtUtil.parseToken(header.substring(7)));
         
         numberingname.setBegin(CalendarUtil.toStartOfDay(numberingname.getBegin()));
-        numberingname.setEnd(CalendarUtil.toEndofDay(numberingname.getEnd()));
+        numberingname.setEnd(CalendarUtil.toEndOfDay(numberingname.getEnd()));
         numberingname.setLastmodified(Calendar.getInstance());
         numberingname.setLastmodifiedby(temp);
         
