@@ -61,7 +61,7 @@ public class ItemInvoicePurchaseDao {
             c.add(Restrictions.eq("invoicepurchase.currency", currency));
         }
         if(partner != null){
-            c.add(Restrictions.eq("invoicepurchase.partner", currency));
+            c.add(Restrictions.eq("invoicepurchase.partner", partner));
         }
         c.add(Restrictions.eq("invoicepurchase.status", status));
         c.addOrder(Order.asc("invoicepurchase.date"));

@@ -65,7 +65,7 @@ public class UserController {
                 String token = JwtUtil.generateToken(user.getId(), warehouse.getId());
                 response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 
-                return ResponseEntity.ok(user.getRole());
+                return ResponseEntity.ok(user);
             }
             else{
                 return ResponseEntity.badRequest().body("Invalid Log In");
@@ -157,6 +157,14 @@ public class UserController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        try{
+            String password = user.getPassword();
+            user.setPassword(net.purnama.pureff.util.GlobalFunctions.encrypt(password));
+        }
+        catch(Exception ex){
+            return ResponseEntity.badRequest().body("");
+        }
         
         user.setLastmodifiedby(temp);
         

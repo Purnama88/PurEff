@@ -52,13 +52,13 @@ public class PaymentTypeInController {
         return ResponseEntity.ok(ls);
     }
     
-    @RequestMapping(value = "api/getPendingPaymentTypeInList", method = RequestMethod.GET, 
-            headers = "Accept=application/json", params = {"type"})
-    public ResponseEntity<?> getPendingPaymentTypeInList(@RequestParam(value="type") int type) {
-        
-        List<PaymentTypeInEntity> ls = paymenttypeinService.getPendingPaymentTypeInList(type);
-        return ResponseEntity.ok(ls);
-    }
+//    @RequestMapping(value = "api/getPendingPaymentTypeInList", method = RequestMethod.GET, 
+//            headers = "Accept=application/json", params = {"type"})
+//    public ResponseEntity<?> getPendingPaymentTypeInList(@RequestParam(value="type") int type) {
+//        
+//        List<PaymentTypeInEntity> ls = paymenttypeinService.getPendingPaymentTypeInList(type);
+//        return ResponseEntity.ok(ls);
+//    }
     
     @RequestMapping(value = "api/getPaymentTypeInList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"startdate", "enddate", "accepted", "valid", "type"})
@@ -102,7 +102,9 @@ public class PaymentTypeInController {
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"startdate", "enddate", 
                 "warehouseid", "partnerid",
-                "currencyid", "type", "status"})
+                "currencyid", "type"
+//                "valid", "accepted"
+            })
     public ResponseEntity<?> getPaymentTypeInList(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
@@ -110,8 +112,10 @@ public class PaymentTypeInController {
             @RequestParam(value="warehouseid") String warehouseid,
             @RequestParam(value="partnerid") String partnerid,
             @RequestParam(value="currencyid") String currencyid,
-            @RequestParam(value="type") int type,
-            @RequestParam(value="status") boolean status){
+            @RequestParam(value="type") int type
+//            ,@RequestParam(value="valid") boolean valid,
+//            @RequestParam(value="accepted") boolean accepted
+    ){
         
         PartnerEntity partner = new PartnerEntity();
         partner.setId(partnerid);
@@ -124,7 +128,9 @@ public class PaymentTypeInController {
         
         List<PaymentTypeInEntity> ls = paymenttypeinService.
                 getPaymentTypeInList(CalendarUtil.toStartOfDay(start), 
-                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, type, status);
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, type
+//                        , valid, accepted
+                );
         
         return ResponseEntity.ok(ls);
     }
