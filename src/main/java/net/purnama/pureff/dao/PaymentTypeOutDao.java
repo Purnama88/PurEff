@@ -92,9 +92,35 @@ public class PaymentTypeOutDao {
     public List<PaymentTypeOutEntity>
          getPaymentTypeOutList(Calendar start, Calendar end, WarehouseEntity warehouse, 
                  PartnerEntity partner,
-                 CurrencyEntity currency, int type
-//                 , boolean valid, boolean status
-         ){
+                 CurrencyEntity currency, int type, boolean valid, boolean status){
+        Session session = this.sessionFactory.getCurrentSession();
+        
+        Criteria c = session.createCriteria(PaymentTypeOutEntity.class, "paymenttypeout");
+        c.createAlias("paymenttypeout.paymentout", "paymentout");
+        c.add(Restrictions.between("paymentout.date", start, end));
+        if(warehouse != null){
+            c.add(Restrictions.eq("paymentout.warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("paymentout.currency", currency));
+        }
+        if(partner != null){
+            c.add(Restrictions.eq("paymentout.partner", partner));
+        }
+        if(type < 4){
+            c.add(Restrictions.eq("type", type));
+        }
+        c.add(Restrictions.eq("paymenttypeout.valid", valid));
+        c.add(Restrictions.eq("paymenttypeout.status", status));
+        c.addOrder(Order.asc("paymentout.date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+    
+    public List<PaymentTypeOutEntity>
+         getPaymentTypeOutList(Calendar start, Calendar end, WarehouseEntity warehouse, 
+                 PartnerEntity partner,
+                 CurrencyEntity currency){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(PaymentTypeOutEntity.class, "paymenttypeout");
@@ -109,11 +135,7 @@ public class PaymentTypeOutDao {
         if(partner != null){
             c.add(Restrictions.eq("paymentout.partner", partner));
         }
-        if(type < 4){
-            c.add(Restrictions.eq("type", type));
-        }
-//        c.add(Restrictions.eq("paymentout.valid", valid));
-//        c.add(Restrictions.eq("paymentout.status", status));
+        c.add(Restrictions.eq("paymenttypeout.valid", true));
         c.addOrder(Order.asc("paymentout.date"));
         
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);

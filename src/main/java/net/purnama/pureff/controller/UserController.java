@@ -7,6 +7,7 @@
 package net.purnama.pureff.controller;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -153,22 +154,25 @@ public class UserController {
     @RequestMapping(value = "api/changeUserPassword", method = RequestMethod.PUT,
             headers = "Accept=application/json")
     public ResponseEntity<?> changeUserPassword(HttpServletRequest httpRequest, 
-            @RequestBody UserEntity user) {
+            @RequestBody HashMap<String, String> map) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity temp = new UserEntity();
-        temp.setId(JwtUtil.parseToken(header.substring(7)));
+        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
+        
+        String oldpassword = (String)map.get("oldpassword");
+        String newpassword = (String)map.get("newpassword");
         
         try{
-            String password = user.getPassword();
-            user.setPassword(net.purnama.pureff.util.GlobalFunctions.encrypt(password));
+            if(!net.purnama.pureff.util.GlobalFunctions.encrypt(oldpassword).equals(user.getPassword())){
+                return ResponseEntity.badRequest().body("Old password does not match");
+            }
+            
+            user.setPassword(net.purnama.pureff.util.GlobalFunctions.encrypt(newpassword));
+        
+            userService.updateUser(user);
         }
         catch(Exception ex){
             return ResponseEntity.badRequest().body("");
         }
-        
-        user.setLastmodifiedby(temp);
-        
-        userService.updateUser(user);
         
         return ResponseEntity.ok(user);
     }

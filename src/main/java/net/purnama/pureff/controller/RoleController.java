@@ -86,6 +86,8 @@ public class RoleController {
             return ResponseEntity.badRequest().body("Name '" + role.getName() +"' already exist");
         }
         
+        
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));

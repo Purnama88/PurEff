@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.UserDao;
 import net.purnama.pureff.dao.WarehouseDao;
+import net.purnama.pureff.entity.RoleEntity;
 import net.purnama.pureff.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,11 @@ public class UserService {
     }
     
     @Transactional
+    public List<UserEntity> getActiveUserList(RoleEntity role){
+        return userDao.getActiveUserList(role);
+    }
+    
+    @Transactional
     public UserEntity getUser(String id) {
             return userDao.getUser(id);
     }
@@ -63,4 +69,6 @@ public class UserService {
     public int countUserList(String keyword) {
             return userDao.countUserList(keyword);
     }
+    
+    
 }

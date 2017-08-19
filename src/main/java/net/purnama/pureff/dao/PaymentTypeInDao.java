@@ -92,9 +92,7 @@ public class PaymentTypeInDao {
     public List<PaymentTypeInEntity>
          getPaymentTypeInList(Calendar start, Calendar end, WarehouseEntity warehouse, 
                  PartnerEntity partner,
-                 CurrencyEntity currency, int type
-//                 , boolean valid, boolean status
-         ){
+                 CurrencyEntity currency, int type, boolean valid, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(PaymentTypeInEntity.class, "paymenttypein");
@@ -112,8 +110,32 @@ public class PaymentTypeInDao {
         if(type < 4){
             c.add(Restrictions.eq("type", type));
         }
-//        c.add(Restrictions.eq("paymentin.valid", valid));
-//        c.add(Restrictions.eq("paymentin.status", status));
+        c.add(Restrictions.eq("paymenttypein.valid", valid));
+        c.add(Restrictions.eq("paymenttypein.status", status));
+        c.addOrder(Order.asc("paymentin.date"));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    }
+    
+    public List<PaymentTypeInEntity>
+         getPaymentTypeInList(Calendar start, Calendar end, WarehouseEntity warehouse, 
+                 PartnerEntity partner,
+                 CurrencyEntity currency){
+        Session session = this.sessionFactory.getCurrentSession();
+        
+        Criteria c = session.createCriteria(PaymentTypeInEntity.class, "paymenttypein");
+        c.createAlias("paymenttypein.paymentin", "paymentin");
+        c.add(Restrictions.between("paymentin.date", start, end));
+        if(warehouse != null){
+            c.add(Restrictions.eq("paymentin.warehouse", warehouse));
+        }
+        if(currency != null){
+            c.add(Restrictions.eq("paymentin.currency", currency));
+        }
+        if(partner != null){
+            c.add(Restrictions.eq("paymentin.partner", partner));
+        }
+        c.add(Restrictions.eq("paymenttypein.valid", true));
         c.addOrder(Order.asc("paymentin.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
