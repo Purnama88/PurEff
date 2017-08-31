@@ -103,7 +103,6 @@ public class PaymentInInvoiceSalesDraftController {
                 }
             }
         }
-        
         return ResponseEntity.ok(retpaymentininvoicesalesdraftlist);
     }
     

@@ -45,7 +45,7 @@ public class UserDao {
     
     public List<UserEntity> getActiveUserList() {
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria c = session.createCriteria(RoleEntity.class);
+        Criteria c = session.createCriteria(UserEntity.class);
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("username"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
@@ -54,7 +54,7 @@ public class UserDao {
     
     public List<UserEntity> getActiveUserList(RoleEntity role) {
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria c = session.createCriteria(RoleEntity.class);
+        Criteria c = session.createCriteria(UserEntity.class);
         c.add(Restrictions.eq("role", role));
         c.add(Restrictions.eq("status", true));
         c.addOrder(Order.asc("username"));
@@ -64,7 +64,7 @@ public class UserDao {
     
     public List<UserEntity> getUserList() {
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria c = session.createCriteria(RoleEntity.class);
+        Criteria c = session.createCriteria(UserEntity.class);
         c.addOrder(Order.asc("username"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
