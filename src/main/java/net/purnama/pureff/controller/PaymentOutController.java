@@ -138,7 +138,7 @@ public class PaymentOutController {
         return ResponseEntity.ok(paymentoutService.countPaymentOutList(keyword));
     }
     
-    @RequestMapping(value = "api/cancelPaymentOut", method = RequestMethod.DELETE, 
+    @RequestMapping(value = "api/cancelPaymentOut", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"id"})
     public ResponseEntity<?> cancelPaymentOut(HttpServletRequest httpRequest,
             @RequestParam(value="id") String id){

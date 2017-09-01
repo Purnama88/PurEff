@@ -127,7 +127,7 @@ public class PaymentInController {
         return ResponseEntity.ok(paymentinService.countPaymentInList(keyword));
     }
     
-    @RequestMapping(value = "api/cancelPaymentIn", method = RequestMethod.DELETE, 
+    @RequestMapping(value = "api/cancelPaymentIn", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"id"})
     public ResponseEntity<?> cancelPaymentIn(HttpServletRequest httpRequest,
             @RequestParam(value="id") String id){
