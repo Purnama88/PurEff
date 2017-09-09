@@ -96,6 +96,15 @@
     </dependencies>
 
     <build>
+        <!--resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -114,7 +123,12 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <!--failOnMissingWebXml>false</failOnMissingWebXml-->
+                    <!--webResources>
+                        <resource>
+                            <directory>net.purnama.transaction</directory>
+                        </resource>
+                    </webResources-->
                 </configuration>
             </plugin>
             <plugin>

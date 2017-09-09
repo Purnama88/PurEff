@@ -67,8 +67,10 @@ public class CalendarUtil {
 
     public static Calendar toStartOfDay(Calendar calendar) {
         calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.HOUR, 0 + TIME_ZONE);
-        calendar.set(Calendar.HOUR_OF_DAY, 0 + + TIME_ZONE);
+//        calendar.set(Calendar.HOUR, 0 + TIME_ZONE);
+//        calendar.set(Calendar.HOUR_OF_DAY, 0 + TIME_ZONE);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 1);
         calendar.set(Calendar.MILLISECOND, 0);
@@ -77,8 +79,10 @@ public class CalendarUtil {
 
     public static Calendar toEndOfDay(Calendar calendar) {
         calendar.set(Calendar.AM_PM, 1);
-        calendar.set(Calendar.HOUR, 11 + TIME_ZONE);
-        calendar.set(Calendar.HOUR_OF_DAY, 23 + TIME_ZONE);
+//        calendar.set(Calendar.HOUR, 11 + TIME_ZONE);
+//        calendar.set(Calendar.HOUR_OF_DAY, 23 + TIME_ZONE);
+        calendar.set(Calendar.HOUR, 11);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         calendar.set(Calendar.MILLISECOND, 999);

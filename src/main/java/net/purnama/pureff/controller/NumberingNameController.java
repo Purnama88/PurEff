@@ -7,6 +7,7 @@ package net.purnama.pureff.controller;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.NumberingNameEntity;
 import net.purnama.pureff.entity.UserEntity;
@@ -69,6 +70,9 @@ public class NumberingNameController {
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
         
+        numberingname.getBegin().setTimeZone(TimeZone.getDefault());
+        numberingname.getEnd().setTimeZone(TimeZone.getDefault());
+        
         numberingname.setBegin(CalendarUtil.toStartOfDay(numberingname.getBegin()));
         numberingname.setEnd(CalendarUtil.toEndOfDay(numberingname.getEnd()));
         
@@ -99,6 +103,9 @@ public class NumberingNameController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity temp = new UserEntity();
         temp.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        numberingname.getBegin().setTimeZone(TimeZone.getDefault());
+        numberingname.getEnd().setTimeZone(TimeZone.getDefault());
         
         numberingname.setBegin(CalendarUtil.toStartOfDay(numberingname.getBegin()));
         numberingname.setEnd(CalendarUtil.toEndOfDay(numberingname.getEnd()));
@@ -147,6 +154,22 @@ public class NumberingNameController {
                         DateUtils.isBetween(numberingname.getBegin(), begin, end) ||
                         DateUtils.isBetween(numberingname.getEnd(), begin, end)){
 
+//                    System.out.println(Calendar.getInstance());
+//                    
+                    System.out.println(DateUtils.isBetween(begin, numberingname.getBegin(), numberingname.getEnd()));
+                    System.out.println(DateUtils.isBetween(end, numberingname.getBegin(), numberingname.getEnd()));
+                    System.out.println(DateUtils.isBetween(numberingname.getBegin(), begin, end));
+                    System.out.println(DateUtils.isBetween(numberingname.getEnd(), begin, end));
+//                    
+//                    System.out.println(begin);
+//                    System.out.println(end);
+//                    System.out.println(numberingname.getBegin());
+//                    System.out.println(numberingname.getEnd());
+//                    
+                    System.out.println(begin.getTime());
+                    System.out.println(end.getTime());
+                    System.out.println(numberingname.getBegin().getTime());
+                    System.out.println(numberingname.getEnd().getTime());
                         status = true;
                         break;
                 }
