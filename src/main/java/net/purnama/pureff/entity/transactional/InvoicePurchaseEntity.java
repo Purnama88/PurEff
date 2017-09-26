@@ -21,7 +21,6 @@ import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.util.GlobalFields;
-import net.purnama.pureff.util.GlobalFunctions;
 import org.hibernate.annotations.Formula;
 
 /**
