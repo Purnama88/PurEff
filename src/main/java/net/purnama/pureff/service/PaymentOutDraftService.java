@@ -9,6 +9,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentOutDraftDao;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentOutDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,12 +50,13 @@ public class PaymentOutDraftService {
     }
     
     @Transactional
-    public List getPaymentOutDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
-        return paymentoutdraftDao.getPaymentOutDraftList(itemperpage, page, sort, keyword, user);
+    public List getPaymentOutDraftList(int itemperpage, int page, String sort,
+            String keyword, UserEntity user, WarehouseEntity warehouse){
+        return paymentoutdraftDao.getPaymentOutDraftList(itemperpage, page, sort, keyword, user, warehouse);
     }
     
     @Transactional
-    public int countPaymentOutDraftList(String keyword, UserEntity user){
-        return paymentoutdraftDao.countPaymentOutDraftList(keyword, user);
+    public int countPaymentOutDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
+        return paymentoutdraftDao.countPaymentOutDraftList(keyword, user, warehouse);
     }    
 }

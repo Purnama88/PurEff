@@ -31,8 +31,6 @@ import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.RateService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -63,13 +61,7 @@ public class ExpensesDraftController {
     ItemExpensesService itemexpensesService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     CurrencyService currencyService;
@@ -104,8 +96,10 @@ public class ExpensesDraftController {
     public ResponseEntity<?> addExpensesDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(4);
         
@@ -182,6 +176,9 @@ public class ExpensesDraftController {
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
         }
+        else if(expensesdraft.getDuedate().getTime().getDate() < expensesdraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
+        }
         
         ExpensesEntity expenses = new ExpensesEntity();
         expenses.setId(IdGenerator.generateId());
@@ -225,8 +222,10 @@ public class ExpensesDraftController {
             itemexpensesService.addItemExpenses(iise);
         }
         
+        ExpensesEntity tempexpenses = expensesService.getExpenses(expenses.getId());
+        
         PartnerEntity partner = expenses.getPartner();
-        partner.setBalance(partner.getBalance() + expenses.getTotal_defaultcurrency());
+        partner.setBalance(partner.getBalance() + tempexpenses.getTotal_defaultcurrency());
         partnerService.updatePartner(partner);
         
         numbering.setCurrent(numbering.getCurrent()+1);
@@ -254,8 +253,10 @@ public class ExpensesDraftController {
     public ResponseEntity<?> updateExpensesDraft(HttpServletRequest httpRequest, 
             @RequestBody ExpensesDraftEntity expensesdraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         expensesdraft.setLastmodified(Calendar.getInstance());
         expensesdraft.setWarehouse(warehouse);
@@ -291,9 +292,11 @@ public class ExpensesDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<ExpensesDraftEntity> ls = expensesdraftService.
-                getExpensesDraftList(itemperpage, page, sort, keyword, user);
+                getExpensesDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -305,7 +308,9 @@ public class ExpensesDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return ResponseEntity.ok(expensesdraftService.countExpensesDraftList(keyword, user));
+        return ResponseEntity.ok(expensesdraftService.countExpensesDraftList(keyword, user, warehouse));
     }
 }

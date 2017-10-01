@@ -9,6 +9,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PaymentInDraftDao;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.PaymentInDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,12 +50,13 @@ public class PaymentInDraftService {
     }
     
     @Transactional
-    public List getPaymentInDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
-        return paymentindraftDao.getPaymentInDraftList(itemperpage, page, sort, keyword, user);
+    public List getPaymentInDraftList(int itemperpage, int page, String sort, 
+            String keyword, UserEntity user, WarehouseEntity warehouse){
+        return paymentindraftDao.getPaymentInDraftList(itemperpage, page, sort, keyword, user, warehouse);
     }
     
     @Transactional
-    public int countPaymentInDraftList(String keyword, UserEntity user){
-        return paymentindraftDao.countPaymentInDraftList(keyword, user);
+    public int countPaymentInDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
+        return paymentindraftDao.countPaymentInDraftList(keyword, user, warehouse);
     } 
 }

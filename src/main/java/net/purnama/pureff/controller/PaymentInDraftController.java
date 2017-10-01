@@ -41,8 +41,6 @@ import net.purnama.pureff.service.PaymentTypeInDraftService;
 import net.purnama.pureff.service.PaymentTypeInService;
 import net.purnama.pureff.service.RateService;
 import net.purnama.pureff.service.ReturnSalesService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.GlobalFields;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,12 +58,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class PaymentInDraftController {
-    
-    @Autowired
-    UserService userService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     InvoiceSalesService invoicesalesService;
@@ -131,8 +123,10 @@ public class PaymentInDraftController {
     public ResponseEntity<?> addPaymentInDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(15);
         
@@ -182,8 +176,10 @@ public class PaymentInDraftController {
             @RequestBody PaymentInDraftEntity paymentindraft) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         paymentindraft.setLastmodified(Calendar.getInstance());
         paymentindraft.setWarehouse(warehouse);
@@ -205,9 +201,11 @@ public class PaymentInDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<PaymentInDraftEntity> ls = paymentindraftService.
-                getPaymentInDraftList(itemperpage, page, sort, keyword, user);
+                getPaymentInDraftList(itemperpage, page, sort, keyword, user, warehouse);
         
         return ResponseEntity.ok(ls);
     }
@@ -220,8 +218,10 @@ public class PaymentInDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return ResponseEntity.ok(paymentindraftService.countPaymentInDraftList(keyword, user));
+        return ResponseEntity.ok(paymentindraftService.countPaymentInDraftList(keyword, user, warehouse));
     }
     
     @RequestMapping(value = "api/deletePaymentInDraft", method = RequestMethod.DELETE, 
@@ -284,6 +284,9 @@ public class PaymentInDraftController {
         }
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        else if(paymentindraft.getDuedate().getTime().getDate() < paymentindraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
         }
         
         PaymentInEntity paymentin = new PaymentInEntity();

@@ -27,8 +27,6 @@ import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PartnerService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -59,13 +57,7 @@ public class InvoiceWarehouseInDraftController {
     ItemInvoiceWarehouseInService iteminvoicewarehouseinService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     MenuService menuService;
@@ -94,8 +86,10 @@ public class InvoiceWarehouseInDraftController {
             headers = "Accept=application/json")
     public ResponseEntity<?> addInvoiceWarehouseInDraft(HttpServletRequest httpRequest) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(5);
         
@@ -229,8 +223,10 @@ public class InvoiceWarehouseInDraftController {
     public ResponseEntity<?> updateInvoiceWarehouseInDraft(HttpServletRequest httpRequest, 
             @RequestBody InvoiceWarehouseInDraftEntity invoicewarehouseindraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         invoicewarehouseindraft.setLastmodified(Calendar.getInstance());
         invoicewarehouseindraft.setWarehouse(warehouse);
@@ -268,9 +264,11 @@ public class InvoiceWarehouseInDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<InvoiceWarehouseInDraftEntity> ls = invoicewarehouseindraftService.
-                getInvoiceWarehouseInDraftList(itemperpage, page, sort, keyword, user);
+                getInvoiceWarehouseInDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -282,7 +280,9 @@ public class InvoiceWarehouseInDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return invoicewarehouseindraftService.countInvoiceWarehouseInDraftList(keyword, user);
+        return invoicewarehouseindraftService.countInvoiceWarehouseInDraftList(keyword, user, warehouse);
     }
 }

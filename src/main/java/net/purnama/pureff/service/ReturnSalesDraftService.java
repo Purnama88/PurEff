@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ReturnSalesDraftDao;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.ReturnSalesDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,12 +51,13 @@ public class ReturnSalesDraftService {
     }
     
     @Transactional
-    public List getReturnSalesDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
-        return returnsalesdraftDao.getReturnSalesDraftList(itemperpage, page, sort, keyword, user);
+    public List getReturnSalesDraftList(int itemperpage, int page, String sort,
+            String keyword, UserEntity user, WarehouseEntity warehouse){
+        return returnsalesdraftDao.getReturnSalesDraftList(itemperpage, page, sort, keyword, user, warehouse);
     }
     
     @Transactional
-    public int countReturnSalesDraftList(String keyword, UserEntity user){
-        return returnsalesdraftDao.countReturnSalesDraftList(keyword, user);
+    public int countReturnSalesDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
+        return returnsalesdraftDao.countReturnSalesDraftList(keyword, user, warehouse);
     }
 }

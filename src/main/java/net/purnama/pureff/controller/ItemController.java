@@ -23,10 +23,10 @@ import net.purnama.pureff.service.ItemService;
 import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.SellPriceService;
 import net.purnama.pureff.service.UomService;
+import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,6 +54,9 @@ public class ItemController {
     
     @Autowired
     ItemWarehouseService itemwarehouseService;
+    
+    @Autowired
+    WarehouseService warehouseService;
     
     @RequestMapping(value = "api/getItemList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -98,17 +101,19 @@ public class ItemController {
         
         itemService.addItem(item);
         
-        ItemWarehouseEntity itemwarehouse = new ItemWarehouseEntity();
-        itemwarehouse.setId(IdGenerator.generateId());
-        itemwarehouse.setItem(item);
-        itemwarehouse.setLastmodified(Calendar.getInstance());
-        itemwarehouse.setLastmodifiedby(user);
-        itemwarehouse.setNote("");
-        itemwarehouse.setStatus(true);
-        itemwarehouse.setStock(0);
-        itemwarehouse.setWarehouse(warehouse);
+        for(WarehouseEntity temp : warehouseService.getWarehouseList()){
+            ItemWarehouseEntity itemwarehouse = new ItemWarehouseEntity();
+            itemwarehouse.setId(IdGenerator.generateId());
+            itemwarehouse.setItem(item);
+            itemwarehouse.setLastmodified(Calendar.getInstance());
+            itemwarehouse.setLastmodifiedby(user);
+            itemwarehouse.setNote("");
+            itemwarehouse.setStatus(true);
+            itemwarehouse.setStock(0);
+            itemwarehouse.setWarehouse(temp);
+            itemwarehouseService.addItemWarehouse(itemwarehouse);
+        }
         
-        itemwarehouseService.addItemWarehouse(itemwarehouse);
         
         UomEntity buyuom = item.getBuyuom();
         BuyPriceEntity buyprice = new BuyPriceEntity();

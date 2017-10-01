@@ -47,8 +47,6 @@ import net.purnama.pureff.service.PaymentTypeOutDraftService;
 import net.purnama.pureff.service.PaymentTypeOutService;
 import net.purnama.pureff.service.RateService;
 import net.purnama.pureff.service.ReturnPurchaseService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.GlobalFields;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,12 +67,6 @@ public class PaymentOutDraftController {
     
     @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    UserService userService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     PaymentOutDraftService paymentoutdraftService;
@@ -146,8 +138,10 @@ public class PaymentOutDraftController {
     public ResponseEntity<?> addPaymentOutDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(16);
         
@@ -196,8 +190,10 @@ public class PaymentOutDraftController {
     public ResponseEntity<?> updatePaymentOutDraft(HttpServletRequest httpRequest,
             @RequestBody PaymentOutDraftEntity paymentoutdraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         paymentoutdraft.setLastmodified(Calendar.getInstance());
         paymentoutdraft.setWarehouse(warehouse);
@@ -257,9 +253,11 @@ public class PaymentOutDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<PaymentOutDraftEntity> ls = paymentoutdraftService.
-                getPaymentOutDraftList(itemperpage, page, sort, keyword, user);
+                getPaymentOutDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -272,8 +270,10 @@ public class PaymentOutDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return ResponseEntity.ok(paymentoutdraftService.countPaymentOutDraftList(keyword, user));
+        return ResponseEntity.ok(paymentoutdraftService.countPaymentOutDraftList(keyword, user, warehouse));
     }
     
     @RequestMapping(value = "api/closePaymentOutDraft", method = RequestMethod.GET,
@@ -305,6 +305,9 @@ public class PaymentOutDraftController {
         }
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        else if(paymentoutdraft.getDuedate().getTime().getDate() < paymentoutdraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
         }
         
         PaymentOutEntity paymentout = new PaymentOutEntity();

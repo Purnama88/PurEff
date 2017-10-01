@@ -32,8 +32,6 @@ import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.RateService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -64,13 +62,7 @@ public class ReturnSalesDraftController {
     ItemReturnSalesService itemreturnsalesService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     CurrencyService currencyService;
@@ -106,8 +98,10 @@ public class ReturnSalesDraftController {
     public ResponseEntity<?> addReturnSalesDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         MenuEntity menu = menuService.getMenu(20);
         
@@ -117,7 +111,6 @@ public class ReturnSalesDraftController {
             return ResponseEntity.badRequest().body("You have not set default numbering for menu return sales");
         }
         else if(numbering.getNumberingname().getEnd().before(Calendar.getInstance())){
-            System.out.println(numbering.getNumberingname().getEnd().after(Calendar.getInstance()));
             numbering.setStatus(false);
             numbering.setLastmodified(Calendar.getInstance());
             numbering.setLastmodifiedby(user);
@@ -185,6 +178,9 @@ public class ReturnSalesDraftController {
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
         }
+        else if(returnsalesdraft.getDuedate().getTime().getDate() < returnsalesdraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
+        }
         
         ReturnSalesEntity returnsales = new ReturnSalesEntity();
         returnsales.setId(IdGenerator.generateId());
@@ -246,8 +242,10 @@ public class ReturnSalesDraftController {
             itemwarehouseService.updateItemWarehouse(iw);
         }
         
+        ReturnSalesEntity tempreturnsales = returnsalesService.getReturnSales(returnsales.getId());
+        
         PartnerEntity partner = returnsales.getPartner();
-        partner.setBalance(partner.getBalance() - returnsales.getTotal_defaultcurrency());
+        partner.setBalance(partner.getBalance() - tempreturnsales.getTotal_defaultcurrency());
         partnerService.updatePartner(partner);
         
         numbering.setCurrent(numbering.getCurrent()+1);
@@ -275,8 +273,10 @@ public class ReturnSalesDraftController {
     public ResponseEntity<?> updateReturnSalesDraft(HttpServletRequest httpRequest,
             @RequestBody ReturnSalesDraftEntity returnsalesdraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         returnsalesdraft.setLastmodified(Calendar.getInstance());
         returnsalesdraft.setWarehouse(warehouse);
@@ -312,9 +312,11 @@ public class ReturnSalesDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         List<ReturnSalesDraftEntity> ls = returnsalesdraftService.
-                getReturnSalesDraftList(itemperpage, page, sort, keyword, user);
+                getReturnSalesDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -326,7 +328,9 @@ public class ReturnSalesDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
-        return ResponseEntity.ok(returnsalesdraftService.countReturnSalesDraftList(keyword, user));
+        return ResponseEntity.ok(returnsalesdraftService.countReturnSalesDraftList(keyword, user, warehouse));
     }
 }

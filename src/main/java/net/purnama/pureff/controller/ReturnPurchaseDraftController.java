@@ -32,8 +32,6 @@ import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.RateService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -64,13 +62,7 @@ public class ReturnPurchaseDraftController {
     ItemReturnPurchaseService itemreturnpurchaseService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     CurrencyService currencyService;
@@ -106,8 +98,10 @@ public class ReturnPurchaseDraftController {
     public ResponseEntity<?> addReturnPurchaseDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(19);
         
@@ -184,6 +178,9 @@ public class ReturnPurchaseDraftController {
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
         }
+        else if(returnpurchasedraft.getDuedate().getTime().getDate() < returnpurchasedraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
+        }
         
         ReturnPurchaseEntity returnpurchase = new ReturnPurchaseEntity();
         returnpurchase.setId(IdGenerator.generateId());
@@ -215,8 +212,6 @@ public class ReturnPurchaseDraftController {
         returnpurchase.setPaid(0);
         returnpurchaseService.addReturnPurchase(returnpurchase);
         
-        
-        
         for(ItemReturnPurchaseDraftEntity iisde : iisdelist){
             ItemReturnPurchaseEntity iise = new ItemReturnPurchaseEntity();
             iise.setId(IdGenerator.generateId());
@@ -247,8 +242,10 @@ public class ReturnPurchaseDraftController {
             itemwarehouseService.updateItemWarehouse(iw);
         }
         
+        ReturnPurchaseEntity tempreturnpurchase = returnpurchaseService.getReturnPurchase(returnpurchase.getId());
+        
         PartnerEntity partner = returnpurchase.getPartner();
-        partner.setBalance(partner.getBalance() - returnpurchase.getTotal_defaultcurrency());
+        partner.setBalance(partner.getBalance() - tempreturnpurchase.getTotal_defaultcurrency());
         partnerService.updatePartner(partner);
         
         numbering.setCurrent(numbering.getCurrent()+1);
@@ -275,8 +272,10 @@ public class ReturnPurchaseDraftController {
             headers = "Accept=application/json")
     public ResponseEntity<?> updateReturnPurchaseDraft(HttpServletRequest httpRequest, @RequestBody ReturnPurchaseDraftEntity returnpurchasedraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         returnpurchasedraft.setLastmodified(Calendar.getInstance());
         returnpurchasedraft.setWarehouse(warehouse);
@@ -312,9 +311,11 @@ public class ReturnPurchaseDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<ReturnPurchaseDraftEntity> ls = returnpurchasedraftService.
-                getReturnPurchaseDraftList(itemperpage, page, sort, keyword, user);
+                getReturnPurchaseDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -326,7 +327,9 @@ public class ReturnPurchaseDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return ResponseEntity.ok(returnpurchasedraftService.countReturnPurchaseDraftList(keyword, user));
+        return ResponseEntity.ok(returnpurchasedraftService.countReturnPurchaseDraftList(keyword, user, warehouse));
     }
 }

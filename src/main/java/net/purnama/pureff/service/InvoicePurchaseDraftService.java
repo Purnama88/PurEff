@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.InvoicePurchaseDraftDao;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.InvoicePurchaseDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,12 +51,13 @@ public class InvoicePurchaseDraftService {
     }
     
     @Transactional
-    public List getInvoicePurchaseDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
-        return invoicepurchasedraftDao.getInvoicePurchaseDraftList(itemperpage, page, sort, keyword, user);
+    public List getInvoicePurchaseDraftList(int itemperpage, int page, String sort, 
+            String keyword, UserEntity user, WarehouseEntity warehouse){
+        return invoicepurchasedraftDao.getInvoicePurchaseDraftList(itemperpage, page, sort, keyword, user, warehouse);
     }
     
     @Transactional
-    public int countInvoicePurchaseDraftList(String keyword, UserEntity user){
-        return invoicepurchasedraftDao.countInvoicePurchaseDraftList(keyword, user);
+    public int countInvoicePurchaseDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
+        return invoicepurchasedraftDao.countInvoicePurchaseDraftList(keyword, user, warehouse);
     }
 }

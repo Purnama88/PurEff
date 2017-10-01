@@ -52,8 +52,20 @@ public class UserController {
         UserEntity user = userService.getUser(username, password);
         WarehouseEntity warehouse = warehouseService.getWarehouse(login.getWarehouseid());   
         
-        if(user != null && warehouse != null && user.isStatus()){
-            
+        if(warehouse == null){
+            return ResponseEntity.badRequest().body("Invalid Log In");
+        }
+        else if(user == null){
+            return ResponseEntity.badRequest().body("Invalid Username or Password");
+        }
+        else if(!user.isStatus()){
+            return ResponseEntity.badRequest().body("User is inactive");
+        }
+        else if(!warehouse.isStatus()){
+                return ResponseEntity.badRequest().body("Warehouse is inactive");
+        }
+        else{
+                        
             boolean contain = false;
             
             for(WarehouseEntity temp : user.getWarehouses()){
@@ -69,11 +81,8 @@ public class UserController {
                 return ResponseEntity.ok(user);
             }
             else{
-                return ResponseEntity.badRequest().body("Invalid Log In");
+                return ResponseEntity.badRequest().body("You do not have privilege to access this warehouse");
             }
-        }
-        else{
-            return ResponseEntity.badRequest().body("Invalid Log In");
         }
     }
     

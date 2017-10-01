@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.DeliveryDraftDao;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.DeliveryDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,12 +52,12 @@ public class DeliveryDraftService {
     
     @Transactional
     public List getDeliveryDraftList(int itemperpage, int page, String sort, 
-            String keyword, UserEntity user){
-        return deliverydraftDao.getDeliveryDraftList(itemperpage, page, sort, keyword, user);
+            String keyword, UserEntity user, WarehouseEntity warehouse){
+        return deliverydraftDao.getDeliveryDraftList(itemperpage, page, sort, keyword, user, warehouse);
     }
     
     @Transactional
-    public int countDeliveryDraftList(String keyword, UserEntity user){
-        return deliverydraftDao.countDeliveryDraftList(keyword, user);
+    public int countDeliveryDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
+        return deliverydraftDao.countDeliveryDraftList(keyword, user, warehouse);
     }
 }

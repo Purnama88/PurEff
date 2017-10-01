@@ -10,6 +10,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.AdjustmentDraftDao;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.AdjustmentDraftEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,12 +51,13 @@ public class AdjustmentDraftService {
     }
     
     @Transactional
-    public List getAdjustmentDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
-        return adjustmentdraftDao.getAdjustmentDraftList(itemperpage, page, sort, keyword, user);
+    public List getAdjustmentDraftList(int itemperpage, int page, String sort,
+            String keyword, UserEntity user, WarehouseEntity warehouse){
+        return adjustmentdraftDao.getAdjustmentDraftList(itemperpage, page, sort, keyword, user, warehouse);
     }
     
     @Transactional
-    public int countAdjustmentDraftList(String keyword, UserEntity user){
-        return adjustmentdraftDao.countAdjustmentDraftList(keyword, user);
+    public int countAdjustmentDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
+        return adjustmentdraftDao.countAdjustmentDraftList(keyword, user, warehouse);
     }
 }

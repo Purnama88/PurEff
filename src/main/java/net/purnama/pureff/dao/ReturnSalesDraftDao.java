@@ -8,6 +8,7 @@ package net.purnama.pureff.dao;
 
 import java.util.List;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.ReturnSalesDraftEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -66,11 +67,13 @@ public class ReturnSalesDraftDao {
         }
     }
     
-    public List getReturnSalesDraftList(int itemperpage, int page, String sort, String keyword, UserEntity user){
+    public List getReturnSalesDraftList(int itemperpage, int page, String sort, 
+            String keyword, UserEntity user, WarehouseEntity warehouse){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ReturnSalesDraftEntity.class);
         c.add(Restrictions.like("id", "%"+keyword+"%"));
         c.add(Restrictions.eq("lastmodifiedby", user));
+        c.add(Restrictions.eq("warehouse", warehouse));
         
         if(sort.contains("-")){
             c.addOrder(Order.desc(sort.substring(1)));
@@ -85,11 +88,12 @@ public class ReturnSalesDraftDao {
         return c.list();
     }
     
-    public int countReturnSalesDraftList(String keyword, UserEntity user) {
+    public int countReturnSalesDraftList(String keyword, UserEntity user, WarehouseEntity warehouse) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(ReturnSalesDraftEntity.class);
         c.add(Restrictions.like("id", "%"+keyword+"%"));
         c.add(Restrictions.eq("lastmodifiedby", user));
+        c.add(Restrictions.eq("warehouse", warehouse));
         c.setProjection(Projections.rowCount());
         List result = c.list();
         int resultint = Integer.valueOf(result.get(0).toString());

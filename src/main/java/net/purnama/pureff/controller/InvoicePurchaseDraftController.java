@@ -32,8 +32,6 @@ import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
 import net.purnama.pureff.service.PartnerService;
 import net.purnama.pureff.service.RateService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -64,13 +62,7 @@ public class InvoicePurchaseDraftController {
     ItemInvoicePurchaseService iteminvoicepurchaseService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     CurrencyService currencyService;
@@ -106,8 +98,10 @@ public class InvoicePurchaseDraftController {
     public ResponseEntity<?> addInvoicePurchaseDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(7);
         
@@ -184,6 +178,9 @@ public class InvoicePurchaseDraftController {
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
         }
+        else if(invoicepurchasedraft.getDuedate().getTime().getDate() < invoicepurchasedraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
+        }
         
         InvoicePurchaseEntity invoicepurchase = new InvoicePurchaseEntity();
         invoicepurchase.setId(IdGenerator.generateId());
@@ -244,8 +241,10 @@ public class InvoicePurchaseDraftController {
             itemwarehouseService.updateItemWarehouse(iw);
         }
         
+        InvoicePurchaseEntity tempinvoicepurchase = invoicepurchaseService.getInvoicePurchase(invoicepurchase.getId());
+        
         PartnerEntity partner = invoicepurchase.getPartner();
-        partner.setBalance(partner.getBalance() + invoicepurchase.getTotal_defaultcurrency());
+        partner.setBalance(partner.getBalance() + tempinvoicepurchase.getTotal_defaultcurrency());
         partnerService.updatePartner(partner);
         
         numbering.setCurrent(numbering.getCurrent()+1);
@@ -273,8 +272,10 @@ public class InvoicePurchaseDraftController {
     public ResponseEntity<?> updateInvoicePurchaseDraft(HttpServletRequest httpRequest,
             @RequestBody InvoicePurchaseDraftEntity invoicepurchasedraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         invoicepurchasedraft.setLastmodified(Calendar.getInstance());
         invoicepurchasedraft.setWarehouse(warehouse);
@@ -310,9 +311,11 @@ public class InvoicePurchaseDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<InvoicePurchaseDraftEntity> ls = invoicepurchasedraftService.
-                getInvoicePurchaseDraftList(itemperpage, page, sort, keyword, user);
+                getInvoicePurchaseDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -324,7 +327,9 @@ public class InvoicePurchaseDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return ResponseEntity.ok(invoicepurchasedraftService.countInvoicePurchaseDraftList(keyword, user));
+        return ResponseEntity.ok(invoicepurchasedraftService.countInvoicePurchaseDraftList(keyword, user, warehouse));
     }
 }

@@ -26,8 +26,6 @@ import net.purnama.pureff.service.ItemAdjustmentService;
 import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -58,12 +56,6 @@ public class AdjustmentDraftController {
     ItemAdjustmentDraftService itemadjustmentdraftService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
-    WarehouseService warehouseService;
-    
-    @Autowired
     MenuService menuService;
     
     @Autowired
@@ -91,8 +83,10 @@ public class AdjustmentDraftController {
     public ResponseEntity<?> addAdjustmentDraft(HttpServletRequest httpRequest){
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         MenuEntity menu = menuService.getMenu(1);
         
@@ -212,8 +206,10 @@ public class AdjustmentDraftController {
     public void updateAdjustmentDraft(HttpServletRequest httpRequest,
             @RequestBody AdjustmentDraftEntity adjustmentdraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         adjustmentdraft.setLastmodified(Calendar.getInstance());
         adjustmentdraft.setWarehouse(warehouse);
@@ -245,9 +241,11 @@ public class AdjustmentDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
         List<AdjustmentDraftEntity> ls = adjustmentdraftService.
-                getAdjustmentDraftList(itemperpage, page, sort, keyword, user);
+                getAdjustmentDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -259,7 +257,9 @@ public class AdjustmentDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId((JwtUtil.parseToken2(header.substring(7))));
         
-        return ResponseEntity.ok(adjustmentdraftService.countAdjustmentDraftList(keyword, user));
+        return ResponseEntity.ok(adjustmentdraftService.countAdjustmentDraftList(keyword, user, warehouse));
     }
 }

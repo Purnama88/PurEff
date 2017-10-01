@@ -64,13 +64,7 @@ public class InvoiceSalesDraftController {
     ItemInvoiceSalesService iteminvoicesalesService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
     PartnerService partnerService;
-    
-    @Autowired
-    WarehouseService warehouseService;
     
     @Autowired
     CurrencyService currencyService;
@@ -106,8 +100,10 @@ public class InvoiceSalesDraftController {
     public ResponseEntity<?> addInvoiceSalesDraft(HttpServletRequest httpRequest) {
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         MenuEntity menu = menuService.getMenu(8);
         
@@ -184,6 +180,9 @@ public class InvoiceSalesDraftController {
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
         }
+        else if(invoicesalesdraft.getDuedate().getTime().getDate() < invoicesalesdraft.getDate().getTime().getDate()){
+            return ResponseEntity.badRequest().body("Due date is set before invoice date");
+        }
         
         InvoiceSalesEntity invoicesales = new InvoiceSalesEntity();
         invoicesales.setId(IdGenerator.generateId());
@@ -244,8 +243,10 @@ public class InvoiceSalesDraftController {
             itemwarehouseService.updateItemWarehouse(iw);
         }
         
+        InvoiceSalesEntity tempinvoicesales = invoicesalesService.getInvoiceSales(invoicesales.getId());
+        
         PartnerEntity partner = invoicesales.getPartner();
-        partner.setBalance(partner.getBalance() + invoicesales.getTotal_defaultcurrency());
+        partner.setBalance(partner.getBalance() + tempinvoicesales.getTotal_defaultcurrency());
         partnerService.updatePartner(partner);
         
         numbering.setCurrent(numbering.getCurrent()+1);
@@ -273,8 +274,10 @@ public class InvoiceSalesDraftController {
     public ResponseEntity<?> updateInvoiceSalesDraft(HttpServletRequest httpRequest, 
             @RequestBody InvoiceSalesDraftEntity invoicesalesdraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         invoicesalesdraft.setLastmodified(Calendar.getInstance());
         invoicesalesdraft.setWarehouse(warehouse);
@@ -310,9 +313,11 @@ public class InvoiceSalesDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         List<InvoiceSalesDraftEntity> ls = invoicesalesdraftService.
-                getInvoiceSalesDraftList(itemperpage, page, sort, keyword, user);
+                getInvoiceSalesDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -324,7 +329,9 @@ public class InvoiceSalesDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
-        return ResponseEntity.ok(invoicesalesdraftService.countInvoiceSalesDraftList(keyword, user));
+        return ResponseEntity.ok(invoicesalesdraftService.countInvoiceSalesDraftList(keyword, user, warehouse));
     }
 }

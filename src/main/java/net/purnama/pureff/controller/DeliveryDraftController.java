@@ -56,12 +56,6 @@ public class DeliveryDraftController {
     ItemDeliveryService itemdeliveryService;
     
     @Autowired
-    UserService userService;
-    
-    @Autowired
-    WarehouseService warehouseService;
-    
-    @Autowired
     MenuService menuService;
     
     @Autowired
@@ -85,8 +79,10 @@ public class DeliveryDraftController {
             headers = "Accept=application/json")
     public ResponseEntity<?> addDeliveryDraft(HttpServletRequest httpRequest){
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         MenuEntity menu = menuService.getMenu(3);
         
@@ -127,8 +123,10 @@ public class DeliveryDraftController {
     public ResponseEntity<?> updateDeliveryDraft(HttpServletRequest httpRequest,
             @RequestBody DeliveryDraftEntity deliverydraft) {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
-        WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         deliverydraft.setLastmodified(Calendar.getInstance());
         deliverydraft.setWarehouse(warehouse);
@@ -150,9 +148,11 @@ public class DeliveryDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
         List<DeliveryDraftEntity> ls = deliverydraftService.
-                getDeliveryDraftList(itemperpage, page, sort, keyword, user);
+                getDeliveryDraftList(itemperpage, page, sort, keyword, user, warehouse);
         return ResponseEntity.ok(ls);
     }
     
@@ -164,8 +164,10 @@ public class DeliveryDraftController {
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = new UserEntity();
         user.setId(JwtUtil.parseToken(header.substring(7)));
+        WarehouseEntity warehouse = new WarehouseEntity();
+        warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
-        return ResponseEntity.ok(deliverydraftService.countDeliveryDraftList(keyword, user));
+        return ResponseEntity.ok(deliverydraftService.countDeliveryDraftList(keyword, user, warehouse));
     }
     
     @RequestMapping(value = "api/closeDeliveryDraft", method = RequestMethod.GET,

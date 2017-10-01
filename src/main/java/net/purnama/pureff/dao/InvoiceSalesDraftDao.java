@@ -8,6 +8,7 @@ package net.purnama.pureff.dao;
 
 import java.util.List;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.draft.InvoiceSalesDraftEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -67,10 +68,11 @@ public class InvoiceSalesDraftDao {
     }
     
     public List getInvoiceSalesDraftList(int itemperpage, int page, String sort, 
-            String keyword, UserEntity user){
+            String keyword, UserEntity user, WarehouseEntity warehouse){
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(InvoiceSalesDraftEntity.class);
         c.add(Restrictions.eq("lastmodifiedby", user));
+        c.add(Restrictions.eq("warehouse", warehouse));
         c.add(Restrictions.like("id", "%"+keyword+"%"));
         
         if(sort.contains("-")){
@@ -86,11 +88,12 @@ public class InvoiceSalesDraftDao {
         return c.list();
     }
     
-    public int countInvoiceSalesDraftList(String keyword, UserEntity user) {
+    public int countInvoiceSalesDraftList(String keyword, UserEntity user, WarehouseEntity warehouse) {
         Session session = this.sessionFactory.getCurrentSession();
         Criteria c = session.createCriteria(InvoiceSalesDraftEntity.class);
         c.add(Restrictions.like("id", "%"+keyword+"%"));
         c.add(Restrictions.eq("lastmodifiedby", user));
+        c.add(Restrictions.eq("warehouse", warehouse));
         c.setProjection(Projections.rowCount());
         List result = c.list();
         int resultint = Integer.valueOf(result.get(0).toString());
