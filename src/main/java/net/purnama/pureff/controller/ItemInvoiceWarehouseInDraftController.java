@@ -56,7 +56,7 @@ public class ItemInvoiceWarehouseInDraftController {
             }
         }
         
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(iteminvoicewarehouseindraftlist);
     }
     
     @RequestMapping(value = "api/deleteItemInvoiceWarehouseInDraftList", method = RequestMethod.POST,

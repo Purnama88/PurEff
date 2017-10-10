@@ -7,6 +7,7 @@
 package net.purnama.pureff.controller;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.CurrencyEntity;
@@ -183,6 +184,26 @@ public class InvoiceSalesDraftController {
         else if(invoicesalesdraft.getDuedate().getTime().getDate() < invoicesalesdraft.getDate().getTime().getDate()){
             return ResponseEntity.badRequest().body("Due date is set before invoice date");
         }
+        else if(invoicesalesdraft.getPartner().getMaximumdiscount() >= 0){
+            if(invoicesalesdraft.getPartner().getMaximumdiscount() < invoicesalesdraft.getDiscount_percentage()){
+                return ResponseEntity.badRequest().body("Discount is exceeding partner's maximum discount");
+            }
+        }
+        else if(invoicesalesdraft.getLastmodifiedby().getDiscount() >= 0){
+            if(invoicesalesdraft.getLastmodifiedby().getDiscount() < invoicesalesdraft.getDiscount_percentage()){
+                return ResponseEntity.badRequest().body("You are not allowed to give such discount");
+            }
+        }
+        else if(!invoicesalesdraft.getLastmodifiedby().isDatebackward()){
+            if(invoicesalesdraft.getDate().getTime().getDate() < new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
+            }
+        }
+        else if(!invoicesalesdraft.getLastmodifiedby().isDateforward()){
+            if(invoicesalesdraft.getDate().getTime().getDate() > new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date forward");
+            }
+        }
         
         InvoiceSalesEntity invoicesales = new InvoiceSalesEntity();
         invoicesales.setId(IdGenerator.generateId());
@@ -212,6 +233,13 @@ public class InvoiceSalesDraftController {
         invoicesales.setUser_code(invoicesales.getLastmodifiedby().getCode());
         invoicesales.setWarehouse_code(invoicesales.getWarehouse().getCode());
         invoicesales.setPaid(0);
+        
+        if(invoicesales.getTotal_defaultcurrency() + 
+                invoicesales.getPartner().getBalance() > 
+                invoicesales.getPartner().getMaximumbalance()){
+            return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+        }
+        
         invoicesalesService.addInvoiceSales(invoicesales);
         
         for(ItemInvoiceSalesDraftEntity iisde : iisdelist){

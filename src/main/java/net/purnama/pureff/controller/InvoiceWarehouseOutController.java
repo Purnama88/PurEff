@@ -114,6 +114,10 @@ public class InvoiceWarehouseOutController {
             @RequestParam(value="id") String id){
         InvoiceWarehouseOutEntity invoicewarehouseout = invoicewarehouseoutService.getInvoiceWarehouseOut(id);
         
+        if(!invoicewarehouseout.isStatus()){
+            return ResponseEntity.badRequest().body("This invoice is already cancelled");
+        }
+        
         List<ItemInvoiceWarehouseOutEntity> iislist = 
                 iteminvoicewarehouseoutService.getItemInvoiceWarehouseOutList(invoicewarehouseout);
         

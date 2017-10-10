@@ -56,7 +56,7 @@ public class ItemExpensesDraftController {
             }
         }
         
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(itemexpensesdraftlist);
     }
     
     @RequestMapping(value = "api/deleteItemExpensesDraftList", method = RequestMethod.POST,

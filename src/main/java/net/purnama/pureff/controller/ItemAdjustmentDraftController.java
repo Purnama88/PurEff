@@ -42,7 +42,7 @@ public class ItemAdjustmentDraftController {
     
     @RequestMapping(value = "api/saveItemAdjustmentDraftList", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public void saveItemAdjustmentDraftList(
+    public ResponseEntity<?> saveItemAdjustmentDraftList(
             @RequestBody List<ItemAdjustmentDraftEntity> itemadjustmentdraftlist) {
         
         for(ItemAdjustmentDraftEntity itemadjustmentdraft : itemadjustmentdraftlist){
@@ -56,11 +56,13 @@ public class ItemAdjustmentDraftController {
                 }
             }
         }
+        
+        return ResponseEntity.ok(itemadjustmentdraftlist);
     }
     
     @RequestMapping(value = "api/deleteItemAdjustmentDraftList", method = RequestMethod.POST,
             headers = "Accept=application/json")
-    public void deleteItemAdjustmentDraftList(
+    public ResponseEntity<?> deleteItemAdjustmentDraftList(
             @RequestBody List<ItemAdjustmentDraftEntity> itemadjustmentdraftlist){
         
         for(ItemAdjustmentDraftEntity itemadjustmentdraft : itemadjustmentdraftlist){
@@ -70,5 +72,7 @@ public class ItemAdjustmentDraftController {
             else{
             }
         }
+        
+        return ResponseEntity.ok("");
     }
 }

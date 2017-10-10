@@ -93,6 +93,10 @@ public class DeliveryController {
             @RequestParam(value="id") String id){
         DeliveryEntity delivery = deliveryService.getDelivery(id);
         
+        if(!delivery.isStatus()){
+            return ResponseEntity.badRequest().body("This invoice is already cancelled");
+        }
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
         WarehouseEntity warehouse = warehouseService.getWarehouse(JwtUtil.parseToken2(header.substring(7)));

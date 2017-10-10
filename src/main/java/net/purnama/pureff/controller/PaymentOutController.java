@@ -149,6 +149,10 @@ public class PaymentOutController {
         
         PaymentOutEntity paymentout = paymentoutService.getPaymentOut(id);
         
+        if(!paymentout.isStatus()){
+            return ResponseEntity.badRequest().body("This invoice is already cancelled");
+        }
+        
         List<PaymentOutInvoicePurchaseEntity> poislist = 
                 paymentoutinvoicepurchaseService.getPaymentOutInvoicePurchaseEntityList(paymentout);
         

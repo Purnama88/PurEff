@@ -113,6 +113,10 @@ public class AdjustmentController {
             @RequestParam(value="id") String id){
         AdjustmentEntity adjustment = adjustmentService.getAdjustment(id);
         
+        if(!adjustment.isStatus()){
+            return ResponseEntity.badRequest().body("This invoice is already cancelled");
+        }
+        
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));
         WarehouseEntity warehouse = adjustment.getWarehouse();

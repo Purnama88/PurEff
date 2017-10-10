@@ -105,7 +105,7 @@ public class AdjustmentDraftController {
         
         Calendar date = Calendar.getInstance();
         
-        System.out.println(new IdGenerator().getAdjustmentId()  + "test");
+//        System.out.println(new IdGenerator().getAdjustmentId()  + "test");
         
         AdjustmentDraftEntity adjustmentdraft = new AdjustmentDraftEntity();
         adjustmentdraft.setId(IdGenerator.generateId());

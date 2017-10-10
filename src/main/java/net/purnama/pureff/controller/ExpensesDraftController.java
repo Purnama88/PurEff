@@ -7,6 +7,7 @@
 package net.purnama.pureff.controller;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.CurrencyEntity;
@@ -179,6 +180,26 @@ public class ExpensesDraftController {
         else if(expensesdraft.getDuedate().getTime().getDate() < expensesdraft.getDate().getTime().getDate()){
             return ResponseEntity.badRequest().body("Due date is set before invoice date");
         }
+        else if(expensesdraft.getPartner().getMaximumdiscount() >= 0){
+            if(expensesdraft.getPartner().getMaximumdiscount() < expensesdraft.getDiscount_percentage()){
+                return ResponseEntity.badRequest().body("Discount is exceeding partner's maximum discount");
+            }
+        }
+        else if(expensesdraft.getLastmodifiedby().getDiscount() >= 0){
+            if(expensesdraft.getLastmodifiedby().getDiscount() < expensesdraft.getDiscount_percentage()){
+                return ResponseEntity.badRequest().body("You are not allowed to give such discount");
+            }
+        }
+        else if(!expensesdraft.getLastmodifiedby().isDatebackward()){
+            if(expensesdraft.getDate().getTime().getDate() < new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
+            }
+        }
+        else if(!expensesdraft.getLastmodifiedby().isDateforward()){
+            if(expensesdraft.getDate().getTime().getDate() > new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date forward");
+            }
+        }
         
         ExpensesEntity expenses = new ExpensesEntity();
         expenses.setId(IdGenerator.generateId());
@@ -208,6 +229,13 @@ public class ExpensesDraftController {
         expenses.setUser_code(expenses.getLastmodifiedby().getCode());
         expenses.setWarehouse_code(expenses.getWarehouse().getCode());
         expenses.setPaid(0);
+        
+        if(expenses.getTotal_defaultcurrency() + 
+                expenses.getPartner().getBalance() > 
+                expenses.getPartner().getMaximumbalance()){
+            return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+        }
+        
         expensesService.addExpenses(expenses);
         
         for(ItemExpensesDraftEntity iisde : iisdelist){

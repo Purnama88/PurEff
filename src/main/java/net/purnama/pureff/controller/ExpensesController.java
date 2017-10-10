@@ -158,6 +158,9 @@ public class ExpensesController {
         if(!ls.isEmpty()){
             return ResponseEntity.badRequest().body("You have some payment associated with this invoice");
         }
+        else if(!expenses.isStatus()){
+            return ResponseEntity.badRequest().body("This invoice is already cancelled");
+        }
         
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         UserEntity user = userService.getUser(JwtUtil.parseToken(header.substring(7)));

@@ -21,6 +21,7 @@ import net.purnama.pureff.entity.NumberingEntity;
 import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
+import net.purnama.pureff.util.GlobalFunctions;
 
 /**
  *
@@ -223,5 +224,10 @@ public class ReturnSalesDraftEntity implements Serializable{
 
     public void setLastmodifiedby(UserEntity lastmodifiedby) {
         this.lastmodifiedby = lastmodifiedby;
+    }
+    
+    @JsonIgnore
+    public double getDiscount_percentage(){
+        return GlobalFunctions.round((discount/subtotal)*100);
     }
 }

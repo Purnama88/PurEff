@@ -138,6 +138,10 @@ public class PaymentInController {
         
         PaymentInEntity paymentin = paymentinService.getPaymentIn(id);
         
+        if(!paymentin.isStatus()){
+            return ResponseEntity.badRequest().body("This invoice is already cancelled");
+        }
+        
         List<PaymentInInvoiceSalesEntity> piislist = 
                 paymentininvoicesalesService.getPaymentInInvoiceSalesEntityList(paymentin);
         
