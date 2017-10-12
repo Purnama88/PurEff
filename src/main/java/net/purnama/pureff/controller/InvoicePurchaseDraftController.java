@@ -192,12 +192,14 @@ public class InvoicePurchaseDraftController {
                 return ResponseEntity.badRequest().body("You are not allowed to give such discount");
             }
         }
-        else if(!invoicepurchasedraft.getLastmodifiedby().isDatebackward()){
+        
+        if(!invoicepurchasedraft.getLastmodifiedby().isDatebackward()){
             if(invoicepurchasedraft.getDate().getTime().getDate() < new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date backward");
             }
         }
-        else if(!invoicepurchasedraft.getLastmodifiedby().isDateforward()){
+        
+        if(!invoicepurchasedraft.getLastmodifiedby().isDateforward()){
             if(invoicepurchasedraft.getDate().getTime().getDate() > new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date forward");
             }
@@ -232,10 +234,12 @@ public class InvoicePurchaseDraftController {
         invoicepurchase.setWarehouse_code(invoicepurchase.getWarehouse().getCode());
         invoicepurchase.setPaid(0);
         
-        if(invoicepurchase.getTotal_defaultcurrency() + 
-                invoicepurchase.getPartner().getBalance() > 
-                invoicepurchase.getPartner().getMaximumbalance()){
-            return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+        if(invoicepurchase.getPartner().getMaximumbalance() >= 0){
+            if(invoicepurchase.getTotal_defaultcurrency() + 
+                    invoicepurchase.getPartner().getBalance() > 
+                    invoicepurchase.getPartner().getMaximumbalance()){
+                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+            }
         }
         
         invoicepurchaseService.addInvoicePurchase(invoicepurchase);

@@ -190,12 +190,14 @@ public class ExpensesDraftController {
                 return ResponseEntity.badRequest().body("You are not allowed to give such discount");
             }
         }
-        else if(!expensesdraft.getLastmodifiedby().isDatebackward()){
+        
+        if(!expensesdraft.getLastmodifiedby().isDatebackward()){
             if(expensesdraft.getDate().getTime().getDate() < new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date backward");
             }
         }
-        else if(!expensesdraft.getLastmodifiedby().isDateforward()){
+        
+        if(!expensesdraft.getLastmodifiedby().isDateforward()){
             if(expensesdraft.getDate().getTime().getDate() > new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date forward");
             }
@@ -230,10 +232,12 @@ public class ExpensesDraftController {
         expenses.setWarehouse_code(expenses.getWarehouse().getCode());
         expenses.setPaid(0);
         
-        if(expenses.getTotal_defaultcurrency() + 
-                expenses.getPartner().getBalance() > 
-                expenses.getPartner().getMaximumbalance()){
-            return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+        if(expenses.getPartner().getMaximumbalance() >= 0){
+            if(expenses.getTotal_defaultcurrency() + 
+                    expenses.getPartner().getBalance() > 
+                    expenses.getPartner().getMaximumbalance()){
+                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+            }
         }
         
         expensesService.addExpenses(expenses);

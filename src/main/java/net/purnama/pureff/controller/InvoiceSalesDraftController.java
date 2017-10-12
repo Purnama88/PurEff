@@ -194,14 +194,16 @@ public class InvoiceSalesDraftController {
                 return ResponseEntity.badRequest().body("You are not allowed to give such discount");
             }
         }
-        else if(!invoicesalesdraft.getLastmodifiedby().isDatebackward()){
-            if(invoicesalesdraft.getDate().getTime().getDate() < new Date().getDate()){
-                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
-            }
-        }
-        else if(!invoicesalesdraft.getLastmodifiedby().isDateforward()){
+        
+        if(!invoicesalesdraft.getLastmodifiedby().isDateforward()){
             if(invoicesalesdraft.getDate().getTime().getDate() > new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date forward");
+            }
+        }
+        
+        if(!invoicesalesdraft.getLastmodifiedby().isDatebackward()){
+            if(invoicesalesdraft.getDate().getTime().getDate() < new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
             }
         }
         
@@ -234,10 +236,12 @@ public class InvoiceSalesDraftController {
         invoicesales.setWarehouse_code(invoicesales.getWarehouse().getCode());
         invoicesales.setPaid(0);
         
-        if(invoicesales.getTotal_defaultcurrency() + 
-                invoicesales.getPartner().getBalance() > 
-                invoicesales.getPartner().getMaximumbalance()){
-            return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+        if(invoicesales.getPartner().getMaximumbalance() >= 0){
+            if(invoicesales.getTotal_defaultcurrency() + 
+                    invoicesales.getPartner().getBalance() > 
+                    invoicesales.getPartner().getMaximumbalance()){
+                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+            }
         }
         
         invoicesalesService.addInvoiceSales(invoicesales);

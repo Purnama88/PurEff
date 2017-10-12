@@ -6,6 +6,7 @@
 package net.purnama.pureff.controller;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.CurrencyEntity;
@@ -308,6 +309,18 @@ public class PaymentOutDraftController {
         }
         else if(paymentoutdraft.getDuedate().getTime().getDate() < paymentoutdraft.getDate().getTime().getDate()){
             return ResponseEntity.badRequest().body("Due date is set before invoice date");
+        }
+        
+        if(!paymentoutdraft.getLastmodifiedby().isDateforward()){
+            if(paymentoutdraft.getDate().getTime().getDate() > new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date forward");
+            }
+        }
+        
+        if(!paymentoutdraft.getLastmodifiedby().isDatebackward()){
+            if(paymentoutdraft.getDate().getTime().getDate() < new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
+            }
         }
         
         PaymentOutEntity paymentout = new PaymentOutEntity();

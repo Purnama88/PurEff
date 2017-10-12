@@ -192,12 +192,14 @@ public class ReturnSalesDraftController {
                 return ResponseEntity.badRequest().body("You are not allowed to give such discount");
             }
         }
-        else if(!returnsalesdraft.getLastmodifiedby().isDatebackward()){
+        
+        if(!returnsalesdraft.getLastmodifiedby().isDatebackward()){
             if(returnsalesdraft.getDate().getTime().getDate() < new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date backward");
             }
         }
-        else if(!returnsalesdraft.getLastmodifiedby().isDateforward()){
+        
+        if(!returnsalesdraft.getLastmodifiedby().isDateforward()){
             if(returnsalesdraft.getDate().getTime().getDate() > new Date().getDate()){
                 return ResponseEntity.badRequest().body("You are not allowed to change date forward");
             }

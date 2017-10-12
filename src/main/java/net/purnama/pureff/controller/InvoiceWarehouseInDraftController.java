@@ -7,6 +7,7 @@
 package net.purnama.pureff.controller;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.ItemWarehouseEntity;
@@ -150,6 +151,18 @@ public class InvoiceWarehouseInDraftController {
         }
         else if(iisdelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
+        if(!invoicewarehouseindraft.getLastmodifiedby().isDateforward()){
+            if(invoicewarehouseindraft.getDate().getTime().getDate() > new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date forward");
+            }
+        }
+        
+        if(!invoicewarehouseindraft.getLastmodifiedby().isDatebackward()){
+            if(invoicewarehouseindraft.getDate().getTime().getDate() < new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
+            }
         }
         
         InvoiceWarehouseInEntity invoicewarehousein = new InvoiceWarehouseInEntity();

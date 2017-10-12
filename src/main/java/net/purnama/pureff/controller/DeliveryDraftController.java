@@ -7,6 +7,7 @@
 package net.purnama.pureff.controller;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.MenuEntity;
@@ -24,8 +25,6 @@ import net.purnama.pureff.service.ItemDeliveryDraftService;
 import net.purnama.pureff.service.ItemDeliveryService;
 import net.purnama.pureff.service.MenuService;
 import net.purnama.pureff.service.NumberingService;
-import net.purnama.pureff.service.UserService;
-import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -196,6 +195,18 @@ public class DeliveryDraftController {
         }
         else if(iddelist.isEmpty()){
             return ResponseEntity.badRequest().body("Invoice is empty");
+        }
+        
+        if(!deliverydraft.getLastmodifiedby().isDateforward()){
+            if(deliverydraft.getDate().getTime().getDate() > new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date forward");
+            }
+        }
+        
+        if(!deliverydraft.getLastmodifiedby().isDatebackward()){
+            if(deliverydraft.getDate().getTime().getDate() < new Date().getDate()){
+                return ResponseEntity.badRequest().body("You are not allowed to change date backward");
+            }
         }
         
         DeliveryEntity delivery = new DeliveryEntity();
