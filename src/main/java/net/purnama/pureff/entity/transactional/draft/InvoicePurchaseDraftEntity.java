@@ -230,4 +230,9 @@ public class InvoicePurchaseDraftEntity implements Serializable{
     public double getDiscount_percentage(){
         return GlobalFunctions.round((discount/subtotal)*100);
     }
+    
+    @JsonIgnore
+    public double getTotal_defaultcurrency(){
+        return GlobalFunctions.round((subtotal - discount - rounding + freight + tax) * rate);
+    }
 }

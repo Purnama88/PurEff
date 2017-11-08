@@ -205,6 +205,14 @@ public class InvoicePurchaseDraftController {
             }
         }
         
+        if(invoicepurchasedraft.getPartner().getMaximumbalance() >= 0){
+            if(invoicepurchasedraft.getTotal_defaultcurrency() + 
+                    invoicepurchasedraft.getPartner().getBalance() > 
+                    invoicepurchasedraft.getPartner().getMaximumbalance()){
+                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+            }
+        }
+        
         InvoicePurchaseEntity invoicepurchase = new InvoicePurchaseEntity();
         invoicepurchase.setId(IdGenerator.generateId());
         invoicepurchase.setNumber(numbering.getCurrentId());
@@ -233,14 +241,6 @@ public class InvoicePurchaseDraftController {
         invoicepurchase.setUser_code(invoicepurchase.getLastmodifiedby().getCode());
         invoicepurchase.setWarehouse_code(invoicepurchase.getWarehouse().getCode());
         invoicepurchase.setPaid(0);
-        
-        if(invoicepurchase.getPartner().getMaximumbalance() >= 0){
-            if(invoicepurchase.getTotal_defaultcurrency() + 
-                    invoicepurchase.getPartner().getBalance() > 
-                    invoicepurchase.getPartner().getMaximumbalance()){
-                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
-            }
-        }
         
         invoicepurchaseService.addInvoicePurchase(invoicepurchase);
         

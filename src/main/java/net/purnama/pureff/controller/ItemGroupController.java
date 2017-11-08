@@ -6,6 +6,7 @@
 
 package net.purnama.pureff.controller;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +58,32 @@ public class ItemGroupController {
         return ResponseEntity.ok(itemgroupService.getItemGroup(id));
     }
 
+    @RequestMapping(value = "api/addItemGroupList",method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> addItemGroupList(HttpServletRequest httpRequest,
+            @RequestBody List<ItemGroupEntity>itemgrouplist){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        List<ItemGroupEntity> returnlist = new ArrayList<>();
+        
+        for(ItemGroupEntity itemgroup : itemgrouplist){
+            itemgroup.setId(IdGenerator.generateId());
+            itemgroup.setLastmodified(Calendar.getInstance());
+            itemgroup.setLastmodifiedby(user);
+
+            try{
+                itemgroupService.addItemGroup(itemgroup);
+            }
+            catch(Exception e){
+                returnlist.add(itemgroup);
+            }
+        }
+        
+        return ResponseEntity.ok(returnlist);
+    }
+    
     @RequestMapping(value = "api/addItemGroup", method = RequestMethod.POST,
             headers = "Accept=application/json")
     public ResponseEntity<?> addItemGroup(HttpServletRequest httpRequest,

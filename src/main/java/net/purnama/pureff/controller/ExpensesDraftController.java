@@ -203,6 +203,14 @@ public class ExpensesDraftController {
             }
         }
         
+        if(expensesdraft.getPartner().getMaximumbalance() >= 0){
+            if(expensesdraft.getTotal_defaultcurrency() + 
+                    expensesdraft.getPartner().getBalance() > 
+                    expensesdraft.getPartner().getMaximumbalance()){
+                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
+            }
+        }
+        
         ExpensesEntity expenses = new ExpensesEntity();
         expenses.setId(IdGenerator.generateId());
         expenses.setNumber(numbering.getCurrentId());
@@ -231,14 +239,6 @@ public class ExpensesDraftController {
         expenses.setUser_code(expenses.getLastmodifiedby().getCode());
         expenses.setWarehouse_code(expenses.getWarehouse().getCode());
         expenses.setPaid(0);
-        
-        if(expenses.getPartner().getMaximumbalance() >= 0){
-            if(expenses.getTotal_defaultcurrency() + 
-                    expenses.getPartner().getBalance() > 
-                    expenses.getPartner().getMaximumbalance()){
-                return ResponseEntity.badRequest().body("Cannot closed this invoice because it's exceeding partner's maximum balance");
-            }
-        }
         
         expensesService.addExpenses(expenses);
         
