@@ -378,17 +378,64 @@ public class InvoiceSalesEntity implements Serializable{
     }
     
     @JsonIgnore
-    public String getFormattedTotal_after_tax(){
+    public String getFormattedtotal_after_tax(){
         return GlobalFields.NUMBERFORMAT.format(getTotal_after_tax());
     }
     
     @JsonIgnore
-    public String getFormattedDate(){
+    public String getFormatteddate(){
         return GlobalFields.DATEFORMAT.format(getDate().getTime());
     }
     
     @JsonIgnore
-    public String getFormattedDueDate(){
+    public String getFormattedduedate(){
         return GlobalFields.DATEFORMAT.format(getDuedate().getTime());
+    }
+    
+    @JsonIgnore
+    public String getFormattedstatus(){
+        
+        if(isStatus()){
+            
+            if(getRemaining() == 0){
+                return "CLOSED";
+            }
+            else{
+                return "OPEN";
+            }
+        }
+        else{
+            return "CANCELED";
+        }
+    }
+    
+    @JsonIgnore
+    public String getFormattedfreight(){
+        return GlobalFields.NUMBERFORMAT.format(getFreight());
+    }
+    
+    @JsonIgnore
+    public String getFormattedtax() {
+        return GlobalFields.NUMBERFORMAT.format(getTax());
+    }
+    
+    @JsonIgnore
+    public String getFormattedsubtotal(){
+        return GlobalFields.NUMBERFORMAT.format(getSubtotal());
+    }
+    
+    @JsonIgnore
+    public String getFormatteddiscount(){
+        return GlobalFields.NUMBERFORMAT.format(getDiscount());
+    }
+    
+    @JsonIgnore
+    public String getFormattedrate(){
+        return GlobalFields.NUMBERFORMAT.format(getRate());
+    }
+    
+    @JsonIgnore
+    public String getFormattedrounding(){
+        return GlobalFields.NUMBERFORMAT.format(getRounding());
     }
 }

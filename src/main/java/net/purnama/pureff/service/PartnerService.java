@@ -9,6 +9,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.PartnerDao;
 import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.PartnerTypeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,5 +90,10 @@ public class PartnerService {
     @Transactional
     public List getActiveNonTradeList(){
         return partnerDao.getActiveNonTradeList();
+    }
+    
+    @Transactional
+    public List getPartnerList(PartnerTypeEntity partnertype, boolean status){
+        return partnerDao.getPartnerList(partnertype, status);
     }
 }

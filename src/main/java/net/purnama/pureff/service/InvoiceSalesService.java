@@ -68,5 +68,10 @@ public class InvoiceSalesService {
             PartnerEntity partner, CurrencyEntity currency, boolean status){
         return invoicesalesDao.getInvoiceSalesList(start, end, warehouse, partner, currency, status);
     }
+    
+    @Transactional
+    public List getInvoiceSalesSumPerMonthByYearAndCurrency(int year, CurrencyEntity currency){
+        return invoicesalesDao.getInvoiceSalesSumPerMonthByYearAndCurrency(year, currency);
+    }
 }
 

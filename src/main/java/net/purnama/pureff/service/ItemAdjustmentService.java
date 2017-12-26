@@ -37,7 +37,7 @@ public class ItemAdjustmentService {
     
     @Transactional
     public List<ItemAdjustmentEntity>
-         getItemAdjustmentList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
-             return itemadjustmentDao.getItemAdjustmentList(start, end, warehouse, status);
-         }
+    getItemAdjustmentList(Calendar start, Calendar end, WarehouseEntity warehouse, boolean status){
+        return itemadjustmentDao.getItemAdjustmentList(start, end, warehouse, status);
+    }
 }

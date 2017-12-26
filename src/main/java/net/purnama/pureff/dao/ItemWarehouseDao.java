@@ -7,6 +7,7 @@ package net.purnama.pureff.dao;
 
 import java.util.List;
 import net.purnama.pureff.entity.ItemEntity;
+import net.purnama.pureff.entity.ItemGroupEntity;
 import net.purnama.pureff.entity.ItemWarehouseEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import org.hibernate.Criteria;
@@ -35,10 +36,13 @@ public class ItemWarehouseDao {
         this.sessionFactory = sessionFactory;
     }
     
-    public List<ItemWarehouseEntity> getItemWarehouseList(WarehouseEntity warehouse) {
+    public List<ItemWarehouseEntity> getItemWarehouseList() {
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria c = session.createCriteria(ItemWarehouseEntity.class);
-        c.add(Restrictions.eq("warehouse", warehouse));
+        Criteria c = session.createCriteria(ItemWarehouseEntity.class, "itemwarehouse");
+        c.createAlias("itemwarehouse.warehouse", "warehouse");
+        c.createAlias("itemwarehouse.item", "item");
+        c.addOrder(Order.desc("item.name"));
+        c.addOrder(Order.asc("warehouse.code"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }
@@ -101,4 +105,22 @@ public class ItemWarehouseDao {
         
         return resultint;
     }
+    
+    public List getItemWarehouseList(WarehouseEntity warehouse, ItemGroupEntity itemgroup,
+            boolean status){
+        
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(ItemWarehouseEntity.class);
+        if(warehouse != null){
+            c.add(Restrictions.eq("warehouse", warehouse));
+        }
+        
+        Criteria nc = c.createCriteria("item");
+        if(itemgroup != null){
+            nc.add(Restrictions.eq("itemgroup", itemgroup));
+        }
+        nc.add(Restrictions.eq("status", status));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
+    } 
 }

@@ -57,7 +57,7 @@ public class InvoiceWarehouseInDraftService {
     }
     
     @Transactional
-    public int countInvoiceWarehouseInDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){{
+    public int countInvoiceWarehouseInDraftList(String keyword, UserEntity user, WarehouseEntity warehouse){
         return invoicewarehouseindraftDao.countInvoiceWarehouseInDraftList(keyword, user, warehouse);
     }
-}}
+}

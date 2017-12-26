@@ -9,6 +9,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.ItemWarehouseDao;
 import net.purnama.pureff.entity.ItemEntity;
+import net.purnama.pureff.entity.ItemGroupEntity;
 import net.purnama.pureff.entity.ItemWarehouseEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class ItemWarehouseService {
     ItemWarehouseDao itemwarehouseDao;
 
     @Transactional
-    public List<ItemWarehouseEntity> getItemWarehouseList(WarehouseEntity warehouse) {
-            return itemwarehouseDao.getItemWarehouseList(warehouse);
+    public List<ItemWarehouseEntity> getItemWarehouseList() {
+            return itemwarehouseDao.getItemWarehouseList();
     }
 
     @Transactional
@@ -52,5 +53,11 @@ public class ItemWarehouseService {
     @Transactional
     public int countItemWarehouseList(WarehouseEntity warehouse, String keyword){
         return itemwarehouseDao.countItemWarehouseList(warehouse, keyword);
+    }
+  
+    @Transactional
+    public List getItemWarehouseList(WarehouseEntity warehouse, ItemGroupEntity itemgroup,
+            boolean status){
+        return itemwarehouseDao.getItemWarehouseList(warehouse, itemgroup, status);
     }
 }

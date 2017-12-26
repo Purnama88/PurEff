@@ -5,6 +5,7 @@
  */
 package net.purnama.pureff.entity.transactional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import net.purnama.pureff.entity.ItemEntity;
 import net.purnama.pureff.entity.UomEntity;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -135,5 +137,10 @@ public class ItemInvoiceWarehouseInEntity implements Serializable {
 
     public void setBasequantity(double basequantity) {
         this.basequantity = basequantity;
+    }
+    
+    @JsonIgnore
+    public String getFormattedquantity(){
+        return GlobalFields.NUMBERFORMAT.format(getQuantity());
     }
 }

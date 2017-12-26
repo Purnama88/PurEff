@@ -9,6 +9,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
 import net.purnama.pureff.entity.UserEntity;
 
 /**
@@ -81,7 +82,10 @@ public class JwtUtil {
         claims.put("user", user);
 //        claims.put("warehuse", warehouseid);
         
+        
+
         return Jwts.builder()
+                .setIssuedAt(new Date())
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
@@ -89,12 +93,25 @@ public class JwtUtil {
     
     public static String generateToken(String userid, String warehouseid){
         
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        
         Claims  claims = Jwts.claims().setSubject("Pur-Eff Session");
         claims.put("user", userid);
         claims.put("warehouse", warehouseid);
         
+        //if it has been specified, let's add the expiration
+//        if (ttlMillis >= 0) {
+        long expMillis = nowMillis + 1000 * 60 *30;
+        Date exp = new Date(expMillis);
+//        }
+
+        
         return Jwts.builder()
+                .setIssuer("Purnama")
                 .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(exp)
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }

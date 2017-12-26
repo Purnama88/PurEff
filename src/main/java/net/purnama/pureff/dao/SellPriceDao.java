@@ -14,6 +14,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,7 +35,11 @@ public class SellPriceDao {
     
     public List<SellPriceEntity> getSellPriceList() {
         Session session = this.sessionFactory.getCurrentSession();
-        Criteria c = session.createCriteria(SellPriceEntity.class);
+        Criteria c = session.createCriteria(SellPriceEntity.class, "sellprice");
+        c.createAlias("sellprice.item", "item");
+        c.createAlias("sellprice.uom", "uom");
+        c.addOrder(Order.desc("item.name"));
+        c.addOrder(Order.asc("uom.name"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();
     }

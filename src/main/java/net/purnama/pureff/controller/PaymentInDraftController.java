@@ -340,9 +340,9 @@ public class PaymentInDraftController {
             prs.setInvoice_id(piisd.getInvoicesales().getNumber());
             prs.setInvoice_warehouse(piisd.getInvoicesales().getWarehouse_code());
             prs.setInvoice_currency(piisd.getInvoicesales().getCurrency_code());
-            prs.setInvoice_date(piisd.getInvoicesales().getFormattedDate());
-            prs.setInvoice_duedate(piisd.getInvoicesales().getFormattedDueDate());
-            prs.setInvoice_total(piisd.getInvoicesales().getFormattedTotal_after_tax());
+            prs.setInvoice_date(piisd.getInvoicesales().getFormatteddate());
+            prs.setInvoice_duedate(piisd.getInvoicesales().getFormattedduedate());
+            prs.setInvoice_total(piisd.getInvoicesales().getFormattedtotal_after_tax());
             
             paymentininvoicesalesService.addPaymentinInvoiceSales(prs);
             
@@ -364,9 +364,9 @@ public class PaymentInDraftController {
             prs.setInvoice_id(pirsd.getReturnsales().getNumber());
             prs.setInvoice_warehouse(pirsd.getReturnsales().getWarehouse_code());
             prs.setInvoice_currency(pirsd.getReturnsales().getCurrency_code());
-            prs.setInvoice_date(pirsd.getReturnsales().getFormattedDate());
-            prs.setInvoice_duedate(pirsd.getReturnsales().getFormattedDueDate());
-            prs.setInvoice_total(pirsd.getReturnsales().getFormattedTotal_after_tax());
+            prs.setInvoice_date(pirsd.getReturnsales().getFormatteddate());
+            prs.setInvoice_duedate(pirsd.getReturnsales().getFormattedduedate());
+            prs.setInvoice_total(pirsd.getReturnsales().getFormattedtotal_after_tax());
             
             paymentinreturnsalesService.addPaymentInReturnSales(prs);
             

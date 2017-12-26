@@ -48,6 +48,7 @@ import net.purnama.pureff.service.PaymentTypeOutDraftService;
 import net.purnama.pureff.service.PaymentTypeOutService;
 import net.purnama.pureff.service.RateService;
 import net.purnama.pureff.service.ReturnPurchaseService;
+import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.GlobalFields;
 import net.purnama.pureff.util.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -362,9 +363,9 @@ public class PaymentOutDraftController {
             prs.setInvoice_id(piisd.getInvoicepurchase().getNumber());
             prs.setInvoice_warehouse(piisd.getInvoicepurchase().getWarehouse_code());
             prs.setInvoice_currency(piisd.getInvoicepurchase().getCurrency_code());
-            prs.setInvoice_date(piisd.getInvoicepurchase().getFormattedDate());
-            prs.setInvoice_duedate(piisd.getInvoicepurchase().getFormattedDueDate());
-            prs.setInvoice_total(piisd.getInvoicepurchase().getFormattedTotal_after_tax());
+            prs.setInvoice_date(piisd.getInvoicepurchase().getFormatteddate());
+            prs.setInvoice_duedate(piisd.getInvoicepurchase().getFormattedduedate());
+            prs.setInvoice_total(piisd.getInvoicepurchase().getFormattedtotal_after_tax());
             
             paymentoutinvoicepurchaseService.addPaymentOutInvoicePurchase(prs);
             
@@ -387,9 +388,9 @@ public class PaymentOutDraftController {
             prs.setInvoice_id(piisd.getExpenses().getNumber());
             prs.setInvoice_warehouse(piisd.getExpenses().getWarehouse_code());
             prs.setInvoice_currency(piisd.getExpenses().getCurrency_code());
-            prs.setInvoice_date(piisd.getExpenses().getFormattedDate());
-            prs.setInvoice_duedate(piisd.getExpenses().getFormattedDueDate());
-            prs.setInvoice_total(piisd.getExpenses().getFormattedTotal_after_tax());
+            prs.setInvoice_date(piisd.getExpenses().getFormatteddate());
+            prs.setInvoice_duedate(piisd.getExpenses().getFormattedduedate());
+            prs.setInvoice_total(piisd.getExpenses().getFormattedtotal_after_tax());
             
             paymentoutexpensesService.addPaymentOutExpenses(prs);
             
@@ -412,9 +413,9 @@ public class PaymentOutDraftController {
             prs.setInvoice_id(pirsd.getReturnpurchase().getNumber());
             prs.setInvoice_warehouse(pirsd.getReturnpurchase().getWarehouse_code());
             prs.setInvoice_currency(pirsd.getReturnpurchase().getCurrency_code());
-            prs.setInvoice_date(pirsd.getReturnpurchase().getFormattedDate());
-            prs.setInvoice_duedate(pirsd.getReturnpurchase().getFormattedDueDate());
-            prs.setInvoice_total(pirsd.getReturnpurchase().getFormattedTotal_after_tax());
+            prs.setInvoice_date(pirsd.getReturnpurchase().getFormatteddate());
+            prs.setInvoice_duedate(pirsd.getReturnpurchase().getFormattedduedate());
+            prs.setInvoice_total(pirsd.getReturnpurchase().getFormattedtotal_after_tax());
             
             paymentoutreturnpurchaseService.addPaymentOutReturnPurchase(prs);
             

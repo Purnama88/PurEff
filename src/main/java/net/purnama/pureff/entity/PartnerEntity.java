@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -235,5 +236,21 @@ public class PartnerEntity implements Serializable{
 
     public void setLastmodifiedby(UserEntity lastmodifiedby) {
         this.lastmodifiedby = lastmodifiedby;
+    }
+    
+    @JsonIgnore
+    public String getFormattedbalance(){
+        
+        return GlobalFields.NUMBERFORMAT.format(getBalance());
+    }
+    
+    @JsonIgnore
+    public String getFormattedmaximumbalance(){
+        if(getMaximumbalance() >= 0){
+            return GlobalFields.NUMBERFORMAT.format(getMaximumbalance());
+        }
+        else{
+            return "UNLIMITED";
+        }
     }
 }

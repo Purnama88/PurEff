@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -161,5 +162,10 @@ public class AdjustmentEntity implements Serializable{
 
     public void setPrinted(int printed) {
         this.printed = printed;
+    }
+    
+    @JsonIgnore
+    public String getFormatteddate(){
+        return GlobalFields.DATEFORMAT.format(getDate().getTime());
     }
 }

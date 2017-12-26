@@ -7,6 +7,7 @@ package net.purnama.pureff.dao;
 
 import java.util.List;
 import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.PartnerTypeEntity;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -168,5 +169,19 @@ public class PartnerDao {
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
+    }
+    
+    public List getPartnerList(PartnerTypeEntity partnertype,
+            boolean status){
+        
+        Session session = this.sessionFactory.getCurrentSession();
+        Criteria c = session.createCriteria(PartnerEntity.class);
+        if(partnertype != null){
+            c.add(Restrictions.eq("partnertype", partnertype));
+        }
+        
+        c.add(Restrictions.eq("status", status));
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        return c.list();
     }
 }

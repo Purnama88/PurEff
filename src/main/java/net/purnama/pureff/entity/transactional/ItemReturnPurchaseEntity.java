@@ -5,6 +5,7 @@
  */
 package net.purnama.pureff.entity.transactional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import net.purnama.pureff.entity.ItemEntity;
 import net.purnama.pureff.entity.UomEntity;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -181,4 +183,43 @@ public class ItemReturnPurchaseEntity implements Serializable {
         this.invoice_ref = invoice_ref;
     }
     
+    @JsonIgnore
+    public String getFormattedquantity(){
+        return GlobalFields.NUMBERFORMAT.format(getQuantity());
+    }
+    
+    @JsonIgnore
+    public String getFormattedprice(){
+        return GlobalFields.NUMBERFORMAT.format(getPrice());
+    }
+    
+    @JsonIgnore
+    public String getFormatteddiscount(){
+        return GlobalFields.NUMBERFORMAT.format(getDiscount());
+    }
+    
+    @JsonIgnore
+    public double getSubtotal() {
+        return getQuantity() * getPrice();
+    }
+    
+    @JsonIgnore
+    public double getDiscount_percentage() {
+        return getDiscount() / getSubtotal() * 100;
+    }
+    
+    @JsonIgnore
+    public String getFormatteddiscount_percentage(){
+        return GlobalFields.NUMBERFORMAT.format(getDiscount_percentage());
+    }
+    
+    @JsonIgnore
+    public double getTotal() {
+        return getSubtotal() - getDiscount();
+    }
+    
+    @JsonIgnore
+    public String getFormattedtotal(){
+        return GlobalFields.NUMBERFORMAT.format(getTotal());
+    }
 }

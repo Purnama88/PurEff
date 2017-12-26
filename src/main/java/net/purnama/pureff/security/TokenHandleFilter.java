@@ -45,6 +45,9 @@ public class TokenHandleFilter implements Filter{
         else{
             
             if(JwtUtil.parseToken(header.substring(7)) != null){
+                
+                httpResponse.setHeader(HttpHeaders.AUTHORIZATION, "test");
+                
                 chain.doFilter(request, response);
             }
             else{

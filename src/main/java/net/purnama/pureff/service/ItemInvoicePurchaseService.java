@@ -39,9 +39,9 @@ public class ItemInvoicePurchaseService {
     
     @Transactional
     public List<ItemInvoicePurchaseEntity>
-         getItemInvoicePurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse,
-                 PartnerEntity partner, CurrencyEntity currency, boolean status){
-         return iteminvoicepurchaseDao.getItemInvoicePurchaseList(start, end, warehouse, partner,
-                 currency, status);
+    getItemInvoicePurchaseList(Calendar start, Calendar end, WarehouseEntity warehouse,
+             PartnerEntity partner, CurrencyEntity currency, boolean status){
+        return iteminvoicepurchaseDao.getItemInvoicePurchaseList(start, end, warehouse, partner,
+                currency, status);
     }
 }

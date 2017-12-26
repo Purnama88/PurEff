@@ -6,9 +6,15 @@
 
 package net.purnama.pureff.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.convertion.IndonesianNumberConvertion;
 import net.purnama.pureff.entity.ItemEntity;
 import net.purnama.pureff.entity.ItemWarehouseEntity;
 import net.purnama.pureff.entity.UserEntity;
@@ -21,8 +27,17 @@ import net.purnama.pureff.service.ItemInvoiceWarehouseInService;
 import net.purnama.pureff.service.ItemWarehouseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.tablemodel.ItemInvoiceWarehouseInTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRTableModelDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -148,6 +163,49 @@ public class InvoiceWarehouseInController {
         invoicewarehouseinService.updateInvoiceWarehouseIn(invoicewarehousein);
         
         return ResponseEntity.ok("");
+    }
+    
+    @RequestMapping(value = {"api/getInvoiceWarehouseInPrintPage"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getInvoiceWarehouseInPrintPage(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="id") String id) throws IOException, JRException{
+        
+        InvoiceWarehouseInEntity invoicewarehousein = invoicewarehouseinService.getInvoiceWarehouseIn(id);
+        
+        List<ItemInvoiceWarehouseInEntity> list = iteminvoicewarehouseinService.getItemInvoiceWarehouseInList(invoicewarehousein);
+        
+        HashMap map = new HashMap();
+        map.put("DATE", invoicewarehousein.getFormatteddate());
+        map.put("ID", invoicewarehousein.getNumber());
+        map.put("NOTE", invoicewarehousein.getNote());
+        map.put("ORIGIN", invoicewarehousein.getOrigin_code());
+        map.put("DESTINATION", invoicewarehousein.getWarehouse_code());    
+
+        ClassLoader cldr = this.getClass().getClassLoader();
+            URL imageURL = cldr.getResource("net/purnama/template/InventoryTransfer.jasper");
+
+        InputStream is = imageURL.openStream();
+        JasperReport jr = (JasperReport) JRLoader.loadObject(is);
+
+        ItemInvoiceWarehouseInTableModel iistm = new ItemInvoiceWarehouseInTableModel(list);
+        
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jr, 
+                map,
+                new JRTableModelDataSource(iistm));
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JasperExportManager.exportReportToPdfStream(jasperPrint, baos);
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("content-disposition", "attachment; filename=InvoiceWarehouseIn-"+ invoicewarehousein.getNumber() +".pdf");
+        responseHeaders.add("Content-Type","application/octet-stream");
+
+        ResponseEntity re = new ResponseEntity(baos.toByteArray(), responseHeaders,HttpStatus.OK);
+        
+        return re;
     }
 }
 

@@ -9,7 +9,6 @@ package net.purnama.pureff.service;
 import java.util.List;
 import javax.transaction.Transactional;
 import net.purnama.pureff.dao.UserDao;
-import net.purnama.pureff.dao.WarehouseDao;
 import net.purnama.pureff.entity.RoleEntity;
 import net.purnama.pureff.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;

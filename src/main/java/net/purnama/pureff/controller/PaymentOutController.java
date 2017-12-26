@@ -5,9 +5,16 @@
  */
 package net.purnama.pureff.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import net.purnama.pureff.convertion.IndonesianNumberConvertion;
 import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.UserEntity;
@@ -21,6 +28,7 @@ import net.purnama.pureff.entity.transactional.PaymentOutReturnPurchaseEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeOutEntity;
 import net.purnama.pureff.entity.transactional.ReturnPurchaseEntity;
 import net.purnama.pureff.security.JwtUtil;
+import net.purnama.pureff.service.CurrencyService;
 import net.purnama.pureff.service.ExpensesService;
 import net.purnama.pureff.service.InvoicePurchaseService;
 import net.purnama.pureff.service.PartnerService;
@@ -32,11 +40,21 @@ import net.purnama.pureff.service.PaymentTypeOutService;
 import net.purnama.pureff.service.ReturnPurchaseService;
 import net.purnama.pureff.service.UserService;
 import net.purnama.pureff.service.WarehouseService;
+import net.purnama.pureff.tablemodel.PaymentOutTableModel2;
+import net.purnama.pureff.tablemodel.PaymentTypeOutTableModel;
 import net.purnama.pureff.util.CalendarUtil;
 import net.purnama.pureff.util.GlobalFields;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRTableModelDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -83,6 +101,9 @@ public class PaymentOutController {
     
     @Autowired
     PaymentTypeOutService paymenttypeoutService;
+    
+    @Autowired
+    CurrencyService currencyService;
     
     @RequestMapping(value = "api/getPaymentOutList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -262,5 +283,119 @@ public class PaymentOutController {
                         CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/getPaymentOutPrintPage"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"id"})
+    public ResponseEntity<?> getPaymentOutPrintPage(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="id") String id) throws IOException, JRException{
+        
+        PaymentOutEntity paymentout = paymentoutService.getPaymentOut(id);
+        
+        List<PaymentTypeOutEntity> list = paymenttypeoutService.getPaymentTypeOutList(paymentout);
+        
+        HashMap map = new HashMap();
+        map.put("DATE", paymentout.getFormatteddate());
+        map.put("ID", paymentout.getNumber());
+        map.put("CURRENCY", paymentout.getCurrency_code());
+        map.put("WAREHOUSE", paymentout.getWarehouse_code());
+        map.put("NOTE", paymentout.getNote());
+        map.put("PARTNER", paymentout.getPartner_name());
+        map.put("ADDRESS", paymentout.getPartner_address());
+        map.put("SAID", IndonesianNumberConvertion.numberToSaid(paymentout.getAmount()));
+        map.put("RATE", paymentout.getFormattedrate());
+        map.put("AMOUNT", paymentout.getFormattedamount());
+
+        ClassLoader cldr = this.getClass().getClassLoader();
+            URL imageURL = cldr.getResource("net/purnama/template/PaymentOut.jasper");
+
+        InputStream is = imageURL.openStream();
+        JasperReport jr = (JasperReport) JRLoader.loadObject(is);
+
+        PaymentTypeOutTableModel ptitm = new PaymentTypeOutTableModel(list);
+        
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jr, 
+                map,
+                new JRTableModelDataSource(ptitm));
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JasperExportManager.exportReportToPdfStream(jasperPrint, baos);
+        
+        responseHeaders.add("content-disposition", "attachment; filename=PaymentOut-"+ paymentout.getNumber() +".pdf");
+        responseHeaders.add("Content-Type","application/octet-stream");
+
+        ResponseEntity re = new ResponseEntity(baos.toByteArray(), responseHeaders,HttpStatus.OK);
+        
+        return re;
+    }
+    
+    @RequestMapping(value = {"api/getPaymentOutRecapReport"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "partnerid",
+                "currencyid", "status"})
+    public ResponseEntity<?> getPaymentOutRecapReport(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="status") boolean status) throws IOException, JRException{
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        
+        WarehouseEntity warehouse = warehouseService.getWarehouse(warehouseid);
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = currencyService.getCurrency(currencyid);
+        
+        List<PaymentOutEntity> paymentoutlist = paymentoutService.
+                getPaymentOutList(start, end, warehouse, partner, currency, status);
+        
+        double total = 0;
+                        
+        for(PaymentOutEntity invoice : paymentoutlist){
+            total += invoice.getAmount();
+        }
+        
+        PaymentOutTableModel2 istm = new PaymentOutTableModel2(paymentoutlist);
+                        
+        HashMap map = new HashMap();
+        map.put("DATE", GlobalFields.DATEFORMAT.format(new Date()));
+        map.put("CURRENCY", currency.getCode());
+        map.put("WAREHOUSE", warehouse.getCode());
+        map.put("START", GlobalFields.DATEFORMAT.format(start.getTime()));
+        map.put("END", GlobalFields.DATEFORMAT.format(end.getTime()));
+        map.put("NUMOFINVOICES", String.valueOf(paymentoutlist.size()));
+        map.put("TOTAL", GlobalFields.NUMBERFORMAT.format(total));
+        
+        ClassLoader cldr = this.getClass().getClassLoader();
+        URL imageURL = cldr.getResource("net/purnama/template/PaymentOutRecapReport.jasper");
+
+        InputStream is = imageURL.openStream();
+                        JasperReport jr = (JasperReport) JRLoader.loadObject(is);
+                        
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jr,
+            map, new JRTableModelDataSource(istm));
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JasperExportManager.exportReportToPdfStream(jasperPrint, baos);
+        
+        
+        responseHeaders.add("content-disposition", "attachment; filename=PaymentOutRecap.pdf");
+        responseHeaders.add("Content-Type","application/octet-stream");
+
+        ResponseEntity re = new ResponseEntity(baos.toByteArray(), responseHeaders,HttpStatus.OK);
+        
+        return re;
     }
 }

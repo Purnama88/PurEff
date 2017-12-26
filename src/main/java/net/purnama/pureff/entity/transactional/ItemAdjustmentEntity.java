@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import net.purnama.pureff.entity.ItemEntity;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -118,4 +119,18 @@ public class ItemAdjustmentEntity implements Serializable{
         return getQuantity() - getTstock();
     }
     
+    @JsonIgnore
+    public String getFormattedtstock() {
+        return GlobalFields.NUMBERFORMAT.format(getTstock());
+    }
+    
+    @JsonIgnore
+    public String getFormattedquantity() {
+        return GlobalFields.NUMBERFORMAT.format(getQuantity());
+    }
+    
+    @JsonIgnore
+    public String getFormatteddiff(){
+        return GlobalFields.NUMBERFORMAT.format(getDiff());
+    }
 }

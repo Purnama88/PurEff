@@ -5,16 +5,34 @@
  */
 package net.purnama.pureff.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
 import net.purnama.pureff.entity.PartnerEntity;
+import net.purnama.pureff.entity.PartnerTypeEntity;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.security.JwtUtil;
 import net.purnama.pureff.service.PartnerService;
+import net.purnama.pureff.service.PartnerTypeService;
+import net.purnama.pureff.tablemodel.PartnerTableModel;
+import net.purnama.pureff.util.GlobalFields;
 import net.purnama.pureff.util.IdGenerator;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRTableModelDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +48,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PartnerController {
     @Autowired
     PartnerService partnerService;
+    
+    @Autowired
+    PartnerTypeService partnertypeService;
     
     @RequestMapping(value = "api/getActivePartnerList", method = RequestMethod.GET, 
             headers = "Accept=application/json")
@@ -152,12 +173,76 @@ public class PartnerController {
         return ResponseEntity.ok(ls);
     }
     
-    
-    
     @RequestMapping(value = {"api/countPartnerList"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"keyword"})
     public ResponseEntity<?> countPartnerList(@RequestParam(value="keyword") String keyword){
         return ResponseEntity.ok(partnerService.countPartnerList(keyword));
+    }
+    
+    @RequestMapping(value = {"api/getPartnerList"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {
+                "partnertypeid", "status"})
+    public ResponseEntity<?> getPartnerList(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="partnertypeid") String partnertypeid,
+            @RequestParam(value="status") boolean status){
+        
+        PartnerTypeEntity partnertype = new PartnerTypeEntity();
+        partnertype.setId(partnertypeid);
+        
+        
+        List<PartnerEntity> ls = partnerService.
+                getPartnerList(partnertype, status);
+        
+        return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/getPartnerReport"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {
+                "partnertypeid", "status"})
+    public ResponseEntity<?> getPartnerReport(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="partnertypeid") String partnertypeid,
+            @RequestParam(value="status") boolean status) throws IOException, JRException{
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        
+        PartnerTypeEntity partnertype = partnertypeService.getPartnerType(partnertypeid);
+        
+        List<PartnerEntity> list = partnerService.
+                getPartnerList(partnertype, status);
+        
+        HashMap map = new HashMap();
+        map.put("DATE", GlobalFields.DATEFORMAT.format(new Date()));
+        map.put("PARTNERTYPE", partnertype.getName());
+        if(status){
+            map.put("STATUS", "ACTIVE");
+        }
+        else{
+            map.put("STATUS", "INACTIVE");
+        }
+
+        ClassLoader cldr = this.getClass().getClassLoader();
+        URL imageURL = cldr.getResource("net/purnama/template/PartnerBalanceReport.jasper");
+
+        InputStream is = imageURL.openStream();
+        JasperReport jr = (JasperReport) JRLoader.loadObject(is);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jr,
+            map, new JRTableModelDataSource(new PartnerTableModel(list)));
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JasperExportManager.exportReportToPdfStream(jasperPrint, baos);
+        
+        responseHeaders.add("content-disposition", "attachment; filename=Partner.pdf");
+        responseHeaders.add("Content-Type","application/octet-stream");
+
+        ResponseEntity re = new ResponseEntity(baos.toByteArray(), responseHeaders,HttpStatus.OK);
+        
+        return re;
     }
 }

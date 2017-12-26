@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import net.purnama.pureff.entity.UserEntity;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -184,4 +185,30 @@ public class PaymentTypeInEntity implements Serializable{
         this.lastmodifiedby = lastmodifiedby;
     }
     
+    @JsonIgnore
+    public String getFormatteddate(){
+        return GlobalFields.DATEFORMAT.format(getDate().getTime());
+    }
+    
+    @JsonIgnore
+    public String getFormattedduedate(){
+        return GlobalFields.DATEFORMAT.format(getDuedate().getTime());
+    }
+    
+    @JsonIgnore
+    public String getFormattedamount(){
+        return GlobalFields.NUMBERFORMAT.format(getAmount());
+    }
+    
+    @JsonIgnore
+    public String getFormattedtype(){
+        return PAYMENT_TYPE[getType()];
+    }
+    
+    public static final String [] PAYMENT_TYPE = {
+        "CASH",
+        "TRANSFER",
+        "CREDIT CARD",
+        "CHEQUE",
+    };
 }

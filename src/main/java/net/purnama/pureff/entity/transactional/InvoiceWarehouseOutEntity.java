@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import net.purnama.pureff.entity.UserEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
+import net.purnama.pureff.util.GlobalFields;
 
 /**
  *
@@ -197,5 +198,8 @@ public class InvoiceWarehouseOutEntity implements Serializable{
         this.lastmodifiedby = lastmodifiedby;
     }
     
-    
+    @JsonIgnore
+    public String getFormatteddate(){
+        return GlobalFields.DATEFORMAT.format(getDate().getTime());
+    }
 }

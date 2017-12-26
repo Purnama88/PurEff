@@ -19,46 +19,46 @@ import org.springframework.stereotype.Service;
 @Service("numberingnameService")
 public class NumberingNameService {
     
-    	@Autowired
-	NumberingNameDao numberingnameDao;
-	
-        @Transactional
-	public List<NumberingNameEntity> getActiveNumberingNameList() {
-		return numberingnameDao.getActiveNumberingNameList();
-	}
-        
-	@Transactional
-	public List<NumberingNameEntity> getNumberingNameList() {
-		return numberingnameDao.getNumberingNameList();
-	}
+    @Autowired
+    NumberingNameDao numberingnameDao;
 
-	@Transactional
-	public NumberingNameEntity getNumberingName(String id) {
-		return numberingnameDao.getNumberingName(id);
-	}
-        
-        @Transactional
-	public NumberingNameEntity getNumberingNameByName(String name) {
-		return numberingnameDao.getNumberingNameByName(name);
-	}
+    @Transactional
+    public List<NumberingNameEntity> getActiveNumberingNameList() {
+            return numberingnameDao.getActiveNumberingNameList();
+    }
 
-	@Transactional
-	public void addNumberingName(NumberingNameEntity numberingname) {
-		numberingnameDao.addNumberingName(numberingname);
-	}
+    @Transactional
+    public List<NumberingNameEntity> getNumberingNameList() {
+            return numberingnameDao.getNumberingNameList();
+    }
 
-	@Transactional
-	public void updateNumberingName(NumberingNameEntity numberingname) {
-		numberingnameDao.updateNumberingName(numberingname);
-	}
-        
-        @Transactional
-        public List getNumberingNameList(int itemperpage, int page, String sort, String keyword){
-            return numberingnameDao.getNumberingNameList(itemperpage, page, sort, keyword);
-        }
-        
-        @Transactional
-        public int countNumberingNameList(String keyword) {
-            return numberingnameDao.countNumberingNameList(keyword);
-        }
+    @Transactional
+    public NumberingNameEntity getNumberingName(String id) {
+            return numberingnameDao.getNumberingName(id);
+    }
+
+    @Transactional
+    public NumberingNameEntity getNumberingNameByName(String name) {
+            return numberingnameDao.getNumberingNameByName(name);
+    }
+
+    @Transactional
+    public void addNumberingName(NumberingNameEntity numberingname) {
+            numberingnameDao.addNumberingName(numberingname);
+    }
+
+    @Transactional
+    public void updateNumberingName(NumberingNameEntity numberingname) {
+            numberingnameDao.updateNumberingName(numberingname);
+    }
+
+    @Transactional
+    public List getNumberingNameList(int itemperpage, int page, String sort, String keyword){
+        return numberingnameDao.getNumberingNameList(itemperpage, page, sort, keyword);
+    }
+
+    @Transactional
+    public int countNumberingNameList(String keyword) {
+        return numberingnameDao.countNumberingNameList(keyword);
+    }
 }

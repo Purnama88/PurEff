@@ -5,8 +5,15 @@
  */
 package net.purnama.pureff.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import net.purnama.pureff.entity.CurrencyEntity;
 import net.purnama.pureff.entity.PartnerEntity;
@@ -15,13 +22,24 @@ import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.PaymentInEntity;
 import net.purnama.pureff.entity.transactional.PaymentTypeInEntity;
 import net.purnama.pureff.security.JwtUtil;
+import net.purnama.pureff.service.CurrencyService;
 import net.purnama.pureff.service.PaymentInService;
 import net.purnama.pureff.service.PaymentTypeInService;
+import net.purnama.pureff.service.WarehouseService;
 import net.purnama.pureff.util.CalendarUtil;
+import net.purnama.pureff.util.GlobalFields;
 import net.purnama.pureff.util.IdGenerator;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +59,12 @@ public class PaymentTypeInController {
     
     @Autowired
     PaymentInService paymentinService;
+    
+    @Autowired
+    WarehouseService warehouseService;
+    
+    @Autowired
+    CurrencyService currencyService;
     
     @RequestMapping(value = "api/getPaymentTypeInList", method = RequestMethod.GET, 
             headers = "Accept=application/json", params = {"paymentid"})
@@ -166,5 +190,130 @@ public class PaymentTypeInController {
                 );
         
         return ResponseEntity.ok(ls);
+    }
+    
+    @RequestMapping(value = {"api/getPaymentInDetailReport"},
+            method = RequestMethod.GET,
+            headers = "Accept=application/json", params = {"startdate", "enddate", 
+                "warehouseid", "partnerid", "currencyid"})
+    public ResponseEntity<?> getPaymentTypeDetailReport(
+            HttpServletRequest httpRequest,
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid) throws IOException, JRException{
+        
+        WarehouseEntity warehouse = warehouseService.getWarehouse(warehouseid);
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        CurrencyEntity currency = currencyService.getCurrency(currencyid);
+        
+        List<PaymentTypeInEntity> ls = paymenttypeinService.
+                getPaymentTypeInList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency);
+        
+        JRBeanCollectionDataSource beanColDataSource =
+                            new JRBeanCollectionDataSource(ls);
+
+        Map parameters = new HashMap();
+                        
+        parameters.put("WAREHOUSE", warehouse.getCode());
+        parameters.put("START", GlobalFields.DATEFORMAT.format(start.getTime()));
+        parameters.put("END", GlobalFields.DATEFORMAT.format(end.getTime()));
+        parameters.put("DATE", GlobalFields.DATEFORMAT.format(new Date()));
+        parameters.put("CURRENCY", currency.getCode());
+                        
+        ClassLoader cldr = this.getClass().getClassLoader();
+        URL imageURL = cldr.getResource("net/purnama/template/PaymentInDetailReport.jasper");
+                          
+        InputStream is = imageURL.openStream();
+        JasperReport jr = (JasperReport) JRLoader.loadObject(is);
+                        
+        JasperPrint jasperPrint = JasperFillManager.fillReport(
+                        jr, parameters, beanColDataSource);
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JasperExportManager.exportReportToPdfStream(jasperPrint, baos);
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        
+        responseHeaders.add("content-disposition", "attachment; filename=PaymentInDetail.pdf");
+        responseHeaders.add("Content-Type","application/octet-stream");
+
+        ResponseEntity re = new ResponseEntity(baos.toByteArray(), responseHeaders,HttpStatus.OK);
+        
+        return re;
+    }
+    
+    @RequestMapping(value = "api/getPaymentTypeInReport", method = RequestMethod.GET, 
+            headers = "Accept=application/json", params = {
+                "startdate", "enddate", "warehouseid", "partnerid",
+                "currencyid", "accepted", "valid", "type"})
+    public ResponseEntity<?> getPaymentTypeInReport(
+            @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
+            @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
+            @RequestParam(value="warehouseid") String warehouseid,
+            @RequestParam(value="partnerid") String partnerid,
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="accepted") boolean accepted,
+            @RequestParam(value="valid") boolean valid,
+            @RequestParam(value="type") int type) throws JRException, IOException{
+        
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+        
+        WarehouseEntity warehouse =  warehouseService.getWarehouse(warehouseid);
+        
+        CurrencyEntity currency = currencyService.getCurrency(currencyid);
+        
+        List<PaymentTypeInEntity> list = paymenttypeinService.
+                getPaymentTypeInList(CalendarUtil.toStartOfDay(start), 
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, type,
+                        valid, accepted);
+        
+        double total = 0;
+                        
+        for(PaymentTypeInEntity invoice : list){
+            total += invoice.getAmount();
+        }
+
+        JRBeanCollectionDataSource beanColDataSource =
+            new JRBeanCollectionDataSource(list);
+
+        Map parameters = new HashMap();
+
+        parameters.put("WAREHOUSE", warehouse.getCode());
+        parameters.put("START", GlobalFields.DATEFORMAT.format(start.getTime()));
+        parameters.put("END", GlobalFields.DATEFORMAT.format(end.getTime()));
+        parameters.put("DATE", GlobalFields.DATEFORMAT.format(new Date()));
+        parameters.put("CURRENCY", currency.getCode());
+        parameters.put("NUMOFINVOICES", String.valueOf(list.size()));
+        parameters.put("TOTAL", GlobalFields.NUMBERFORMAT.format(total));
+
+        ClassLoader cldr = this.getClass().getClassLoader();
+        URL imageURL = cldr.getResource("net/purnama/template/PaymentTypeInReport.jasper");
+
+        InputStream is = imageURL.openStream();
+        JasperReport jr = (JasperReport) JRLoader.loadObject(is);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(
+        jr, parameters, beanColDataSource);
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        JasperExportManager.exportReportToPdfStream(jasperPrint, baos);
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        
+        responseHeaders.add("content-disposition", "attachment; filename=PaymentTypeIn.pdf");
+        responseHeaders.add("Content-Type","application/octet-stream");
+
+        ResponseEntity re = new ResponseEntity(baos.toByteArray(), responseHeaders,HttpStatus.OK);
+        
+        return re;
     }
 }

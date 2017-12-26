@@ -13,6 +13,7 @@ import net.purnama.pureff.entity.PartnerEntity;
 import net.purnama.pureff.entity.WarehouseEntity;
 import net.purnama.pureff.entity.transactional.InvoiceSalesEntity;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -140,5 +141,17 @@ public class InvoiceSalesDao {
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         List ls = c.list();
         return ls;
+    }
+    
+    public List getInvoiceSalesSumPerMonthByYearAndCurrency(int year, CurrencyEntity currency){
+        Session session = this.sessionFactory.getCurrentSession();
+        SQLQuery query = session.createSQLQuery(
+                "SELECT month(date), SUM(subtotal - discount - rounding + freight + tax) " +
+                    "FROM pureff.invoicesales WHERE YEAR(date) = '" + year 
+                        + "' AND  currency_id = '" + currency.getId() + "' " +
+                    "GROUP BY MONTH(date)");
+        
+        
+        return query.list();
     }
 }
