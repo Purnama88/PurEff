@@ -120,11 +120,11 @@ public class PaymentTypeOutDao {
     public List<PaymentTypeOutEntity>
          getPaymentTypeOutList(Calendar start, Calendar end, WarehouseEntity warehouse, 
                  PartnerEntity partner,
-                 CurrencyEntity currency){
+                 CurrencyEntity currency, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(PaymentTypeOutEntity.class, "paymenttypeout");
-        c.createAlias("paymenttypeout.paymentout", "paymentin");
+        c.createAlias("paymenttypeout.paymentout", "paymentout");
         c.add(Restrictions.between("paymentout.date", start, end));
         if(warehouse != null){
             c.add(Restrictions.eq("paymentout.warehouse", warehouse));
@@ -135,7 +135,7 @@ public class PaymentTypeOutDao {
         if(partner != null){
             c.add(Restrictions.eq("paymentout.partner", partner));
         }
-        c.add(Restrictions.eq("paymenttypeout.valid", true));
+        c.add(Restrictions.eq("paymentout.status", status));
         c.addOrder(Order.asc("paymentout.date"));
         
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);

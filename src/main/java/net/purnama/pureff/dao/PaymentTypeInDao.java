@@ -120,7 +120,7 @@ public class PaymentTypeInDao {
     public List<PaymentTypeInEntity>
          getPaymentTypeInList(Calendar start, Calendar end, WarehouseEntity warehouse, 
                  PartnerEntity partner,
-                 CurrencyEntity currency){
+                 CurrencyEntity currency, boolean status){
         Session session = this.sessionFactory.getCurrentSession();
         
         Criteria c = session.createCriteria(PaymentTypeInEntity.class, "paymenttypein");
@@ -135,7 +135,7 @@ public class PaymentTypeInDao {
         if(partner != null){
             c.add(Restrictions.eq("paymentin.partner", partner));
         }
-        c.add(Restrictions.eq("paymenttypein.valid", true));
+        c.add(Restrictions.eq("paymentin.status", status));
         c.addOrder(Order.asc("paymentin.date"));
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         return c.list();

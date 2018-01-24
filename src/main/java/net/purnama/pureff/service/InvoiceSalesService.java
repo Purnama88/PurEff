@@ -70,8 +70,8 @@ public class InvoiceSalesService {
     }
     
     @Transactional
-    public List getInvoiceSalesSumPerMonthByYearAndCurrency(int year, CurrencyEntity currency){
-        return invoicesalesDao.getInvoiceSalesSumPerMonthByYearAndCurrency(year, currency);
+    public List getInvoiceSalesSumPerMonthByYearAndCurrency(int year, PartnerEntity partner, CurrencyEntity currency){
+        return invoicesalesDao.getInvoiceSalesSumPerMonthByYearAndCurrency(year, partner, currency);
     }
 }
 

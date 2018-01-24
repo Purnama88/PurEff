@@ -65,7 +65,7 @@ public class PaymentTypeOutService {
     @Transactional
     public List<PaymentTypeOutEntity> getPaymentTypeOutList(Calendar start, Calendar end, WarehouseEntity warehouse, 
                  PartnerEntity partner,
-                 CurrencyEntity currency){
-        return paymenttypeoutDao.getPaymentTypeOutList(start, end, warehouse, partner, currency);
+                 CurrencyEntity currency, boolean status){
+        return paymenttypeoutDao.getPaymentTypeOutList(start, end, warehouse, partner, currency, status);
     }
 }

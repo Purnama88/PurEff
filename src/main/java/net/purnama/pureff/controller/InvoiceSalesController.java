@@ -369,16 +369,20 @@ public class InvoiceSalesController {
     
     @RequestMapping(value = {"api/getInvoiceSalesSumPerMonthByYearAndCurrency"},
             method = RequestMethod.GET,
-            headers = "Accept=application/json", params = {"year",
+            headers = "Accept=application/json", params = {"year", "partnerid",
                 "currencyid"})
     public ResponseEntity<?> getInvoiceSalesSumPerMonthByYearAndCurrency(
             @RequestParam(value="year")int year,
+            @RequestParam(value="partnerid") String partnerid,
             @RequestParam(value="currencyid") String currencyid){
         
         CurrencyEntity currency = new CurrencyEntity();
         currency.setId(currencyid);
         
-        List ls = invoicesalesService.getInvoiceSalesSumPerMonthByYearAndCurrency(year, currency);
+        PartnerEntity partner = new PartnerEntity();
+        partner.setId(partnerid);
+                
+        List ls = invoicesalesService.getInvoiceSalesSumPerMonthByYearAndCurrency(year, partner, currency);
         
         return ResponseEntity.ok(ls);
         

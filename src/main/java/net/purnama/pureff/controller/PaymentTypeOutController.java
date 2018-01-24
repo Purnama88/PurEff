@@ -174,9 +174,7 @@ public class PaymentTypeOutController {
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"startdate", "enddate", 
                 "warehouseid", "partnerid",
-                "currencyid"
-//                    , "type"
-//                    , "valid", "accepted"
+                "currencyid", "status"
             })
     public ResponseEntity<?> getPaymentTypeOutList(
             HttpServletRequest httpRequest,
@@ -184,10 +182,8 @@ public class PaymentTypeOutController {
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
             @RequestParam(value="warehouseid") String warehouseid,
             @RequestParam(value="partnerid") String partnerid,
-            @RequestParam(value="currencyid") String currencyid
-//            ,@RequestParam(value="type") int type
-//            ,@RequestParam(value="valid") boolean valid,
-//            @RequestParam(value="accepted") boolean accepted
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="status") boolean status
     ){
         
         PartnerEntity partner = new PartnerEntity();
@@ -201,9 +197,7 @@ public class PaymentTypeOutController {
         
         List<PaymentTypeOutEntity> ls = paymenttypeoutService.
                 getPaymentTypeOutList(CalendarUtil.toStartOfDay(start), 
-                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency
-//                        , type
-//                        , valid, accepted
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status
                 );
         
         return ResponseEntity.ok(ls);
@@ -212,14 +206,15 @@ public class PaymentTypeOutController {
     @RequestMapping(value = {"api/getPaymentOutDetailReport"},
             method = RequestMethod.GET,
             headers = "Accept=application/json", params = {"startdate", "enddate", 
-                "warehouseid", "partnerid", "currencyid"})
+                "warehouseid", "partnerid", "currencyid", "status"})
     public ResponseEntity<?> getPaymentTypeDetailReport(
             HttpServletRequest httpRequest,
             @RequestParam(value="startdate")@DateTimeFormat(pattern="MMddyyyy") Calendar start,
             @RequestParam(value="enddate")@DateTimeFormat(pattern="MMddyyyy") Calendar end,
             @RequestParam(value="warehouseid") String warehouseid,
             @RequestParam(value="partnerid") String partnerid,
-            @RequestParam(value="currencyid") String currencyid) throws IOException, JRException{
+            @RequestParam(value="currencyid") String currencyid,
+            @RequestParam(value="status") boolean status) throws IOException, JRException{
         
         WarehouseEntity warehouse = warehouseService.getWarehouse(warehouseid);
         
@@ -230,7 +225,7 @@ public class PaymentTypeOutController {
         
         List<PaymentTypeOutEntity> ls = paymenttypeoutService.
                 getPaymentTypeOutList(CalendarUtil.toStartOfDay(start), 
-                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency);
+                        CalendarUtil.toEndOfDay(end), warehouse, partner, currency, status);
         
         JRBeanCollectionDataSource beanColDataSource =
                             new JRBeanCollectionDataSource(ls);

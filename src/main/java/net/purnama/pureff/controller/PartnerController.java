@@ -192,7 +192,6 @@ public class PartnerController {
         PartnerTypeEntity partnertype = new PartnerTypeEntity();
         partnertype.setId(partnertypeid);
         
-        
         List<PartnerEntity> ls = partnerService.
                 getPartnerList(partnertype, status);
         

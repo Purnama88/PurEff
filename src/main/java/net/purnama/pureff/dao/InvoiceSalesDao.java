@@ -143,12 +143,12 @@ public class InvoiceSalesDao {
         return ls;
     }
     
-    public List getInvoiceSalesSumPerMonthByYearAndCurrency(int year, CurrencyEntity currency){
+    public List getInvoiceSalesSumPerMonthByYearAndCurrency(int year, PartnerEntity partner, CurrencyEntity currency){
         Session session = this.sessionFactory.getCurrentSession();
         SQLQuery query = session.createSQLQuery(
                 "SELECT month(date), SUM(subtotal - discount - rounding + freight + tax) " +
                     "FROM pureff.invoicesales WHERE YEAR(date) = '" + year 
-                        + "' AND  currency_id = '" + currency.getId() + "' " +
+                        + "' AND currency_id = '" + currency.getId() + "' AND partner_id = '" + partner.getId() + "' " +
                     "GROUP BY MONTH(date)");
         
         

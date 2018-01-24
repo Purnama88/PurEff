@@ -64,7 +64,7 @@ public class PaymentTypeInService {
     @Transactional
     public List<PaymentTypeInEntity> getPaymentTypeInList(Calendar start, Calendar end, WarehouseEntity warehouse, 
                  PartnerEntity partner,
-                 CurrencyEntity currency){
-        return paymenttypeinDao.getPaymentTypeInList(start, end, warehouse, partner, currency);
+                 CurrencyEntity currency, boolean status){
+        return paymenttypeinDao.getPaymentTypeInList(start, end, warehouse, partner, currency, status);
     }
 }
