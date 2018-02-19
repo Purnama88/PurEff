@@ -6,6 +6,7 @@
 
 package net.purnama.pureff.controller;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -97,6 +98,8 @@ public class ItemController {
         WarehouseEntity warehouse = new WarehouseEntity();
         warehouse.setId(JwtUtil.parseToken2(header.substring(7)));
         
+        List<ItemEntity> returnlist = new ArrayList<>();
+        
         for(ItemEntity item : itemlist){
             ItemGroupEntity itemgroup = itemgroupService.getItemGroupByCode(item.getItemgroup().getCode());
             
@@ -157,73 +160,79 @@ public class ItemController {
             item.setStatus(true);
             item.setLastmodifiedby(user);
             
-            itemService.addItem(item);
+            try{
             
-            for(WarehouseEntity temp : warehouseService.getWarehouseList()){
-                ItemWarehouseEntity itemwarehouse = new ItemWarehouseEntity();
-                itemwarehouse.setId(IdGenerator.generateId());
-                itemwarehouse.setItem(item);
-                itemwarehouse.setLastmodified(Calendar.getInstance());
-                itemwarehouse.setLastmodifiedby(user);
-                itemwarehouse.setNote("");
-                itemwarehouse.setStatus(true);
-                itemwarehouse.setStock(0);
-                itemwarehouse.setWarehouse(temp);
-                itemwarehouseService.addItemWarehouse(itemwarehouse);
+                itemService.addItem(item);
+
+                for(WarehouseEntity temp : warehouseService.getWarehouseList()){
+                    ItemWarehouseEntity itemwarehouse = new ItemWarehouseEntity();
+                    itemwarehouse.setId(IdGenerator.generateId());
+                    itemwarehouse.setItem(item);
+                    itemwarehouse.setLastmodified(Calendar.getInstance());
+                    itemwarehouse.setLastmodifiedby(user);
+                    itemwarehouse.setNote("");
+                    itemwarehouse.setStatus(true);
+                    itemwarehouse.setStock(0);
+                    itemwarehouse.setWarehouse(temp);
+                    itemwarehouseService.addItemWarehouse(itemwarehouse);
+                }
+
+                buyuom = item.getBuyuom();
+                BuyPriceEntity buyprice = new BuyPriceEntity();
+                buyprice.setId(IdGenerator.generateId());
+                buyprice.setItem(item);
+                buyprice.setUom(buyuom);
+                buyprice.setLastmodified(Calendar.getInstance());
+                buyprice.setLastmodifiedby(user);
+                buyprice.setNote("");
+                buyprice.setStatus(true);
+                buyprice.setValue(0);
+                buypriceService.addBuyPrice(buyprice);
+
+                for(UomEntity uom : uomService.getUomList(buyuom)){
+                    BuyPriceEntity buy = new BuyPriceEntity();
+                    buy.setId(IdGenerator.generateId());
+                    buy.setItem(item);
+                    buy.setUom(uom);
+                    buy.setLastmodified(Calendar.getInstance());
+                    buy.setLastmodifiedby(user);
+                    buy.setNote("");
+                    buy.setStatus(true);
+                    buy.setValue(0);
+                    buypriceService.addBuyPrice(buy);
+                }
+
+                selluom = item.getSelluom();
+                SellPriceEntity sellprice = new SellPriceEntity();
+                sellprice.setId(IdGenerator.generateId());
+                sellprice.setItem(item);
+                sellprice.setUom(selluom);
+                sellprice.setLastmodified(Calendar.getInstance());
+                sellprice.setLastmodifiedby(user);
+                sellprice.setNote("");
+                sellprice.setStatus(true);
+                sellprice.setValue(0);
+                sellpriceService.addSellPrice(sellprice);
+
+                for(UomEntity uom : uomService.getUomList(selluom)){
+                    SellPriceEntity sell = new SellPriceEntity();
+                    sell.setId(IdGenerator.generateId());
+                    sell.setItem(item);
+                    sell.setUom(uom);
+                    sell.setLastmodified(Calendar.getInstance());
+                    sell.setLastmodifiedby(user);
+                    sell.setNote("");
+                    sell.setStatus(true);
+                    sell.setValue(0);
+                    sellpriceService.addSellPrice(sell);
+                }
             }
-            
-            buyuom = item.getBuyuom();
-            BuyPriceEntity buyprice = new BuyPriceEntity();
-            buyprice.setId(IdGenerator.generateId());
-            buyprice.setItem(item);
-            buyprice.setUom(buyuom);
-            buyprice.setLastmodified(Calendar.getInstance());
-            buyprice.setLastmodifiedby(user);
-            buyprice.setNote("");
-            buyprice.setStatus(true);
-            buyprice.setValue(0);
-            buypriceService.addBuyPrice(buyprice);
-
-            for(UomEntity uom : uomService.getUomList(buyuom)){
-                BuyPriceEntity buy = new BuyPriceEntity();
-                buy.setId(IdGenerator.generateId());
-                buy.setItem(item);
-                buy.setUom(uom);
-                buy.setLastmodified(Calendar.getInstance());
-                buy.setLastmodifiedby(user);
-                buy.setNote("");
-                buy.setStatus(true);
-                buy.setValue(0);
-                buypriceService.addBuyPrice(buy);
-            }
-
-            selluom = item.getSelluom();
-            SellPriceEntity sellprice = new SellPriceEntity();
-            sellprice.setId(IdGenerator.generateId());
-            sellprice.setItem(item);
-            sellprice.setUom(selluom);
-            sellprice.setLastmodified(Calendar.getInstance());
-            sellprice.setLastmodifiedby(user);
-            sellprice.setNote("");
-            sellprice.setStatus(true);
-            sellprice.setValue(0);
-            sellpriceService.addSellPrice(sellprice);
-
-            for(UomEntity uom : uomService.getUomList(selluom)){
-                SellPriceEntity sell = new SellPriceEntity();
-                sell.setId(IdGenerator.generateId());
-                sell.setItem(item);
-                sell.setUom(uom);
-                sell.setLastmodified(Calendar.getInstance());
-                sell.setLastmodifiedby(user);
-                sell.setNote("");
-                sell.setStatus(true);
-                sell.setValue(0);
-                sellpriceService.addSellPrice(sell);
+            catch(Exception e){
+                returnlist.add(item);
             }
         }
         
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(returnlist);
     }
     
     @RequestMapping(value = "api/addItem", method = RequestMethod.POST,

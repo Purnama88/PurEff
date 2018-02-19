@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -143,7 +144,43 @@ public class PartnerController {
         
         return ResponseEntity.ok(partner);
     }
-
+    
+    @RequestMapping(value="api/addPartnerList", method = RequestMethod.POST,
+            headers = "Accept=application/json")
+    public ResponseEntity<?> addPartnerList(HttpServletRequest httpRequest,
+            @RequestBody List<PartnerEntity> partnerlist){
+        String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        UserEntity user = new UserEntity();
+        user.setId(JwtUtil.parseToken(header.substring(7)));
+        
+        List<PartnerEntity> returnlist = new ArrayList<>();
+        
+        for(PartnerEntity partner : partnerlist){
+            PartnerTypeEntity partnertype = partnertypeService.getPartnerTypeByName(partner.getPartnertype().getName());
+            
+            if(partnertype == null){
+                returnlist.add(partner);
+            }
+            else{
+                
+                partner.setPartnertype(partnertype);
+                partner.setId(IdGenerator.generateId());
+                partner.setLastmodified(Calendar.getInstance());
+                partner.setLastmodifiedby(user);
+                
+                try{
+                    partnerService.addPartner(partner);
+                }
+                catch(Exception e){
+                    returnlist.add(partner);
+                }
+            }
+            
+        }
+        
+        return ResponseEntity.ok(returnlist);
+    }
+        
     @RequestMapping(value = "api/updatePartner", method = RequestMethod.PUT,
             headers = "Accept=application/json")
     public ResponseEntity<?> updatePartner(HttpServletRequest httpRequest,
