@@ -102,7 +102,7 @@ public class JwtUtil {
         
         //if it has been specified, let's add the expiration
 //        if (ttlMillis >= 0) {
-        long expMillis = nowMillis + 1000 * 60 *30;
+        long expMillis = nowMillis + 1000 * 60 * 5 /*5 minutes*/;
         Date exp = new Date(expMillis);
 //        }
 

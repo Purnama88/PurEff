@@ -40,18 +40,23 @@ public class TokenHandleFilter implements Filter{
         String header = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         
         if(header == null){
-            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized");
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
         else{
             
             if(JwtUtil.parseToken(header.substring(7)) != null){
                 
-                httpResponse.setHeader(HttpHeaders.AUTHORIZATION, "test");
+                String userid = JwtUtil.parseToken(header.substring(7));
+                String warehouseid = JwtUtil.parseToken(header.substring(7));
+                
+                String token = JwtUtil.generateToken(userid, warehouseid);
+                
+                httpResponse.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
                 
                 chain.doFilter(request, response);
             }
             else{
-                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized");
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             }
         }
     }
